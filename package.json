@@ -1,8 +1,8 @@
 {
   "name": "codecomfy-vscode",
   "displayName": "CodeComfy Gallery",
-  "description": "Open NextGallery for the current workspace to view ComfyUI generation outputs",
-  "version": "0.1.0",
+  "description": "Generate images and videos with ComfyUI, view outputs in NextGallery",
+  "version": "0.3.0",
   "publisher": "mcp-tool-shop",
   "author": {
     "name": "mcp-tool-shop",
@@ -24,17 +24,28 @@
     "gallery",
     "ai",
     "image generation",
+    "video generation",
     "stable diffusion"
   ],
-  "activationEvents": [
-    "onCommand:codecomfy.openGallery"
-  ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "codecomfy.openGallery",
         "title": "CodeComfy: Open Gallery"
+      },
+      {
+        "command": "codecomfy.generateImageHQ",
+        "title": "CodeComfy: Generate Image (HQ)"
+      },
+      {
+        "command": "codecomfy.generateVideoHQ",
+        "title": "CodeComfy: Generate Video (HQ)"
+      },
+      {
+        "command": "codecomfy.cancelGeneration",
+        "title": "CodeComfy: Cancel Generation"
       }
     ],
     "configuration": {
@@ -44,6 +55,21 @@
           "type": "string",
           "default": "",
           "description": "Path to NextGallery.exe. If not set, common install locations will be checked."
+        },
+        "codecomfy.comfyuiUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8188",
+          "description": "URL of the ComfyUI server."
+        },
+        "codecomfy.ffmpegPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to FFmpeg executable. If not set, common locations and PATH will be checked."
+        },
+        "codecomfy.autoOpenGalleryOnComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open NextGallery when generation completes."
         }
       }
     }

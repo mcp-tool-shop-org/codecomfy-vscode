@@ -1,0 +1,76 @@
+{
+  "id": "hq-image",
+  "name": "HQ Image",
+  "kind": "image",
+  "defaults": {
+    "width": 1024,
+    "height": 1024,
+    "steps": 30,
+    "cfg_scale": 7.0
+  },
+  "workflow": {
+    "3": {
+      "class_type": "KSampler",
+      "inputs": {
+        "cfg": 7,
+        "denoise": 1,
+        "latent_image": ["5", 0],
+        "model": ["4", 0],
+        "negative": ["7", 0],
+        "positive": ["6", 0],
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "seed": 0,
+        "steps": 30
+      }
+    },
+    "4": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "juggernautXL_v9Rundiffusionphoto2.safetensors"
+      }
+    },
+    "5": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "batch_size": 1,
+        "height": 1024,
+        "width": 1024
+      }
+    },
+    "6": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": ["4", 1],
+        "text": ""
+      },
+      "_meta": {
+        "title": "Positive Prompt"
+      }
+    },
+    "7": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": ["4", 1],
+        "text": ""
+      },
+      "_meta": {
+        "title": "Negative Prompt"
+      }
+    },
+    "8": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": ["3", 0],
+        "vae": ["4", 2]
+      }
+    },
+    "9": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "codecomfy",
+        "images": ["8", 0]
+      }
+    }
+  }
+}
