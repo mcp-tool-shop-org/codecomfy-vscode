@@ -1,0 +1,67 @@
+{
+  "name": "codecomfy-vscode",
+  "displayName": "CodeComfy Gallery",
+  "description": "Open NextGallery for the current workspace to view ComfyUI generation outputs",
+  "version": "0.1.0",
+  "publisher": "mcp-tool-shop",
+  "author": {
+    "name": "mcp-tool-shop",
+    "email": "64996768+mcp-tool-shop@users.noreply.github.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcp-tool-shop-org/codecomfy-vscode"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "comfyui",
+    "gallery",
+    "ai",
+    "image generation",
+    "stable diffusion"
+  ],
+  "activationEvents": [
+    "onCommand:codecomfy.openGallery"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codecomfy.openGallery",
+        "title": "CodeComfy: Open Gallery"
+      }
+    ],
+    "configuration": {
+      "title": "CodeComfy",
+      "properties": {
+        "codecomfy.nextGalleryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to NextGallery.exe. If not set, common install locations will be checked."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}
