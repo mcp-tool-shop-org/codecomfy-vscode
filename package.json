@@ -2,7 +2,7 @@
   "name": "codecomfy-vscode",
   "displayName": "CodeComfy Gallery",
   "description": "Generate images and videos with ComfyUI, view outputs in NextGallery",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "mcp-tool-shop",
   "author": {
     "name": "mcp-tool-shop",
