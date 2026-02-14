@@ -30,15 +30,18 @@ import {
     INDEX_SCHEMA_VERSION,
 } from '../types';
 import { findFfmpeg, assembleVideo, cleanupPartialVideo } from '../engines/ffmpeg';
+import { Logger, createNullLogger } from '../logging/logger';
 
 export interface JobRouterOptions {
     ffmpegPath?: string;
+    logger?: Logger;
 }
 
 export class JobRouter {
     private workspacePath: string;
     private engine: IGenerationEngine;
     private options: JobRouterOptions;
+    private log: Logger;
     private currentRun: JobRun | null = null;
     private cancelRequested = false;
 
@@ -46,6 +49,7 @@ export class JobRouter {
         this.workspacePath = workspacePath;
         this.engine = engine;
         this.options = options;
+        this.log = options.logger ?? createNullLogger('JobRouter');
     }
 
     /**
@@ -59,6 +63,7 @@ export class JobRouter {
         this.cancelRequested = false;
 
         const runId = this.generateRunId();
+        this.log.info(`Run ${runId} created`, `kind=${input.kind} preset=${input.preset_id}`);
 
         // For video: compute frame_count from fps and duration
         const processedInputs = { ...input.inputs };
@@ -68,6 +73,7 @@ export class JobRouter {
             processedInputs.fps = fps;
             processedInputs.duration_seconds = duration;
             processedInputs.frame_count = Math.ceil(fps * duration);
+            this.log.info(`Video params: ${duration}s @ ${fps}fps = ${processedInputs.frame_count} frames`);
         }
 
         const request: JobRequest = {
@@ -100,17 +106,21 @@ export class JobRouter {
 
         try {
             // Run ComfyUI generation
+            this.log.info(`Run ${runId} dispatching to engine "${this.engine.id}"`);
             const result = await this.engine.generate(request, preset);
 
             if (!result.success) {
+                this.log.warn(`Run ${runId} engine returned failure`, result.error);
                 return this.handleFailure(runDir, result.error, onProgress);
             }
 
             // For video: assemble frames into MP4
             let finalArtifacts: Artifact[];
             if (request.kind === 'video') {
+                this.log.info(`Run ${runId} assembling video from ${result.artifacts.length} frames`);
                 const videoResult = await this.assembleVideoFromFrames(request, result.artifacts);
                 if (!videoResult.success) {
+                    this.log.warn(`Run ${runId} video assembly failed`, videoResult.error);
                     return this.handleFailure(runDir, videoResult.error, onProgress);
                 }
                 finalArtifacts = videoResult.artifacts;
@@ -133,11 +143,14 @@ export class JobRouter {
             this.writeStatus(runDir, this.currentRun);
             onProgress?.(this.currentRun);
 
+            this.log.info(`Run ${runId} succeeded — ${finalArtifacts.length} artifact(s)`);
             return { success: true, artifacts: finalArtifacts };
         } catch (err) {
+            const errMsg = err instanceof Error ? err.message : String(err);
+            this.log.error(`Run ${runId} threw`, errMsg);
             return this.handleFailure(
                 runDir,
-                err instanceof Error ? err.message : String(err),
+                errMsg,
                 onProgress
             );
         } finally {
@@ -151,6 +164,7 @@ export class JobRouter {
      */
     async cancel(): Promise<void> {
         if (this.currentRun) {
+            this.log.warn(`Canceling run ${this.currentRun.run_id}`);
             this.cancelRequested = true;
             await this.engine.cancel();
         }

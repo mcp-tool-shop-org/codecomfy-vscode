@@ -9,6 +9,7 @@ import { getPresetRegistry } from './presets/registry';
 import { JobRequestInput, JobRun, Preset } from './types';
 import { parseSeed, validatePrompt } from './validation/inputs';
 import { validateVideoLimits } from './validation/video';
+import { createChannelLogger } from './logging/logger';
 
 /**
  * Common install locations for NextGallery on Windows
@@ -160,7 +161,8 @@ async function generateImageHQCommand(): Promise<void> {
     }
 
     const engine = new ComfyServerEngine(config.comfyuiUrl);
-    const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath });
+    const logger = createChannelLogger('JobRouter', outputChannel);
+    const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath, logger });
     currentRouter = router;
 
     const requestInput: JobRequestInput = {
@@ -253,7 +255,8 @@ async function generateVideoHQCommand(): Promise<void> {
     }
 
     const engine = new ComfyServerEngine(config.comfyuiUrl);
-    const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath });
+    const logger = createChannelLogger('JobRouter', outputChannel);
+    const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath, logger });
     currentRouter = router;
 
     const requestInput: JobRequestInput = {
