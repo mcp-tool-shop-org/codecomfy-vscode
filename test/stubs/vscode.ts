@@ -6,8 +6,6 @@
  * (run via @vscode/test-electron), not here.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export namespace workspace {
     const _config: Record<string, any> = {};
 

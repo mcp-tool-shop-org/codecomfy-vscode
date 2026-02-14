@@ -34,7 +34,7 @@ of the real `vscode` module, so they run in any Node.js environment.
 ### Run lint
 
 ```bash
-npm run lint      # eslint src --ext ts
+npm run lint      # eslint (flat config — eslint.config.mjs)
 ```
 
 Both `npm test` and `npm run lint` must pass before merging.
