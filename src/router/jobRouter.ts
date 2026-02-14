@@ -199,8 +199,8 @@ export class JobRouter {
         request: JobRequest,
         _frameArtifacts: Artifact[]
     ): Promise<{ success: boolean; artifacts: Artifact[]; error?: string }> {
-        // Find FFmpeg
-        const ffmpegPath = findFfmpeg(this.options.ffmpegPath);
+        // Find FFmpeg (async PATH probe)
+        const ffmpegPath = await findFfmpeg(this.options.ffmpegPath);
         if (!ffmpegPath) {
             return {
                 success: false,

@@ -6,7 +6,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { spawn, spawnSync } from 'child_process';
+import { spawn } from 'child_process';
 
 /**
  * Common FFmpeg locations on Windows.
@@ -18,24 +18,39 @@ const COMMON_FFMPEG_PATHS = [
 ];
 
 /**
- * Check if FFmpeg is reachable on the system PATH.
+ * Check if FFmpeg is reachable on the system PATH (async).
  *
- * On Windows `spawnSync` can resolve executables from PATH without `shell: true`
+ * On Windows, `spawn` can resolve executables from PATH without `shell: true`
  * because the OS CreateProcess API performs its own PATH search for .exe files.
  * We pass `windowsHide: true` so no console window flashes.
  */
-function isFfmpegOnPath(): boolean {
-    try {
-        const result = spawnSync('ffmpeg', ['-version'], {
-            stdio: 'pipe',
-            timeout: 5000,
-            shell: false,
-            windowsHide: true,
-        });
-        return result.status === 0;
-    } catch {
-        return false;
-    }
+function isFfmpegOnPath(): Promise<boolean> {
+    return new Promise((resolve) => {
+        try {
+            const proc = spawn('ffmpeg', ['-version'], {
+                stdio: 'pipe',
+                shell: false,
+                windowsHide: true,
+            });
+
+            const timeout = setTimeout(() => {
+                proc.kill();
+                resolve(false);
+            }, 5000);
+
+            proc.on('error', () => {
+                clearTimeout(timeout);
+                resolve(false);
+            });
+
+            proc.on('close', (code) => {
+                clearTimeout(timeout);
+                resolve(code === 0);
+            });
+        } catch {
+            resolve(false);
+        }
+    });
 }
 
 /**
@@ -44,9 +59,9 @@ function isFfmpegOnPath(): boolean {
  * Resolution order:
  *  1. Configured path (if supplied and file exists)
  *  2. Common install locations on disk
- *  3. System PATH lookup (no shell)
+ *  3. System PATH lookup (async, no shell)
  */
-export function findFfmpeg(configuredPath?: string): string | undefined {
+export async function findFfmpeg(configuredPath?: string): Promise<string | undefined> {
     // 1. Configured path
     if (configuredPath && configuredPath !== 'ffmpeg' && fs.existsSync(configuredPath)) {
         return configuredPath;
@@ -61,7 +76,7 @@ export function findFfmpeg(configuredPath?: string): string | undefined {
 
     // 3. System PATH — the 'ffmpeg' bare name is safe to pass to spawn()
     //    on Windows because Node's spawn resolves .exe via PATH without shell.
-    if (isFfmpegOnPath()) {
+    if (await isFfmpegOnPath()) {
         return 'ffmpeg';
     }
 

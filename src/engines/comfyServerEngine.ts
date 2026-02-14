@@ -11,6 +11,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import {
     IGenerationEngine,
     GenerationResult,
@@ -115,7 +117,7 @@ export class ComfyServerEngine implements IGenerationEngine {
             return {
                 success: false,
                 artifacts: [],
-                error: err instanceof Error ? err.message : String(err),
+                error: categorizeError(err),
             };
         } finally {
             this.currentPromptId = null;
@@ -280,22 +282,21 @@ export class ComfyServerEngine implements IGenerationEngine {
             if (!nodeOutput.images) continue;
 
             for (const img of nodeOutput.images) {
-                const imageData = await this.downloadImage(img.filename, img.subfolder, img.type);
-                if (!imageData) continue;
-
                 const ext = path.extname(img.filename) || '.png';
                 const outputFilename = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
                 const outputPath = path.join(outputDir, outputFilename);
 
-                fs.writeFileSync(outputPath, imageData);
+                const sizeBytes = await this.downloadToFile(
+                    img.filename, img.subfolder, img.type, outputPath,
+                );
+                if (sizeBytes === null) continue;
 
                 const relativePath = path.join(CODECOMFY_DIR, OUTPUTS_DIR, outputFilename);
-                const stats = fs.statSync(outputPath);
 
                 artifacts.push({
                     type: 'image',
                     path: relativePath.replace(/\\/g, '/'),
-                    size_bytes: stats.size,
+                    size_bytes: sizeBytes,
                     provenance: { seed: request.inputs.seed },
                 });
             }
@@ -332,15 +333,15 @@ export class ComfyServerEngine implements IGenerationEngine {
         // Sort images by filename to preserve order
         allImages.sort((a, b) => a.filename.localeCompare(b.filename));
 
-        // Download and save each frame
+        // Download and save each frame (streamed to disk)
         for (let i = 0; i < allImages.length; i++) {
             const img = allImages[i];
-            const imageData = await this.downloadImage(img.filename, img.subfolder, img.type);
-            if (!imageData) continue;
-
-            // Save with original filename (will be renamed by FFmpeg assembler)
             const outputPath = path.join(framesDir, img.filename);
-            fs.writeFileSync(outputPath, imageData);
+
+            const sizeBytes = await this.downloadToFile(
+                img.filename, img.subfolder, img.type, outputPath,
+            );
+            if (sizeBytes === null) continue;
 
             // Relative path for artifact
             const relativePath = path.join(
@@ -354,18 +355,26 @@ export class ComfyServerEngine implements IGenerationEngine {
             artifacts.push({
                 type: 'image', // Frames are images; router assembles into video
                 path: relativePath.replace(/\\/g, '/'),
-                size_bytes: imageData.length,
+                size_bytes: sizeBytes,
             });
         }
 
         return artifacts;
     }
 
-    private async downloadImage(
+    /**
+     * Stream an image from ComfyUI directly to disk.
+     *
+     * Returns the file size on success, or null on failure.
+     * Writes to a temp file first, then renames — avoids partial files on error.
+     */
+    private async downloadToFile(
         filename: string,
         subfolder: string,
-        type: string
-    ): Promise<Buffer | null> {
+        type: string,
+        destPath: string,
+    ): Promise<number | null> {
+        const tmpPath = `${destPath}.tmp.${Date.now()}`;
         try {
             const params = new URLSearchParams({
                 filename,
@@ -378,9 +387,23 @@ export class ComfyServerEngine implements IGenerationEngine {
                 return null;
             }
 
-            const arrayBuffer = await response.arrayBuffer();
-            return Buffer.from(arrayBuffer);
+            if (!response.body) {
+                return null;
+            }
+
+            // Stream response body → temp file
+            const nodeStream = Readable.fromWeb(response.body as any);
+            const fileStream = fs.createWriteStream(tmpPath);
+            await pipeline(nodeStream, fileStream);
+
+            // Atomic rename
+            fs.renameSync(tmpPath, destPath);
+
+            const stats = fs.statSync(destPath);
+            return stats.size;
         } catch {
+            // Clean up partial temp file
+            try { if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath); } catch { /* ignore */ }
             return null;
         }
     }
@@ -388,4 +411,45 @@ export class ComfyServerEngine implements IGenerationEngine {
     private sleep(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
+}
+
+// ── Error categorisation ──────────────────────────────────────────────────────
+
+/**
+ * Categorise an error into a user-friendly message with an action hint.
+ */
+export function categorizeError(err: unknown): string {
+    const raw = err instanceof Error ? err.message : String(err);
+
+    // Network / connectivity
+    if (
+        raw.includes('ECONNREFUSED') ||
+        raw.includes('ECONNRESET') ||
+        raw.includes('ETIMEDOUT') ||
+        raw.includes('fetch failed')
+    ) {
+        return `[Network] ${raw}. Check that ComfyUI is running and codecomfy.comfyuiUrl is correct.`;
+    }
+
+    // Server-side HTTP errors
+    if (raw.includes('ComfyUI error (HTTP')) {
+        return `[Server] ${raw}. The ComfyUI server returned an error — check the ComfyUI console for details.`;
+    }
+
+    // Response shape / validation
+    if (raw.includes('response invalid') || raw.includes('ComfyResponseError')) {
+        return `[API] ${raw}. The ComfyUI response had an unexpected shape — you may be running an incompatible version.`;
+    }
+
+    // File system / IO
+    if (
+        raw.includes('ENOENT') ||
+        raw.includes('EACCES') ||
+        raw.includes('EPERM') ||
+        raw.includes('ENOSPC')
+    ) {
+        return `[IO] ${raw}. Check disk space and file permissions for the workspace folder.`;
+    }
+
+    return raw;
 }
