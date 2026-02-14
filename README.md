@@ -62,22 +62,12 @@ Open **Settings → Extensions → CodeComfy** or add to `settings.json`:
    - `CodeComfy: Generate Video (HQ)` — short video (2–8 s)
 3. **Enter a prompt** (and optionally a seed), then watch the status bar.
 
-<!-- Replace these SVG placeholders with real PNGs once you have them -->
-<p align="center">
-  <img src="assets/screenshot-command-palette.svg" alt="Command Palette" width="600" />
-</p>
+<!-- Screenshots: replace with real PNGs — see assets/SCREENSHOTS.md -->
 
-The status bar shows real-time progress:
+The **status bar** shows real-time progress (queued → generating → done).
 
-<p align="center">
-  <img src="assets/screenshot-statusbar.svg" alt="Status bar" width="600" />
-</p>
-
-Structured logs appear in the **CodeComfy** Output channel:
-
-<p align="center">
-  <img src="assets/screenshot-output.svg" alt="Output channel" width="600" />
-</p>
+Structured logs appear in the **CodeComfy** Output channel
+(`Ctrl+Shift+U`, then select "CodeComfy").
 
 Outputs are saved to `.codecomfy/outputs/` in your workspace root.
 Run metadata lives in `.codecomfy/runs/`.

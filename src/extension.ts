@@ -87,7 +87,10 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('codecomfy.openGallery', openGalleryCommand),
         vscode.commands.registerCommand('codecomfy.generateImageHQ', generateImageHQCommand),
         vscode.commands.registerCommand('codecomfy.generateVideoHQ', generateVideoHQCommand),
-        vscode.commands.registerCommand('codecomfy.cancelGeneration', cancelGenerationCommand)
+        vscode.commands.registerCommand('codecomfy.cancelGeneration', cancelGenerationCommand),
+        vscode.commands.registerCommand('codecomfy.openOutputChannel', () => {
+            outputChannel.show(true);
+        })
     );
 }
 

@@ -9,6 +9,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-02-14
+
 ### Added
 - Exponential backoff + jitter for ComfyUI polling (1 s → 8 s cap, ±20 % jitter)
 - Runtime shape guards for `/prompt` and `/history` API responses (`ComfyResponseError`)
@@ -16,10 +18,24 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Run history pruning — keeps last 200 runs / 30 days, prunes folders + index entries
 - Streaming downloads — images and frames are piped directly to disk
 - Async FFmpeg PATH probe (replaced `spawnSync`)
-- Categorised error messages: `[Network]`, `[Server]`, `[API]`, `[IO]`
+- Categorised error messages: `[Network]`, `[Server]`, `[API]`, `[IO]` with troubleshooting links
 - Comprehensive README with prerequisites, install steps, quickstart, and troubleshooting
-- Visual assets (SVG placeholders for command palette, status bar, output channel)
+- Extension icon and branding (orange couch + code brackets)
 - Marketplace metadata polish (categories, keywords, icon, homepage, bugs URL)
+- `CodeComfy: Open Output Channel` command
+- Cross-platform FFmpeg and NextGallery path detection (macOS, Linux)
+- Known Limitations section in README
+
+### Changed
+- Dev dependencies modernised: ESLint 9 (flat config), TypeScript 5.8, `@vscode/vsce` 3.x
+- Migrated `.eslintrc.json` → `eslint.config.mjs`
+- Path-filtered CI workflow (skips doc-only pushes)
+- Release workflow gains CHANGELOG version verification and Marketplace publish step
+- `.vscodeignore` tuned — VSIX reduced to ~69 KB
+
+### Security
+- Resolved `qs` vulnerability by upgrading `@vscode/vsce` to 3.x
+- `npm audit` clean (0 vulnerabilities)
 
 ## [0.4.0] - 2026-02-01
 

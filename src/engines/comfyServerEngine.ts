@@ -418,6 +418,8 @@ export class ComfyServerEngine implements IGenerationEngine {
 /**
  * Categorise an error into a user-friendly message with an action hint.
  */
+const TROUBLESHOOTING_URL = 'https://github.com/mcp-tool-shop-org/codecomfy-vscode#troubleshooting';
+
 export function categorizeError(err: unknown): string {
     const raw = err instanceof Error ? err.message : String(err);
 
@@ -428,17 +430,17 @@ export function categorizeError(err: unknown): string {
         raw.includes('ETIMEDOUT') ||
         raw.includes('fetch failed')
     ) {
-        return `[Network] ${raw}. Check that ComfyUI is running and codecomfy.comfyuiUrl is correct.`;
+        return `[Network] ${raw}. Check that ComfyUI is running and codecomfy.comfyuiUrl is correct. See ${TROUBLESHOOTING_URL}`;
     }
 
     // Server-side HTTP errors
     if (raw.includes('ComfyUI error (HTTP')) {
-        return `[Server] ${raw}. The ComfyUI server returned an error — check the ComfyUI console for details.`;
+        return `[Server] ${raw}. The ComfyUI server returned an error — check the ComfyUI console for details. See ${TROUBLESHOOTING_URL}`;
     }
 
     // Response shape / validation
     if (raw.includes('response invalid') || raw.includes('ComfyResponseError')) {
-        return `[API] ${raw}. The ComfyUI response had an unexpected shape — you may be running an incompatible version.`;
+        return `[API] ${raw}. The ComfyUI response had an unexpected shape — you may be running an incompatible version. See ${TROUBLESHOOTING_URL}`;
     }
 
     // File system / IO
@@ -448,7 +450,7 @@ export function categorizeError(err: unknown): string {
         raw.includes('EPERM') ||
         raw.includes('ENOSPC')
     ) {
-        return `[IO] ${raw}. Check disk space and file permissions for the workspace folder.`;
+        return `[IO] ${raw}. Check disk space and file permissions for the workspace folder. See ${TROUBLESHOOTING_URL}`;
     }
 
     return raw;
