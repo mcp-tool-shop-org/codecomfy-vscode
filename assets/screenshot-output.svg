@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="140" viewBox="0 0 640 140">
+  <rect width="640" height="140" rx="8" fill="#1e1e1e" stroke="#3c3c3c" stroke-width="1"/>
+  <text x="16" y="28" fill="#808080" font-family="monospace" font-size="11">[2026-02-14T12:00:00Z] INFO  [JobRouter] Run m1a2b3_cafe created</text>
+  <text x="16" y="48" fill="#808080" font-family="monospace" font-size="11">[2026-02-14T12:00:00Z] INFO  [JobRouter] Run m1a2b3_cafe dispatching to engine "comfy-server"</text>
+  <text x="16" y="68" fill="#808080" font-family="monospace" font-size="11">[2026-02-14T12:00:05Z] INFO  [JobRouter] Run m1a2b3_cafe succeeded - 1 artifact(s)</text>
+  <text x="16" y="88" fill="#569cd6" font-family="monospace" font-size="11">Generation complete! 1 image(s) created.</text>
+  <text x="16" y="108" fill="#569cd6" font-family="monospace" font-size="11">  - .codecomfy/outputs/1707900005_a1b2c3d4.png</text>
+</svg>
