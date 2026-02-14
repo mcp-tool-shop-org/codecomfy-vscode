@@ -21,6 +21,7 @@ import {
     OUTPUTS_DIR,
     RUNS_DIR,
 } from '../types';
+import { BackoffTimer } from '../polling/backoff';
 
 interface ComfyPromptResponse {
     prompt_id: string;
@@ -227,7 +228,7 @@ export class ComfyServerEngine implements IGenerationEngine {
 
     private async pollForCompletion(promptId: string, timeoutMs = 300000): Promise<ComfyHistoryEntry | null> {
         const startTime = Date.now();
-        const pollInterval = 1000;
+        const backoff = new BackoffTimer();
 
         while (Date.now() - startTime < timeoutMs) {
             if (this.canceled) {
@@ -237,7 +238,7 @@ export class ComfyServerEngine implements IGenerationEngine {
             try {
                 const response = await fetch(`${this.serverUrl}/history/${promptId}`);
                 if (!response.ok) {
-                    await this.sleep(pollInterval);
+                    await this.sleep(backoff.next());
                     continue;
                 }
 
@@ -247,11 +248,16 @@ export class ComfyServerEngine implements IGenerationEngine {
                 if (entry?.status?.completed) {
                     return entry;
                 }
+
+                // Entry exists but not completed — progress detected, reset backoff
+                if (entry) {
+                    backoff.reset();
+                }
             } catch {
-                // Continue polling on error
+                // Network error — let backoff grow
             }
 
-            await this.sleep(pollInterval);
+            await this.sleep(backoff.next());
         }
 
         return null;
