@@ -31,6 +31,7 @@ import {
 } from '../types';
 import { findFfmpeg, assembleVideo, cleanupPartialVideo } from '../engines/ffmpeg';
 import { Logger, createNullLogger } from '../logging/logger';
+import { pruneRuns } from '../pruning/pruner';
 
 export interface JobRouterOptions {
     ffmpegPath?: string;
@@ -144,6 +145,19 @@ export class JobRouter {
             onProgress?.(this.currentRun);
 
             this.log.info(`Run ${runId} succeeded — ${finalArtifacts.length} artifact(s)`);
+
+            // Best-effort pruning — never let it fail the run
+            try {
+                const pruneResult = pruneRuns(this.workspacePath, { logger: this.log });
+                if (pruneResult.prunedRuns > 0) {
+                    this.log.info(
+                        `Pruned ${pruneResult.prunedRuns} old run(s), ${pruneResult.prunedIndexEntries} index entries`,
+                    );
+                }
+            } catch (pruneErr) {
+                this.log.warn('Pruning failed (non-fatal)', String(pruneErr));
+            }
+
             return { success: true, artifacts: finalArtifacts };
         } catch (err) {
             const errMsg = err instanceof Error ? err.message : String(err);
