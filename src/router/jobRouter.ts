@@ -169,7 +169,7 @@ export class JobRouter {
 
     private async assembleVideoFromFrames(
         request: JobRequest,
-        frameArtifacts: Artifact[]
+        _frameArtifacts: Artifact[]
     ): Promise<{ success: boolean; artifacts: Artifact[]; error?: string }> {
         // Find FFmpeg
         const ffmpegPath = findFfmpeg(this.options.ffmpegPath);

@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -22,9 +23,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Compile
+      # ── Quality gates (fail fast before packaging) ────────────────
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Compile (production)
         run: npm run compile
 
+      # ── Version consistency check ─────────────────────────────────
+      - name: Verify tag matches package.json version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag version (v${TAG_VERSION}) does not match package.json version (${PKG_VERSION})"
+            exit 1
+          fi
+          echo "✓ Tag v${TAG_VERSION} matches package.json ${PKG_VERSION}"
+
+      # ── Package + Release ─────────────────────────────────────────
       - name: Package VSIX
         run: npx vsce package
 
@@ -37,6 +58,7 @@ jobs:
           sha256sum codecomfy-vscode-${{ steps.version.outputs.version }}.vsix > SHA256SUMS.txt
 
       - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
           files: |
