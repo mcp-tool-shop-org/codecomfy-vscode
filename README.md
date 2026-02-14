@@ -1,45 +1,67 @@
-# CodeComfy Gallery for VS Code
+# CodeComfy — ComfyUI generation from VS Code
 
-Open [NextGallery](https://github.com/mcp-tool-shop-org/next-gallery) to view ComfyUI generation outputs for the current workspace.
+Generate images and videos with ComfyUI without leaving your editor.
+Pick a preset, type a prompt, and watch the status bar while CodeComfy
+handles the workflow submission, polling, frame download, and FFmpeg assembly.
 
-## Features
+> **Windows-first.** Tested on Windows 10/11. macOS + Linux support is planned
+> but not yet validated — PRs welcome.
 
-- **One command**: `CodeComfy: Open Gallery` launches NextGallery for your current workspace
-- **Single-instance routing**: If a gallery is already open for the workspace, it activates the existing window
-- **Multi-root workspaces**: Uses the first workspace folder
+---
 
-## Requirements
+## Prerequisites
 
-- [NextGallery](https://github.com/mcp-tool-shop-org/next-gallery) installed on Windows
-- A workspace folder with CodeComfy outputs (`.codecomfy/outputs/index.json`)
+| Dependency | Required | Notes |
+|------------|----------|-------|
+| **ComfyUI** | Yes | Running locally (`http://127.0.0.1:8188`) or on a remote machine. CodeComfy talks to its HTTP API. |
+| **FFmpeg**  | For video | Must be on your system PATH *or* configured via `codecomfy.ffmpegPath`. [Download FFmpeg](https://ffmpeg.org/download.html). |
+| **NextGallery** | Optional | Companion gallery viewer. Not required for generation itself. |
 
-## Usage
+## Installation
 
-1. Open a workspace folder in VS Code
-2. Run `CodeComfy: Open Gallery` from the Command Palette (`Ctrl+Shift+P`)
-3. NextGallery opens showing your generation outputs
+CodeComfy is not yet on the VS Code Marketplace.
+Install from a `.vsix` file:
 
-## Configuration
+1. Download the latest `.vsix` from
+   [Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases).
+2. In VS Code: **Extensions** sidebar → `···` menu → **Install from VSIX…**
+3. Reload the window when prompted.
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `codecomfy.nextGalleryPath` | Path to NextGallery.exe | Auto-detect common locations |
+### Settings
 
-If NextGallery isn't found automatically, set the path manually:
+Open **Settings → Extensions → CodeComfy** or add to `settings.json`:
 
 ```json
 {
-  "codecomfy.nextGalleryPath": "C:\\path\\to\\NextGallery.exe"
+  "codecomfy.comfyuiUrl": "http://127.0.0.1:8188",
+  "codecomfy.ffmpegPath": "",
+  "codecomfy.autoOpenGalleryOnComplete": true,
+  "codecomfy.nextGalleryPath": ""
 }
 ```
 
-## How It Works
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `codecomfy.comfyuiUrl` | ComfyUI server URL | `http://127.0.0.1:8188` |
+| `codecomfy.ffmpegPath` | Absolute path to FFmpeg executable (leave empty for PATH lookup) | `""` |
+| `codecomfy.autoOpenGalleryOnComplete` | Open NextGallery after generation finishes | `true` |
+| `codecomfy.nextGalleryPath` | Absolute path to NextGallery.exe | Auto-detect |
 
-The extension launches NextGallery with `--workspace <path>` pointing to your current VS Code workspace. NextGallery handles:
+## Quickstart
 
-- Workspace key computation (SHA256-based)
-- Single-instance routing via named pipes and mutex
-- Index file loading and display
+1. **Start ComfyUI** — make sure it is running and reachable.
+2. **Pick a command** — open the Command Palette (`Ctrl+Shift+P`) and choose:
+   - `CodeComfy: Generate Image (HQ)` — single image
+   - `CodeComfy: Generate Video (HQ)` — short video (2–8 s)
+3. **Enter a prompt** (and optionally a seed), then watch the status bar.
+
+Outputs are saved to `.codecomfy/outputs/` in your workspace root.
+Run metadata lives in `.codecomfy/runs/`.
+
+### Cancel
+
+Run `CodeComfy: Cancel Generation` from the Command Palette or click the
+status bar item while a generation is in progress.
 
 ## Generation Limits
 
@@ -55,9 +77,67 @@ If you hit a limit, reduce the duration or choose a preset with a lower frame ra
 
 ## Troubleshooting
 
-- **FFmpeg not found** — Install FFmpeg and ensure it is on your system PATH, or set `codecomfy.ffmpegPath` to the full absolute path (e.g. `C:\ffmpeg\bin\ffmpeg.exe`). Relative paths are rejected for security.
-- **"Generation already running"** — Only one generation can run at a time. Cancel the current one (`CodeComfy: Cancel Generation`) or wait for it to finish. There is a short cooldown between jobs.
-- **Seed / prompt errors** — Seeds must be whole numbers between 0 and 2 147 483 647. Prompts must be non-empty and at most 8 000 characters.
+### `[Network]` — Can't reach ComfyUI server
+
+- Is ComfyUI running? Check `http://127.0.0.1:8188/system_stats` in a browser.
+- If ComfyUI is on a different port or host, update `codecomfy.comfyuiUrl`.
+- Firewall or proxy blocking the connection? Try `curl http://127.0.0.1:8188/system_stats`.
+
+### `[Server]` — ComfyUI returned an error
+
+- Check the ComfyUI terminal/console for stack traces.
+- Common cause: missing model checkpoint or custom node.
+- Ensure your ComfyUI has the nodes required by the preset workflow.
+
+### `[API]` — Response shape error
+
+- Your ComfyUI version may be too old or too new for the bundled presets.
+- A reverse proxy or CDN may be mangling JSON responses.
+- Try hitting `/prompt` and `/history` directly to inspect the response shape.
+
+### `[IO]` — File permission or disk issues
+
+- Ensure your workspace folder is writable.
+- Check available disk space — frame downloads can be large for video.
+- On Windows, avoid workspaces on network drives for best performance.
+
+### FFmpeg not found
+
+- Install FFmpeg and ensure `ffmpeg.exe` is on your system PATH.
+- Or set `codecomfy.ffmpegPath` to the **full absolute path** (e.g. `C:\ffmpeg\bin\ffmpeg.exe`).
+- Relative paths and bare names (other than the PATH-resolved `ffmpeg`) are rejected for security.
+
+### "Generation already running"
+
+Only one generation can run at a time.
+Cancel the current one (`CodeComfy: Cancel Generation`) or wait for it to finish.
+There is a 2-second cooldown between consecutive jobs.
+
+### Seed / prompt validation
+
+- Seeds must be whole numbers between 0 and 2,147,483,647.
+- Prompts must be non-empty and at most 8,000 characters.
+
+## How It Works
+
+```
+Command Palette
+   │
+   ▼
+extension.ts  ─── validates inputs, creates JobRouter
+   │
+   ▼
+JobRouter     ─── creates run folder, tracks lifecycle
+   │
+   ▼
+ComfyServerEngine ─── POST /prompt → poll /history → stream /view
+   │
+   ▼
+FFmpeg        ─── (video only) assemble frames → MP4
+   │
+   ▼
+.codecomfy/outputs/index.json  ─── atomic index update
+```
 
 ## License
 
