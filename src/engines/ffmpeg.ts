@@ -6,46 +6,63 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 
 /**
  * Common FFmpeg locations on Windows.
  */
 const COMMON_FFMPEG_PATHS = [
-    'ffmpeg', // On PATH
     path.join(process.env.LOCALAPPDATA || '', 'Programs', 'ffmpeg', 'bin', 'ffmpeg.exe'),
     path.join(process.env.PROGRAMFILES || '', 'ffmpeg', 'bin', 'ffmpeg.exe'),
     'C:\\ffmpeg\\bin\\ffmpeg.exe',
 ];
 
 /**
+ * Check if FFmpeg is reachable on the system PATH.
+ *
+ * On Windows `spawnSync` can resolve executables from PATH without `shell: true`
+ * because the OS CreateProcess API performs its own PATH search for .exe files.
+ * We pass `windowsHide: true` so no console window flashes.
+ */
+function isFfmpegOnPath(): boolean {
+    try {
+        const result = spawnSync('ffmpeg', ['-version'], {
+            stdio: 'pipe',
+            timeout: 5000,
+            shell: false,
+            windowsHide: true,
+        });
+        return result.status === 0;
+    } catch {
+        return false;
+    }
+}
+
+/**
  * Find FFmpeg executable.
+ *
+ * Resolution order:
+ *  1. Configured path (if supplied and file exists)
+ *  2. Common install locations on disk
+ *  3. System PATH lookup (no shell)
  */
 export function findFfmpeg(configuredPath?: string): string | undefined {
-    // Check configured path first
-    if (configuredPath && fs.existsSync(configuredPath)) {
+    // 1. Configured path
+    if (configuredPath && configuredPath !== 'ffmpeg' && fs.existsSync(configuredPath)) {
         return configuredPath;
     }
 
-    // Try common locations
+    // 2. Common filesystem locations
     for (const candidate of COMMON_FFMPEG_PATHS) {
-        if (candidate === 'ffmpeg') {
-            // Check if on PATH by trying to run it
-            try {
-                const result = require('child_process').spawnSync('ffmpeg', ['-version'], {
-                    stdio: 'pipe',
-                    timeout: 5000,
-                    shell: true,
-                });
-                if (result.status === 0) {
-                    return 'ffmpeg';
-                }
-            } catch {
-                continue;
-            }
-        } else if (fs.existsSync(candidate)) {
+        if (candidate && fs.existsSync(candidate)) {
             return candidate;
         }
+    }
+
+    // 3. System PATH — the 'ffmpeg' bare name is safe to pass to spawn()
+    //    on Windows because Node's spawn resolves .exe via PATH without shell.
+    if (isFfmpegOnPath()) {
+        return 'ffmpeg';
     }
 
     return undefined;
@@ -189,7 +206,8 @@ function runFfmpeg(ffmpegPath: string, args: string[]): Promise<{ success: boole
     return new Promise((resolve) => {
         const proc = spawn(ffmpegPath, args, {
             stdio: ['ignore', 'pipe', 'pipe'],
-            shell: ffmpegPath === 'ffmpeg', // Use shell if just "ffmpeg" (on PATH)
+            shell: false,
+            windowsHide: true,
         });
 
         let stderr = '';
@@ -199,7 +217,10 @@ function runFfmpeg(ffmpegPath: string, args: string[]): Promise<{ success: boole
         });
 
         proc.on('error', (err) => {
-            resolve({ success: false, error: err.message });
+            const hint = ffmpegPath === 'ffmpeg'
+                ? 'Ensure FFmpeg is installed and on your system PATH, or set codecomfy.ffmpegPath to an absolute path.'
+                : `Tried to execute: ${ffmpegPath}`;
+            resolve({ success: false, error: `${err.message}. ${hint}` });
         });
 
         proc.on('close', (code) => {
