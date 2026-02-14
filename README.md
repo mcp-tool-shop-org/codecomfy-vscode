@@ -41,6 +41,24 @@ The extension launches NextGallery with `--workspace <path>` pointing to your cu
 - Single-instance routing via named pipes and mutex
 - Index file loading and display
 
+## Generation Limits
+
+Video generation enforces safety limits to prevent accidental resource exhaustion:
+
+| Parameter | Min | Max |
+|-----------|-----|-----|
+| Duration  | 1 s | 15 s |
+| FPS       | 1   | 60   |
+| Total frames (duration × fps) | — | 450 |
+
+If you hit a limit, reduce the duration or choose a preset with a lower frame rate.
+
+## Troubleshooting
+
+- **FFmpeg not found** — Install FFmpeg and ensure it is on your system PATH, or set `codecomfy.ffmpegPath` to the full absolute path (e.g. `C:\ffmpeg\bin\ffmpeg.exe`). Relative paths are rejected for security.
+- **"Generation already running"** — Only one generation can run at a time. Cancel the current one (`CodeComfy: Cancel Generation`) or wait for it to finish. There is a short cooldown between jobs.
+- **Seed / prompt errors** — Seeds must be whole numbers between 0 and 2 147 483 647. Prompts must be non-empty and at most 8 000 characters.
+
 ## License
 
 MIT

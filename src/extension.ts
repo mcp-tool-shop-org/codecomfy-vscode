@@ -8,6 +8,7 @@ import { ComfyServerEngine } from './engines/comfyServerEngine';
 import { getPresetRegistry } from './presets/registry';
 import { JobRequestInput, JobRun, Preset } from './types';
 import { parseSeed, validatePrompt } from './validation/inputs';
+import { validateVideoLimits } from './validation/video';
 
 /**
  * Common install locations for NextGallery on Windows
@@ -243,6 +244,14 @@ async function generateVideoHQCommand(): Promise<void> {
         return;
     }
 
+    // --- Video safety limits ---
+    const fps = preset.defaults.fps ?? 24;
+    const limitsResult = validateVideoLimits(duration, fps);
+    if (!limitsResult.valid) {
+        vscode.window.showErrorMessage(limitsResult.error!);
+        return;
+    }
+
     const engine = new ComfyServerEngine(config.comfyuiUrl);
     const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath });
     currentRouter = router;
@@ -258,14 +267,14 @@ async function generateVideoHQCommand(): Promise<void> {
             height: preset.defaults.height,
             steps: preset.defaults.steps,
             cfg_scale: preset.defaults.cfg_scale,
-            fps: preset.defaults.fps,
+            fps,
             duration_seconds: duration,
         },
     };
 
     outputChannel.appendLine(`[${new Date().toISOString()}] Starting video generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
-    outputChannel.appendLine(`Duration: ${duration}s @ ${preset.defaults.fps}fps`);
+    outputChannel.appendLine(`Duration: ${duration}s @ ${fps}fps (${Math.ceil(duration * fps)} frames)`);
     if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
     }
