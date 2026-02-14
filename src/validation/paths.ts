@@ -90,11 +90,14 @@ export function validateExecutablePath(
 
     // Reject relative paths
     if (!isAbsolutePath(trimmed)) {
+        const example = process.platform === 'win32'
+            ? 'C:\\ffmpeg\\bin\\ffmpeg.exe'
+            : '/usr/local/bin/ffmpeg';
         return {
             valid: false,
             mode: 'explicit',
             error: `${settingKey} must be an absolute path (got relative: "${trimmed}"). `
-                 + `Use an absolute path like "C:\\ffmpeg\\bin\\ffmpeg.exe", or leave empty to use PATH.`,
+                 + `Use an absolute path like "${example}", or leave empty to use PATH.`,
         };
     }
 

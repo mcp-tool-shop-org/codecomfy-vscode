@@ -10,8 +10,9 @@ Generate images and videos with ComfyUI without leaving your editor.
 Pick a preset, type a prompt, and watch the status bar while CodeComfy
 handles the workflow submission, polling, frame download, and FFmpeg assembly.
 
-> **Windows-first.** Tested on Windows 10/11. macOS + Linux support is planned
-> but not yet validated — PRs welcome.
+> **Windows-first, cross-platform friendly.** Fully tested on Windows 10/11.
+> macOS and Linux are expected to work — see [Known Limitations](#known-limitations).
+> PRs welcome.
 
 ---
 
@@ -140,6 +141,24 @@ There is a 2-second cooldown between consecutive jobs.
 
 - Seeds must be whole numbers between 0 and 2,147,483,647.
 - Prompts must be non-empty and at most 8,000 characters.
+
+## Known Limitations
+
+| Area | Status |
+|------|--------|
+| **Windows** | Fully tested (Windows 10/11). Primary platform. |
+| **macOS** | Expected to work for image + video generation. NextGallery may not be available yet. |
+| **Linux** | Expected to work for image + video generation. NextGallery may not be available yet. |
+| **Remote / WSL** | ComfyUI URL must be reachable from the host running VS Code. |
+
+Core functionality (prompt → ComfyUI → download → FFmpeg assembly) is
+platform-agnostic. The only Windows-specific feature is NextGallery
+auto-detection, which falls back gracefully to a "set the path in
+settings" prompt on other platforms.
+
+If you hit a platform-specific issue, please
+[open an issue](https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues)
+with your OS, VS Code version, and ComfyUI version.
 
 ## How It Works
 

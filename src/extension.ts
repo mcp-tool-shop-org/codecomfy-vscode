@@ -12,13 +12,30 @@ import { validateVideoLimits } from './validation/video';
 import { createChannelLogger } from './logging/logger';
 
 /**
- * Common install locations for NextGallery on Windows
+ * Common install locations for NextGallery, OS-dependent.
+ * NextGallery is currently Windows-only; paths for other platforms are
+ * included as forward-looking placeholders.
  */
-const COMMON_PATHS = [
-    path.join(process.env.LOCALAPPDATA || '', 'Programs', 'NextGallery', 'NextGallery.exe'),
-    path.join(process.env.PROGRAMFILES || '', 'NextGallery', 'NextGallery.exe'),
-    path.join(process.env['PROGRAMFILES(X86)'] || '', 'NextGallery', 'NextGallery.exe'),
-];
+function getCommonNextGalleryPaths(): string[] {
+    if (process.platform === 'win32') {
+        return [
+            path.join(process.env.LOCALAPPDATA || '', 'Programs', 'NextGallery', 'NextGallery.exe'),
+            path.join(process.env.PROGRAMFILES || '', 'NextGallery', 'NextGallery.exe'),
+            path.join(process.env['PROGRAMFILES(X86)'] || '', 'NextGallery', 'NextGallery.exe'),
+        ];
+    }
+    if (process.platform === 'darwin') {
+        return [
+            '/Applications/NextGallery.app/Contents/MacOS/NextGallery',
+            path.join(process.env.HOME || '', 'Applications', 'NextGallery.app', 'Contents', 'MacOS', 'NextGallery'),
+        ];
+    }
+    // Linux
+    return [
+        '/usr/local/bin/nextgallery',
+        path.join(process.env.HOME || '', '.local', 'bin', 'nextgallery'),
+    ];
+}
 
 let statusBarItem: vscode.StatusBarItem;
 let outputChannel: vscode.OutputChannel;
@@ -89,8 +106,9 @@ async function openGalleryCommand(): Promise<void> {
     const exePath = findNextGalleryExecutable();
 
     if (!exePath) {
+        const exeName = process.platform === 'win32' ? 'NextGallery.exe' : 'NextGallery';
         const action = await vscode.window.showErrorMessage(
-            'NextGallery.exe not found. Set the path in settings.',
+            `${exeName} not found. Set the path in settings.`,
             'Open Settings'
         );
         if (action === 'Open Settings') {
@@ -391,7 +409,7 @@ function findNextGalleryExecutable(): string | undefined {
         return configuredPath;
     }
 
-    for (const candidatePath of COMMON_PATHS) {
+    for (const candidatePath of getCommonNextGalleryPaths()) {
         if (candidatePath && fs.existsSync(candidatePath)) {
             return candidatePath;
         }

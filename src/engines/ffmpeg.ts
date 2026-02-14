@@ -9,13 +9,28 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 
 /**
- * Common FFmpeg locations on Windows.
+ * Common FFmpeg locations, OS-dependent.
  */
-const COMMON_FFMPEG_PATHS = [
-    path.join(process.env.LOCALAPPDATA || '', 'Programs', 'ffmpeg', 'bin', 'ffmpeg.exe'),
-    path.join(process.env.PROGRAMFILES || '', 'ffmpeg', 'bin', 'ffmpeg.exe'),
-    'C:\\ffmpeg\\bin\\ffmpeg.exe',
-];
+function getCommonFfmpegPaths(): string[] {
+    if (process.platform === 'win32') {
+        return [
+            path.join(process.env.LOCALAPPDATA || '', 'Programs', 'ffmpeg', 'bin', 'ffmpeg.exe'),
+            path.join(process.env.PROGRAMFILES || '', 'ffmpeg', 'bin', 'ffmpeg.exe'),
+            'C:\\ffmpeg\\bin\\ffmpeg.exe',
+        ];
+    }
+    if (process.platform === 'darwin') {
+        return [
+            '/opt/homebrew/bin/ffmpeg',
+            '/usr/local/bin/ffmpeg',
+        ];
+    }
+    // Linux and other Unix
+    return [
+        '/usr/bin/ffmpeg',
+        '/usr/local/bin/ffmpeg',
+    ];
+}
 
 /**
  * Check if FFmpeg is reachable on the system PATH (async).
@@ -68,7 +83,7 @@ export async function findFfmpeg(configuredPath?: string): Promise<string | unde
     }
 
     // 2. Common filesystem locations
-    for (const candidate of COMMON_FFMPEG_PATHS) {
+    for (const candidate of getCommonFfmpegPaths()) {
         if (candidate && fs.existsSync(candidate)) {
             return candidate;
         }
