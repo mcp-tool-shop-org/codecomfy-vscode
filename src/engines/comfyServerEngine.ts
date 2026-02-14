@@ -22,22 +22,13 @@ import {
     RUNS_DIR,
 } from '../types';
 import { BackoffTimer } from '../polling/backoff';
-
-interface ComfyPromptResponse {
-    prompt_id: string;
-    number: number;
-    node_errors: Record<string, unknown>;
-}
-
-interface ComfyHistoryEntry {
-    prompt: unknown[];
-    outputs: Record<string, ComfyNodeOutput>;
-    status: { status_str: string; completed: boolean };
-}
-
-interface ComfyNodeOutput {
-    images?: Array<{ filename: string; subfolder: string; type: string }>;
-}
+import {
+    validatePromptResponse,
+    validateHistoryResponse,
+    ValidatedPromptResponse,
+    ValidatedHistoryEntry,
+    ComfyResponseError,
+} from './comfyValidation';
 
 export class ComfyServerEngine implements IGenerationEngine {
     readonly id = 'comfy-server';
@@ -207,7 +198,7 @@ export class ComfyServerEngine implements IGenerationEngine {
     // Prompt Submission and Polling
     // =========================================================================
 
-    private async submitPrompt(workflow: Record<string, unknown>): Promise<ComfyPromptResponse | null> {
+    private async submitPrompt(workflow: Record<string, unknown>): Promise<ValidatedPromptResponse | null> {
         try {
             const response = await fetch(`${this.serverUrl}/prompt`, {
                 method: 'POST',
@@ -217,16 +208,20 @@ export class ComfyServerEngine implements IGenerationEngine {
 
             if (!response.ok) {
                 const text = await response.text();
-                throw new Error(`ComfyUI error: ${text}`);
+                throw new Error(`ComfyUI error (HTTP ${response.status}): ${text}`);
             }
 
-            return await response.json() as ComfyPromptResponse;
+            const body: unknown = await response.json();
+            return validatePromptResponse(body);
         } catch (err) {
+            if (err instanceof ComfyResponseError) {
+                throw new Error(`ComfyUI prompt response invalid: ${err.message}\nRaw: ${err.rawBody}`);
+            }
             throw new Error(`Failed to submit prompt: ${err instanceof Error ? err.message : String(err)}`);
         }
     }
 
-    private async pollForCompletion(promptId: string, timeoutMs = 300000): Promise<ComfyHistoryEntry | null> {
+    private async pollForCompletion(promptId: string, timeoutMs = 300000): Promise<ValidatedHistoryEntry | null> {
         const startTime = Date.now();
         const backoff = new BackoffTimer();
 
@@ -242,8 +237,8 @@ export class ComfyServerEngine implements IGenerationEngine {
                     continue;
                 }
 
-                const history = await response.json() as Record<string, ComfyHistoryEntry>;
-                const entry = history[promptId];
+                const body: unknown = await response.json();
+                const entry = validateHistoryResponse(body, promptId);
 
                 if (entry?.status?.completed) {
                     return entry;
@@ -253,8 +248,12 @@ export class ComfyServerEngine implements IGenerationEngine {
                 if (entry) {
                     backoff.reset();
                 }
-            } catch {
-                // Network error — let backoff grow
+            } catch (err) {
+                // ComfyResponseError = shape mismatch — rethrow so the caller sees it
+                if (err instanceof ComfyResponseError) {
+                    throw new Error(`ComfyUI history response invalid: ${err.message}\nRaw: ${err.rawBody}`);
+                }
+                // Other errors (network) — let backoff grow
             }
 
             await this.sleep(backoff.next());
@@ -271,7 +270,7 @@ export class ComfyServerEngine implements IGenerationEngine {
      * Collect images for single image generation.
      * Saves to .codecomfy/outputs/
      */
-    private async collectImages(history: ComfyHistoryEntry, request: JobRequest): Promise<Artifact[]> {
+    private async collectImages(history: ValidatedHistoryEntry, request: JobRequest): Promise<Artifact[]> {
         const artifacts: Artifact[] = [];
         const outputDir = path.join(request.workspace_path, CODECOMFY_DIR, OUTPUTS_DIR);
         fs.mkdirSync(outputDir, { recursive: true });
@@ -310,7 +309,7 @@ export class ComfyServerEngine implements IGenerationEngine {
      * Saves to .codecomfy/runs/{run_id}/frames/
      * Returns artifacts with type 'image' that the router will assemble into video.
      */
-    private async collectFrames(history: ComfyHistoryEntry, request: JobRequest): Promise<Artifact[]> {
+    private async collectFrames(history: ValidatedHistoryEntry, request: JobRequest): Promise<Artifact[]> {
         const artifacts: Artifact[] = [];
         const framesDir = path.join(
             request.workspace_path,
