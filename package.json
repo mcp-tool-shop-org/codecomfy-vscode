@@ -1,7 +1,7 @@
 {
   "name": "codecomfy-vscode",
-  "displayName": "CodeComfy Gallery",
-  "description": "Generate images and videos with ComfyUI, view outputs in NextGallery",
+  "displayName": "CodeComfy — ComfyUI Generation",
+  "description": "Generate images and videos with ComfyUI directly from VS Code. Prompt, poll, download, assemble — all without leaving your editor.",
   "version": "0.4.0",
   "publisher": "mcp-tool-shop",
   "author": {
@@ -9,23 +9,34 @@
     "email": "64996768+mcp-tool-shop@users.noreply.github.com"
   },
   "license": "MIT",
+  "icon": "assets/icon.png",
+  "homepage": "https://github.com/mcp-tool-shop-org/codecomfy-vscode#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/mcp-tool-shop-org/codecomfy-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues"
   },
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
+    "Machine Learning",
+    "Visualization",
     "Other"
   ],
   "keywords": [
     "comfyui",
-    "gallery",
-    "ai",
+    "stable diffusion",
     "image generation",
     "video generation",
-    "stable diffusion"
+    "diffusion",
+    "workflow",
+    "ffmpeg",
+    "ai art",
+    "txt2img",
+    "txt2vid"
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
@@ -64,7 +75,7 @@
         "codecomfy.ffmpegPath": {
           "type": "string",
           "default": "",
-          "description": "Path to FFmpeg executable. If not set, common locations and PATH will be checked."
+          "description": "Absolute path to FFmpeg executable. Leave empty to auto-detect from PATH."
         },
         "codecomfy.autoOpenGalleryOnComplete": {
           "type": "boolean",
