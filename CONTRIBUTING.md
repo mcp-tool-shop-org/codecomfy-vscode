@@ -1,53 +1,106 @@
 # Contributing to CodeComfy VS Code
 
-Thank you for your interest in contributing to CodeComfy VS Code!
+Thank you for your interest in contributing!
 
 ## Development Setup
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/mcp-tool-shop-org/codecomfy-vscode.git
-   cd codecomfy-vscode
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Open in VS Code:
-   ```bash
-   code .
-   ```
-
-4. Press F5 to launch the Extension Development Host
-
-## Code Style
-
-- TypeScript with strict mode
-- ESLint for linting
-- Prettier for formatting
-
-Run linting:
 ```bash
-npm run lint
+# 1. Clone
+git clone https://github.com/mcp-tool-shop-org/codecomfy-vscode.git
+cd codecomfy-vscode
+
+# 2. Install dependencies (use ci for reproducible installs)
+npm ci
+
+# 3. Open in VS Code
+code .
+```
+
+### Run the extension locally
+
+- Press **F5** in VS Code to launch the Extension Development Host.
+- The extension compiles on launch via `vscode:prepublish`.
+- Use `npm run watch` in a terminal for live recompilation.
+
+### Run tests
+
+```bash
+npm test          # compile:test + mocha (headless, no Electron needed)
+```
+
+Tests use a lightweight VS Code stub (`test/stubs/vscode.ts`) instead
+of the real `vscode` module, so they run in any Node.js environment.
+
+### Run lint
+
+```bash
+npm run lint      # eslint src --ext ts
+```
+
+Both `npm test` and `npm run lint` must pass before merging.
+
+## Project Structure
+
+```
+src/
+├── engines/            # ComfyUI client + FFmpeg video assembler
+│   ├── comfyServerEngine.ts
+│   ├── comfyValidation.ts
+│   └── ffmpeg.ts
+├── logging/            # Structured logger
+│   └── logger.ts
+├── polling/            # Backoff timer
+│   └── backoff.ts
+├── presets/            # Bundled workflow presets (JSON)
+│   ├── registry.ts
+│   ├── hq-image.json
+│   └── hq-video.json
+├── pruning/            # Run history cleanup
+│   └── pruner.ts
+├── router/             # Job lifecycle + index management
+│   └── jobRouter.ts
+├── types/              # Shared type definitions
+│   └── index.ts
+├── validation/         # Input + path + video limit guards
+│   ├── inputs.ts
+│   ├── paths.ts
+│   └── video.ts
+├── config.ts           # VS Code settings reader
+└── extension.ts        # Entry point + command registrations
+
+test/
+├── stubs/vscode.ts     # Minimal VS Code mock
+├── register-vscode-stub.js  # Runtime Module._resolveFilename hook
+└── unit/               # All unit tests (*.test.ts)
 ```
 
 ## Pull Request Process
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feat/amazing-feature`)
-3. Make your changes
-4. Run tests and linting
-5. Commit with conventional commits (`feat:`, `fix:`, `docs:`, etc.)
-6. Push to your fork
-7. Open a Pull Request
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feat/amazing-feature`).
+3. Write code + tests. Aim for at least 1 test per exported function.
+4. Run `npm run lint && npm test` — both must pass.
+5. Commit with [Conventional Commits](https://www.conventionalcommits.org/):
+   `feat:`, `fix:`, `docs:`, `test:`, `chore:`, `security:`, `reliability:`.
+6. Push to your fork and open a Pull Request.
+7. CI will run lint + test + compile + version-check automatically.
+
+## Release Checklist (maintainers)
+
+1. **Bump version** in `package.json` (follow semver).
+2. **Update CHANGELOG.md** — move "Unreleased" items under the new version heading.
+3. **Commit**: `chore: bump version to X.Y.Z`
+4. **Tag**: `git tag vX.Y.Z && git push origin vX.Y.Z`
+5. **CI packages**: the `publish.yml` workflow runs `vsce package` on tag push.
+6. **Create GitHub Release**: attach the `.vsix` artifact from CI.
+7. **Verify checksums**: compare the `.vsix` SHA256 between CI output and the release download.
 
 ## Reporting Issues
 
-- Use GitHub Issues for bug reports and feature requests
-- Include reproduction steps for bugs
-- Check existing issues before creating new ones
+- Use [GitHub Issues](https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues)
+  for bug reports and feature requests.
+- Include reproduction steps, VS Code version, OS, and ComfyUI version for bugs.
+- Check existing issues before creating new ones.
 
 ## License
 

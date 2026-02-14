@@ -1,24 +1,57 @@
 # Changelog
 
+All notable changes to the **CodeComfy** VS Code extension are documented here.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [Unreleased]
+
+### Added
+- Exponential backoff + jitter for ComfyUI polling (1 s → 8 s cap, ±20 % jitter)
+- Runtime shape guards for `/prompt` and `/history` API responses (`ComfyResponseError`)
+- Structured logging module (`src/logging/logger.ts`) with Output channel sink
+- Run history pruning — keeps last 200 runs / 30 days, prunes folders + index entries
+- Streaming downloads — images and frames are piped directly to disk
+- Async FFmpeg PATH probe (replaced `spawnSync`)
+- Categorised error messages: `[Network]`, `[Server]`, `[API]`, `[IO]`
+- Comprehensive README with prerequisites, install steps, quickstart, and troubleshooting
+- Visual assets (SVG placeholders for command palette, status bar, output channel)
+- Marketplace metadata polish (categories, keywords, icon, homepage, bugs URL)
+
+## [0.4.0] - 2026-02-01
+
+### Added
+- Security: removed `shell: true` from all FFmpeg process spawns
+- Security: `codecomfy.ffmpegPath` validated at read time (must be absolute, existing, executable)
+- Safety: concurrency guard — only one generation at a time, with 2 s cooldown
+- Safety: seed (0 – 2,147,483,647), prompt (non-empty, ≤ 8,000 chars) validation
+- Safety: video generation hard limits (max 15 s, 1–60 fps, ≤ 450 frames)
+- Test harness: Mocha + Sinon with headless VS Code stub (99 → 170 tests)
+- CI gates: lint → test → compile → version-check → package → release
+- ESLint config (`.eslintrc.json`)
+
 ## [0.3.0] - 2026-01-31
 
 ### Added
-- `CodeComfy: Generate Video (HQ)` command - generate videos via ComfyUI + FFmpeg
+- `CodeComfy: Generate Video (HQ)` command — generate videos via ComfyUI + FFmpeg
 - Video assembly pipeline: ComfyUI frames → FFmpeg MP4 (H.264, CRF 18)
 - Automatic thumbnail generation for videos
-- Duration picker (2s / 4s / 8s) for video generation
+- Duration picker (2 s / 4 s / 8 s) for video generation
 - `codecomfy.ffmpegPath` setting for FFmpeg location
 - Video metadata in index: `duration_seconds`, `fps`, `mime_type`, `thumbnail_path`
 
 ### Changed
-- Router now computes `frame_count` from `fps * duration_seconds` for video presets
+- Router now computes `frame_count` from `fps × duration_seconds` for video presets
 - Engine saves video frames to `runs/{id}/frames/` before assembly
 
 ## [0.2.0] - 2026-01-31
 
 ### Added
-- `CodeComfy: Generate Image (HQ)` command - generate images via ComfyUI server
-- `CodeComfy: Cancel Generation` command - cancel in-progress generation
+- `CodeComfy: Generate Image (HQ)` command — generate images via ComfyUI server
+- `CodeComfy: Cancel Generation` command — cancel in-progress generation
 - Job router with run lifecycle management (queued → running → succeeded/failed/canceled)
 - Workspace storage at `.codecomfy/` with versioned index schema (v1.0)
 - Atomic index writes for crash safety
