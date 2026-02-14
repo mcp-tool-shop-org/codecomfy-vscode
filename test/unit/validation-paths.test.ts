@@ -52,14 +52,18 @@ after(() => {
 // =============================================================================
 
 describe('isAbsolutePath', () => {
-    it('detects Windows absolute paths', () => {
-        assert.strictEqual(isAbsolutePath('C:\\ffmpeg\\bin\\ffmpeg.exe'), true);
-        assert.strictEqual(isAbsolutePath('D:\\Programs\\tool.exe'), true);
-    });
+    // path.isAbsolute() is platform-dependent: Windows drive-letter paths
+    // are only recognised as absolute on Windows.
+    if (process.platform === 'win32') {
+        it('detects Windows absolute paths', () => {
+            assert.strictEqual(isAbsolutePath('C:\\ffmpeg\\bin\\ffmpeg.exe'), true);
+            assert.strictEqual(isAbsolutePath('D:\\Programs\\tool.exe'), true);
+        });
 
-    it('detects UNC paths as absolute', () => {
-        assert.strictEqual(isAbsolutePath('\\\\server\\share\\file'), true);
-    });
+        it('detects UNC paths as absolute', () => {
+            assert.strictEqual(isAbsolutePath('\\\\server\\share\\file'), true);
+        });
+    }
 
     it('detects POSIX absolute paths', () => {
         assert.strictEqual(isAbsolutePath('/usr/bin/ffmpeg'), true);
