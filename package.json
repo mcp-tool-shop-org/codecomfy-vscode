@@ -81,7 +81,7 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
     "pretest": "npm run compile:test",
-    "test": "mocha dist-test/test/**/*.test.js --timeout 10000",
+    "test": "mocha --require test/register-vscode-stub.js dist-test/test/**/*.test.js --timeout 10000",
     "package": "vsce package"
   },
   "devDependencies": {
