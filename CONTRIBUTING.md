@@ -91,8 +91,9 @@ test/
 2. **Update CHANGELOG.md** — move "Unreleased" items under the new version heading.
 3. **Commit**: `chore: bump version to X.Y.Z`
 4. **Tag**: `git tag vX.Y.Z && git push origin vX.Y.Z`
-5. **CI packages**: the `publish.yml` workflow runs `vsce package` on tag push.
-6. **Create GitHub Release**: attach the `.vsix` artifact from CI.
+5. **CI packages + publishes**: the `publish.yml` workflow runs `vsce package` on tag push,
+   creates a GitHub Release, and publishes to the VS Code Marketplace (if `VSCE_PAT` is set).
+6. **Verify**: confirm the GitHub Release has the `.vsix` + `SHA256SUMS.txt`.
 7. **Verify checksums**: compare the `.vsix` SHA256 between CI output and the release download.
 
 ## Reporting Issues
