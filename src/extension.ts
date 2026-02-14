@@ -21,6 +21,40 @@ let statusBarItem: vscode.StatusBarItem;
 let outputChannel: vscode.OutputChannel;
 let currentRouter: JobRouter | null = null;
 
+// ---------------------------------------------------------------------------
+// Concurrency guard — only one generation at a time, with cooldown
+// ---------------------------------------------------------------------------
+/** Minimum milliseconds between the end of one generation and the start of the next. */
+const GENERATION_COOLDOWN_MS = 2_000;
+
+let generationActive = false;
+let lastGenerationEndedAt = 0;
+let idleTimer: ReturnType<typeof setTimeout> | undefined;
+
+/**
+ * Check whether a new generation can start.
+ * Shows a message and returns `false` when blocked.
+ */
+function canStartGeneration(): boolean {
+    if (generationActive) {
+        vscode.window.showWarningMessage(
+            'A generation is already running. Cancel it first or wait for it to finish.',
+        );
+        return false;
+    }
+
+    const elapsed = Date.now() - lastGenerationEndedAt;
+    if (elapsed < GENERATION_COOLDOWN_MS) {
+        const remaining = Math.ceil((GENERATION_COOLDOWN_MS - elapsed) / 1000);
+        vscode.window.showWarningMessage(
+            `Please wait ${remaining}s before starting another generation.`,
+        );
+        return false;
+    }
+
+    return true;
+}
+
 export function activate(context: vscode.ExtensionContext) {
     outputChannel = vscode.window.createOutputChannel('CodeComfy');
 
@@ -82,6 +116,7 @@ async function generateImageHQCommand(): Promise<void> {
         vscode.window.showWarningMessage('Open a folder or workspace first.');
         return;
     }
+    if (!canStartGeneration()) return;
 
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const config = getConfig();
@@ -142,6 +177,7 @@ async function generateVideoHQCommand(): Promise<void> {
         vscode.window.showWarningMessage('Open a folder or workspace first.');
         return;
     }
+    if (!canStartGeneration()) return;
 
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const config = getConfig();
@@ -251,6 +287,8 @@ async function runGeneration(
         }
     };
 
+    generationActive = true;
+
     try {
         const result = await router.run(requestInput, preset, onProgress);
 
@@ -285,8 +323,17 @@ async function runGeneration(
         vscode.window.showErrorMessage(`Generation error: ${message}`);
     } finally {
         currentRouter = null;
-        setTimeout(() => {
+        generationActive = false;
+        lastGenerationEndedAt = Date.now();
+
+        // Reset status bar after a delay — clear any previous timer first
+        // to avoid a stale timer overwriting the status mid-generation.
+        if (idleTimer !== undefined) {
+            clearTimeout(idleTimer);
+        }
+        idleTimer = setTimeout(() => {
             statusBarItem.text = '$(sparkle) CodeComfy: Idle';
+            idleTimer = undefined;
         }, 3000);
     }
 }
