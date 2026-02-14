@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="couch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8833a"/>
+      <stop offset="100%" stop-color="#d4722c"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#569cd6"/>
+      <stop offset="100%" stop-color="#4488cc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="128" height="128" rx="24" fill="url(#bg)"/>
+
+  <!-- Code brackets -->
+  <text x="22" y="56" fill="#569cd6" font-family="Consolas, monospace" font-size="28" font-weight="bold">&lt;</text>
+  <text x="96" y="56" fill="#569cd6" font-family="Consolas, monospace" font-size="28" font-weight="bold">/&gt;</text>
+
+  <!-- Couch (simplified) -->
+  <rect x="32" y="58" width="64" height="24" rx="6" fill="url(#couch)"/>
+  <rect x="28" y="52" width="12" height="34" rx="4" fill="url(#couch)"/>
+  <rect x="88" y="52" width="12" height="34" rx="4" fill="url(#couch)"/>
+  <!-- Cushion -->
+  <rect x="36" y="56" width="56" height="10" rx="4" fill="#f0a050" opacity="0.6"/>
+
+  <!-- Sparkle / generation indicator -->
+  <circle cx="64" cy="36" r="3" fill="#ffd700"/>
+  <circle cx="52" cy="42" r="2" fill="#ffd700" opacity="0.7"/>
+  <circle cx="76" cy="42" r="2" fill="#ffd700" opacity="0.7"/>
+
+  <!-- Film strip at bottom -->
+  <rect x="24" y="92" width="80" height="14" rx="3" fill="#333"/>
+  <rect x="28" y="95" width="8" height="8" rx="1" fill="#569cd6" opacity="0.8"/>
+  <rect x="40" y="95" width="8" height="8" rx="1" fill="#569cd6" opacity="0.6"/>
+  <rect x="52" y="95" width="8" height="8" rx="1" fill="#569cd6" opacity="0.8"/>
+  <rect x="64" y="95" width="8" height="8" rx="1" fill="#569cd6" opacity="0.6"/>
+  <rect x="76" y="95" width="8" height="8" rx="1" fill="#569cd6" opacity="0.8"/>
+  <rect x="88" y="95" width="8" height="8" rx="1" fill="#569cd6" opacity="0.6"/>
+</svg>

@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="assets/icon.png" alt="CodeComfy icon" width="96" />
+</p>
+
 # CodeComfy — ComfyUI generation from VS Code
+
+*Sit back, type a prompt, let the couch do the work.*
 
 Generate images and videos with ComfyUI without leaving your editor.
 Pick a preset, type a prompt, and watch the status bar while CodeComfy
