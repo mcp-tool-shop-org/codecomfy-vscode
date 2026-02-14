@@ -7,6 +7,7 @@ import { JobRouter } from './router/jobRouter';
 import { ComfyServerEngine } from './engines/comfyServerEngine';
 import { getPresetRegistry } from './presets/registry';
 import { JobRequestInput, JobRun, Preset } from './types';
+import { parseSeed, validatePrompt } from './validation/inputs';
 
 /**
  * Common install locations for NextGallery on Windows
@@ -121,21 +122,35 @@ async function generateImageHQCommand(): Promise<void> {
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const config = getConfig();
 
-    const prompt = await vscode.window.showInputBox({
+    // --- Prompt ---
+    const rawPrompt = await vscode.window.showInputBox({
         title: 'Generate Image (HQ)',
         prompt: 'Enter your prompt',
         placeHolder: 'A beautiful sunset over mountains...',
     });
 
-    if (!prompt) return;
+    if (rawPrompt === undefined) return; // user pressed Escape
 
-    const seedInput = await vscode.window.showInputBox({
+    const promptResult = validatePrompt(rawPrompt);
+    if (!promptResult.valid) {
+        vscode.window.showErrorMessage(promptResult.error!);
+        return;
+    }
+    const prompt = promptResult.value!;
+
+    // --- Seed ---
+    const rawSeed = await vscode.window.showInputBox({
         title: 'Seed (optional)',
         prompt: 'Enter a seed for reproducibility, or leave empty for random',
         placeHolder: 'e.g., 12345',
     });
 
-    const seed = seedInput ? parseInt(seedInput, 10) : undefined;
+    const seedResult = parseSeed(rawSeed);
+    if (!seedResult.valid) {
+        vscode.window.showErrorMessage(seedResult.error!);
+        return;
+    }
+    const seed = seedResult.value;
 
     const preset = getPresetRegistry().get('hq-image');
     if (!preset) {
@@ -153,7 +168,7 @@ async function generateImageHQCommand(): Promise<void> {
         inputs: {
             prompt,
             negative_prompt: '',
-            seed: isNaN(seed as number) ? undefined : seed,
+            seed,
             width: preset.defaults.width,
             height: preset.defaults.height,
             steps: preset.defaults.steps,
@@ -163,7 +178,7 @@ async function generateImageHQCommand(): Promise<void> {
 
     outputChannel.appendLine(`[${new Date().toISOString()}] Starting image generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
-    if (seed !== undefined && !isNaN(seed)) {
+    if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
     }
     outputChannel.show(true);
@@ -182,21 +197,35 @@ async function generateVideoHQCommand(): Promise<void> {
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const config = getConfig();
 
-    const prompt = await vscode.window.showInputBox({
+    // --- Prompt ---
+    const rawPrompt = await vscode.window.showInputBox({
         title: 'Generate Video (HQ)',
         prompt: 'Enter your prompt',
         placeHolder: 'A cinematic landscape with moving clouds...',
     });
 
-    if (!prompt) return;
+    if (rawPrompt === undefined) return; // user pressed Escape
 
-    const seedInput = await vscode.window.showInputBox({
+    const promptResult = validatePrompt(rawPrompt);
+    if (!promptResult.valid) {
+        vscode.window.showErrorMessage(promptResult.error!);
+        return;
+    }
+    const prompt = promptResult.value!;
+
+    // --- Seed ---
+    const rawSeed = await vscode.window.showInputBox({
         title: 'Seed (optional)',
         prompt: 'Enter a seed for reproducibility, or leave empty for random',
         placeHolder: 'e.g., 12345',
     });
 
-    const seed = seedInput ? parseInt(seedInput, 10) : undefined;
+    const seedResult = parseSeed(rawSeed);
+    if (!seedResult.valid) {
+        vscode.window.showErrorMessage(seedResult.error!);
+        return;
+    }
+    const seed = seedResult.value;
 
     // Duration picker
     const durationChoice = await vscode.window.showQuickPick(
@@ -224,7 +253,7 @@ async function generateVideoHQCommand(): Promise<void> {
         inputs: {
             prompt,
             negative_prompt: '',
-            seed: isNaN(seed as number) ? undefined : seed,
+            seed,
             width: preset.defaults.width,
             height: preset.defaults.height,
             steps: preset.defaults.steps,
@@ -237,7 +266,7 @@ async function generateVideoHQCommand(): Promise<void> {
     outputChannel.appendLine(`[${new Date().toISOString()}] Starting video generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
     outputChannel.appendLine(`Duration: ${duration}s @ ${preset.defaults.fps}fps`);
-    if (seed !== undefined && !isNaN(seed)) {
+    if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
     }
     outputChannel.show(true);
