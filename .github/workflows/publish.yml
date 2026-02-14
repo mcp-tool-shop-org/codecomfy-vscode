@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -44,6 +45,17 @@ jobs:
             exit 1
           fi
           echo "✓ Tag v${TAG_VERSION} matches package.json ${PKG_VERSION}"
+
+      # ── CHANGELOG version check ──────────────────────────────────
+      - name: Verify CHANGELOG has entry for this version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if ! grep -q "## \[${PKG_VERSION}\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no entry for version ${PKG_VERSION}"
+            exit 1
+          fi
+          echo "✓ CHANGELOG.md has entry for [${PKG_VERSION}]"
 
       # ── Package + Release ─────────────────────────────────────────
       - name: Package VSIX
