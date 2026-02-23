@@ -2,7 +2,7 @@
   "name": "codecomfy-vscode",
   "displayName": "CodeComfy — ComfyUI Generation",
   "description": "Generate images and videos with ComfyUI directly from VS Code. Prompt, poll, download, assemble — all without leaving your editor.",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "publisher": "mcp-tool-shop",
   "author": {
     "name": "mcp-tool-shop",
