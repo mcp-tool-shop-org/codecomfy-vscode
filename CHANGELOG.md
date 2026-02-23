@@ -18,6 +18,13 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Hardened CI workflow.
 - Added GitHub Pages landing page (`docs/index.md`).
 
+## [0.5.2] - 2026-02-23
+
+### Added
+- **Negative prompt** input during image and video generation — optionally specify what to avoid (e.g., blurry, distorted, low quality)
+- `codecomfy.defaultNegativePrompt` setting to pre-fill the negative prompt input box
+- Negative prompt logged to Output channel alongside the main prompt
+
 ## [0.5.0] - 2026-02-14
 
 ### Added

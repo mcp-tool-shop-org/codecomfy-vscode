@@ -45,7 +45,8 @@ Open **Settings → Extensions → CodeComfy** or add to `settings.json`:
   "codecomfy.comfyuiUrl": "http://127.0.0.1:8188",
   "codecomfy.ffmpegPath": "",
   "codecomfy.autoOpenGalleryOnComplete": true,
-  "codecomfy.nextGalleryPath": ""
+  "codecomfy.nextGalleryPath": "",
+  "codecomfy.defaultNegativePrompt": ""
 }
 ```
 
@@ -55,6 +56,7 @@ Open **Settings → Extensions → CodeComfy** or add to `settings.json`:
 | `codecomfy.ffmpegPath` | Absolute path to FFmpeg executable (leave empty for PATH lookup) | `""` |
 | `codecomfy.autoOpenGalleryOnComplete` | Open NextGallery after generation finishes | `true` |
 | `codecomfy.nextGalleryPath` | Absolute path to NextGallery.exe | Auto-detect |
+| `codecomfy.defaultNegativePrompt` | Default negative prompt pre-filled during generation | `""` |
 
 ## Quickstart
 
@@ -62,7 +64,7 @@ Open **Settings → Extensions → CodeComfy** or add to `settings.json`:
 2. **Pick a command** — open the Command Palette (`Ctrl+Shift+P`) and choose:
    - `CodeComfy: Generate Image (HQ)` — single image
    - `CodeComfy: Generate Video (HQ)` — short video (2–8 s)
-3. **Enter a prompt** (and optionally a seed), then watch the status bar.
+3. **Enter a prompt**, optionally a **negative prompt** (things to avoid), and a **seed**, then watch the status bar.
 
 <!-- Screenshots: replace with real PNGs — see assets/SCREENSHOTS.md -->
 

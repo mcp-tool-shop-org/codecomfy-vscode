@@ -161,6 +161,18 @@ async function generateImageHQCommand(): Promise<void> {
     }
     const prompt = promptResult.value!;
 
+    // --- Negative Prompt ---
+    const defaultNeg = vscode.workspace.getConfiguration('codecomfy').get<string>('defaultNegativePrompt', '');
+    const rawNegativePrompt = await vscode.window.showInputBox({
+        title: 'Negative Prompt (optional)',
+        prompt: 'Enter what you want to avoid (press Enter to skip)',
+        placeHolder: 'e.g., blurry, distorted, low quality',
+        value: defaultNeg,
+        validateInput: (v) => v && v.length > 8000 ? 'Must be 8,000 characters or fewer' : null,
+    });
+    if (rawNegativePrompt === undefined) return;
+    const negativePrompt = rawNegativePrompt.trim();
+
     // --- Seed ---
     const rawSeed = await vscode.window.showInputBox({
         title: 'Seed (optional)',
@@ -191,7 +203,7 @@ async function generateImageHQCommand(): Promise<void> {
         preset_id: preset.id,
         inputs: {
             prompt,
-            negative_prompt: '',
+            negative_prompt: negativePrompt,
             seed,
             width: preset.defaults.width,
             height: preset.defaults.height,
@@ -202,6 +214,9 @@ async function generateImageHQCommand(): Promise<void> {
 
     outputChannel.appendLine(`[${new Date().toISOString()}] Starting image generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
+    if (negativePrompt) {
+        outputChannel.appendLine(`Negative: ${negativePrompt}`);
+    }
     if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
     }
@@ -236,6 +251,18 @@ async function generateVideoHQCommand(): Promise<void> {
         return;
     }
     const prompt = promptResult.value!;
+
+    // --- Negative Prompt ---
+    const defaultNegV = vscode.workspace.getConfiguration('codecomfy').get<string>('defaultNegativePrompt', '');
+    const rawNegativePromptV = await vscode.window.showInputBox({
+        title: 'Negative Prompt (optional)',
+        prompt: 'Enter what you want to avoid (press Enter to skip)',
+        placeHolder: 'e.g., blurry, distorted, low quality',
+        value: defaultNegV,
+        validateInput: (v) => v && v.length > 8000 ? 'Must be 8,000 characters or fewer' : null,
+    });
+    if (rawNegativePromptV === undefined) return;
+    const negativePromptV = rawNegativePromptV.trim();
 
     // --- Seed ---
     const rawSeed = await vscode.window.showInputBox({
@@ -285,7 +312,7 @@ async function generateVideoHQCommand(): Promise<void> {
         preset_id: preset.id,
         inputs: {
             prompt,
-            negative_prompt: '',
+            negative_prompt: negativePromptV,
             seed,
             width: preset.defaults.width,
             height: preset.defaults.height,
@@ -298,6 +325,9 @@ async function generateVideoHQCommand(): Promise<void> {
 
     outputChannel.appendLine(`[${new Date().toISOString()}] Starting video generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
+    if (negativePromptV) {
+        outputChannel.appendLine(`Negative: ${negativePromptV}`);
+    }
     outputChannel.appendLine(`Duration: ${duration}s @ ${fps}fps (${Math.ceil(duration * fps)} frames)`);
     if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
