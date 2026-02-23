@@ -10,7 +10,7 @@ on:
       - 'package-lock.json'
       - 'tsconfig*.json'
       - 'eslint.config.mjs'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
   pull_request:
     branches: [main]
     paths:
@@ -20,7 +20,7 @@ on:
       - 'package-lock.json'
       - 'tsconfig*.json'
       - 'eslint.config.mjs'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 concurrency:
