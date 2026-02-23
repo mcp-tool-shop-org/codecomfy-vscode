@@ -7,7 +7,16 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [0.5.2] - 2026-02-23
+
+### Changed
+- Added CI badge to README.
+
+## [0.5.1] - 2026-02-23
+
+### Changed
+- Hardened CI workflow.
+- Added GitHub Pages landing page (`docs/index.md`).
 
 ## [0.5.0] - 2026-02-14
 
