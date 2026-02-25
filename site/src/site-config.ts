@@ -45,21 +45,8 @@ export const config: SiteConfig = {
       cards: [
         { title: 'Install from VSIX', code: 'Extensions → ··· → Install from VSIX…\n\nDownload latest from Releases' },
         { title: 'Configure ComfyUI', code: 'Settings → Extensions → CodeComfy\n\ncomfyuiUrl: http://127.0.0.1:8188\nffmpegPath: (auto or full path)' },
-        { title: 'Generate', code: 'Ctrl+Shift+P\n\nCodeComfy: Generate Image (HQ)\nCodeComfy: Generate Video (HQ)' },
-        { title: 'View Outputs', code: 'Outputs saved to .codecomfy/outputs/\n\nMetadata in .codecomfy/runs/\n\nNextGallery opens auto' },
-      ],
-    },
-    {
-      kind: 'data-table',
-      id: 'settings',
-      title: 'Configuration',
-      subtitle: 'Control behavior via VS Code settings or settings.json.',
-      rows: [
-        { key: 'codecomfy.comfyuiUrl', value: 'ComfyUI server URL', default: 'http://127.0.0.1:8188' },
-        { key: 'codecomfy.ffmpegPath', value: 'Path to FFmpeg executable (empty = use PATH)', default: '' },
-        { key: 'codecomfy.autoOpenGalleryOnComplete', value: 'Open NextGallery after generation', default: 'true' },
-        { key: 'codecomfy.nextGalleryPath', value: 'Absolute path to NextGallery.exe', default: 'auto-detect' },
-        { key: 'codecomfy.defaultNegativePrompt', value: 'Pre-filled negative prompt', default: '' },
+        { title: 'Generate', code: 'Ctrl+Shift+P → CodeComfy: Generate Image (HQ)\n\nor\n\nCodeComfy: Generate Video (HQ)' },
+        { title: 'View Outputs', code: 'Outputs saved to .codecomfy/outputs/\n\nRun metadata in .codecomfy/runs/\n\nNextGallery auto-opens' },
       ],
     },
   ],
