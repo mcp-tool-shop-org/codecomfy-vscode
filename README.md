@@ -1,8 +1,9 @@
 <p align="center">
-  <img src="assets/logo.png" alt="CodeComfy VSCode" width="400" />
-</p>
-<p align="center">
 <strong>Languages:</strong> <a href="README.md">English</a> | <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिंदी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português</a>
+</p>
+
+<p align="center">
+  <img src="assets/logo.png" alt="CodeComfy VSCode" width="400" />
 </p>
 
 [![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml)
