@@ -3,3 +3,4 @@ dist/
 dist-test/
 *.vsix
 .vscode-test/
+site/.astro/
