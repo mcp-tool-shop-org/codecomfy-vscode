@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" alt="CodeComfy icon" width="96" />
+  <img src="assets/logo.png" alt="CodeComfy VSCode" width="400" />
 </p>
 
 # CodeComfy — ComfyUI generation from VS Code
