@@ -7,6 +7,7 @@
 </p>
 
 [![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml)
+
 *Sit back, type a prompt, let the couch do the work.*
 
 Generate images and videos with ComfyUI without leaving your editor.
