@@ -6,7 +6,9 @@
 
 [![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml)
 
-**Languages:** [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md) | [Español](README.es.md) | [Français](README.fr.md) | [हिंदी](README.hi.md) | [Italiano](README.it.md) | [Português](README.pt-BR.md)
+<p align="center">
+<strong>Languages:</strong> <a href="README.md">English</a> | <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिंदी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português</a>
+</p>
 
 *Sit back, type a prompt, let the couch do the work.*
 
