@@ -9,7 +9,6 @@
 <p align="center">
 <strong>Languages:</strong> <a href="README.md">English</a> | <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिंदी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português</a>
 </p>
-
 *Sit back, type a prompt, let the couch do the work.*
 
 Generate images and videos with ComfyUI without leaving your editor.
