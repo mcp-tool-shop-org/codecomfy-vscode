@@ -6,6 +6,8 @@
 
 [![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml)
 
+**Languages:** [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md) | [Español](README.es.md) | [Français](README.fr.md) | [हिंदी](README.hi.md) | [Italiano](README.it.md) | [Português](README.pt-BR.md)
+
 *Sit back, type a prompt, let the couch do the work.*
 
 Generate images and videos with ComfyUI without leaving your editor.
