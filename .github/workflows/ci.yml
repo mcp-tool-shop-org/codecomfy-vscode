@@ -50,3 +50,13 @@ jobs:
 
       - name: Compile (production)
         run: npm run compile
+
+  dep-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm audit --omit=dev || true

@@ -2,7 +2,7 @@
   "name": "codecomfy-vscode",
   "displayName": "CodeComfy — ComfyUI Generation",
   "description": "Generate images and videos with ComfyUI directly from VS Code. Prompt, poll, download, assemble — all without leaving your editor.",
-  "version": "0.5.5",
+  "version": "1.0.0",
   "publisher": "mcp-tool-shop",
   "author": {
     "name": "mcp-tool-shop",
@@ -102,7 +102,8 @@
     "lint": "eslint",
     "pretest": "npm run compile:test",
     "test": "mocha --require test/register-vscode-stub.js dist-test/test/**/*.test.js --timeout 10000",
-    "package": "vsce package"
+    "package": "vsce package",
+    "verify": "npm test && npm run compile && npx vsce package --no-dependencies"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.0",

@@ -138,6 +138,13 @@ There is a 2-second cooldown between consecutive jobs.
 - Seeds must be whole numbers between 0 and 2,147,483,647.
 - Prompts must be non-empty and at most 8,000 characters.
 
+## Security & Data Scope
+
+- **Network:** connects only to the user-configured ComfyUI URL (default `127.0.0.1:8188`) — no other outbound requests
+- **Files:** outputs saved to `.codecomfy/outputs/` and `.codecomfy/runs/` in the workspace — no files outside the workspace are touched
+- **FFmpeg:** `shell: true` removed from all spawns; path must be absolute, existing, and executable
+- **No telemetry** is collected or sent — see [SECURITY.md](SECURITY.md) for the full policy
+
 ## Known Limitations
 
 | Area | Status |
@@ -179,4 +186,8 @@ FFmpeg        ─── (video only) assemble frames → MP4
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+Built by [MCP Tool Shop](https://mcp-tool-shop.github.io/)
