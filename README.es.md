@@ -1,56 +1,46 @@
 <p align="center">
-  <img src="assets/icon.png" alt="CodeComfy icon" width="96" />
+  <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.md">English</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
 </p>
 
-# CodeComfy: Generación de imágenes con ComfyUI desde VS Code
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/codecomfy-vscode/readme.png" alt="CodeComfy VSCode" width="400" />
+</p>
 
-[![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml)
+[![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml) [![Landing Page](https://img.shields.io/badge/Landing_Page-live-blue)](https://mcp-tool-shop-org.github.io/codecomfy-vscode/)
 
-*Relájese, escriba una instrucción y deje que el sistema haga el trabajo.*
+*Siéntese, escriba una instrucción y deje que el programa haga el trabajo.*
 
-Cree imágenes y videos con ComfyUI sin salir de su editor.
-Seleccione una configuración predefinida, escriba una descripción y observe la barra de estado mientras CodeComfy se encarga del envío del flujo de trabajo, la verificación del estado, la descarga de los fotogramas y la compilación de FFmpeg.
+Genere imágenes y videos con ComfyUI sin salir de su editor.
+Seleccione una configuración predefinida, escriba una instrucción y observe la barra de estado mientras CodeComfy
+se encarga del envío del flujo de trabajo, la verificación del estado, la descarga de fotogramas y la compilación de FFmpeg.
 
-**Diseñado principalmente para Windows, pero compatible con múltiples plataformas.** Completamente probado en Windows 10/11.
-Se espera que funcione en macOS y Linux, pero consulte [Limitaciones conocidas](#known-limitations).
-Se aceptan contribuciones.
+> **Diseñado principalmente para Windows, pero compatible con otras plataformas.** Completamente probado en Windows 10/11.
+> Se espera que macOS y Linux funcionen, pero consulte las [Limitaciones conocidas](#known-limitations).
+> Se aceptan contribuciones.
 
 ---
 
 ## Requisitos previos
 
-| Dependencia. | Requerido. | Notes |
-| Sure, here is the translation:
-
-**English:**
-
-You are a professional English (en) to Spanish (es) translator. Your goal is to accurately convey the meaning and nuances of the original English text while adhering to Spanish grammar, vocabulary, and cultural sensitivities.
-Produce only the Spanish translation, without any additional explanations or commentary. Please translate the following English text into Spanish:
-
-------------
-
-**Spanish:**
-
-Eres un traductor profesional de inglés (en) a español (es). Tu objetivo es transmitir con precisión el significado y los matices del texto original en inglés, respetando la gramática, el vocabulario y las sensibilidades culturales del español.
-Por favor, proporciona únicamente la traducción al español, sin explicaciones ni comentarios adicionales. Traduce el siguiente texto en inglés al español:
-
------------- | Please provide the English text you would like me to translate. I am ready to translate it into Spanish. | Please provide the English text you would like me to translate. I am ready to translate it into Spanish. |
-| **ComfyUI** | Yes | Se puede ejecutar localmente (en `http://127.0.0.1:8188`) o en una máquina remota. CodeComfy se comunica a través de su API HTTP. |
-| **FFmpeg**  | Para video. | Debe estar en la ruta de acceso de su sistema *o* configurado a través de `codecomfy.ffmpegPath`. [Descargue FFmpeg](https://ffmpeg.org/download.html). |
-| **NextGallery** | Opcional. | Visor de galería complementario. No es necesario para la generación en sí. |
+| Dependencia | Requerido | Notas |
+|------------|----------|-------|
+| **ComfyUI** | Sí | Ejecutándose localmente (`http://127.0.0.1:8188`) o en una máquina remota. CodeComfy se comunica a través de su API HTTP. |
+| **FFmpeg**  | Para video | Debe estar en su PATH del sistema *o* configurado a través de `codecomfy.ffmpegPath`. [Descargue FFmpeg](https://ffmpeg.org/download.html). |
+| **NextGallery** | Opcional | Visor de galería complementario. No es necesario para la generación en sí. |
 
 ## Instalación
 
 CodeComfy aún no está disponible en el Marketplace de VS Code.
-Para instalarlo, utilice un archivo `.vsix`:
+Instale desde un archivo `.vsix`:
 
-1. Descargue el archivo `.vsix` más reciente desde la sección de [Lanzamientos](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases).
-2. En VS Code: barra lateral de **Extensiones** → menú `···` → **Instalar desde VSIX…**
+1. Descargue el archivo `.vsix` más reciente de
+[Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases).
+2. En VS Code: Barra lateral de **Extensiones** → menú `···` → **Instalar desde VSIX…**
 3. Recargue la ventana cuando se le solicite.
 
 ### Configuración
 
-Abra **Configuración → Extensiones → CodeComfy** o añada lo siguiente a `settings.json`:
+Abra **Configuración → Extensiones → CodeComfy** o agréguelo a `settings.json`:
 
 ```json
 {
@@ -62,104 +52,114 @@ Abra **Configuración → Extensiones → CodeComfy** o añada lo siguiente a `s
 }
 ```
 
-| Escenario. | Descripción. | Predeterminado. |
-| Please provide the English text you would like me to translate. I am ready to translate it into Spanish. | Please provide the English text you would like me to translate. I am ready to translate it into Spanish. | Please provide the English text you would like me to translate. I am ready to translate it into Spanish. |
-| `codecomfy.comfyuiUrl` | URL del servidor de ComfyUI. | `http://127.0.0.1:8188` |
-| `codecomfy.ffmpegPath` | Ruta absoluta al ejecutable de FFmpeg (dejar en blanco para que se busque en la variable PATH). | `""` |
-| `codecomfy.autoOpenGalleryOnComplete` | Abrir NextGallery una vez que finalice el proceso de generación. | `true` |
-| `codecomfy.nextGalleryPath` | Ruta absoluta al archivo NextGallery.exe. | Detección automática. |
-| `codecomfy.defaultNegativePrompt` | El indicador negativo predeterminado se completa automáticamente durante la generación. | `""` |
+| Configuración | Descripción | Valor predeterminado |
+|---------|-------------|---------|
+| `codecomfy.comfyuiUrl` | URL del servidor de ComfyUI | `http://127.0.0.1:8188` |
+| `codecomfy.ffmpegPath` | Ruta absoluta al ejecutable de FFmpeg (déjelo vacío para buscar en el PATH) | `""` |
+| `codecomfy.autoOpenGalleryOnComplete` | Abrir NextGallery después de que finalice la generación | `true` |
+| `codecomfy.nextGalleryPath` | Ruta absoluta a NextGallery.exe | Detección automática |
+| `codecomfy.defaultNegativePrompt` | Instrucción negativa predeterminada que se completa durante la generación | `""` |
 
-## Guía de inicio rápido
+## Inicio rápido
 
-1. **Inicie ComfyUI:** asegúrese de que se está ejecutando y que es accesible.
-2. **Seleccione un comando:** abra la paleta de comandos (`Ctrl+Shift+P`) y elija:
-- `CodeComfy: Generar imagen (alta calidad)` — genera una sola imagen.
-- `CodeComfy: Generar video (alta calidad)` — genera un video corto (de 2 a 8 segundos).
-3. **Introduzca una descripción**, opcionalmente una **descripción negativa** (elementos a evitar), y una **semilla**, y luego observe la barra de estado.
+1. **Inicie ComfyUI** — asegúrese de que se esté ejecutando y sea accesible.
+2. **Seleccione un comando** — abra la Paleta de Comandos (`Ctrl+Shift+P`) y elija:
+- `CodeComfy: Generate Image (HQ)` — imagen única
+- `CodeComfy: Generate Video (HQ)` — video corto (2–8 s)
+3. **Escriba una instrucción**, opcionalmente una **instrucción negativa** (cosas que evitar), y una **semilla**, y luego observe la barra de estado.
 
-<!-- Capturas de pantalla: reemplazar con imágenes PNG reales. Ver el archivo assets/SCREENSHOTS.md -->
+<!-- Screenshots: replace with real PNGs — see assets/SCREENSHOTS.md -->
 
 La **barra de estado** muestra el progreso en tiempo real (en cola → generando → completado).
 
-Los registros estructurados aparecen en el canal de salida de **CodeComfy** (presione `Ctrl+Shift+U` y luego seleccione "CodeComfy").
+Los registros estructurados aparecen en el canal de salida de **CodeComfy**
+(`Ctrl+Shift+U`, luego seleccione "CodeComfy").
 
-Los resultados se guardan en la carpeta `.codecomfy/outputs/`, ubicada en la raíz de su espacio de trabajo.
-La información sobre las ejecuciones se almacena en la carpeta `.codecomfy/runs/`.
+Las salidas se guardan en `.codecomfy/outputs/` en la raíz de su espacio de trabajo.
+Los metadatos de la ejecución se encuentran en `.codecomfy/runs/`.
 
 ### Cancelar
 
-Ejecute el comando "CodeComfy: Cancelar generación" desde la paleta de comandos o haga clic en el elemento de la barra de estado mientras se está realizando una generación.
+Ejecute `CodeComfy: Cancel Generation` desde la Paleta de Comandos o haga clic en el
+elemento de la barra de estado mientras se está generando algo.
 
 ## Límites de generación
 
-La generación de video aplica límites de seguridad para evitar el agotamiento accidental de los recursos:
+La generación de video impone límites de seguridad para evitar el agotamiento accidental de recursos:
 
-| Parámetro. | Min | Max |
-| Por favor, proporciona el texto que deseas que traduzca. |-----|-----|
-| Duración. | 1 s | 15 s |
-| FPS       | 1   | 60   |
-| Número total de fotogramas (duración × fotogramas por segundo). | — | 450 |
+| Parámetro | Mínimo | Máximo |
+|-----------|-----|-----|
+| Duración | 1 s | 15 s |
+| FPS | 1   | 60   |
+| Número total de fotogramas (duración × fps) | — | 450 |
 
-Si alcanza un límite, reduzca la duración o elija una configuración predefinida con una velocidad de fotogramas más baja.
+Si alcanza un límite, reduzca la duración o elija una configuración predefinida con una frecuencia de fotogramas más baja.
 
 ## Solución de problemas
 
-### `[Red]` — No se puede conectar al servidor de ComfyUI
+### `[Red]` — No se puede acceder al servidor de ComfyUI
 
-- ¿Está ComfyUI en ejecución? Verifique la dirección `http://127.0.0.1:8188/system_stats` en un navegador.
-- Si ComfyUI se está ejecutando en un puerto o host diferente, actualice la variable `codecomfy.comfyuiUrl`.
-- ¿Un firewall o un servidor proxy están bloqueando la conexión? Intente ejecutar el comando `curl http://127.0.0.1:8188/system_stats`.
+- ¿Está ComfyUI en ejecución? Verifique `http://127.0.0.1:8188/system_stats` en un navegador.
+- Si ComfyUI está en un puerto u host diferente, actualice `codecomfy.comfyuiUrl`.
+- ¿Un firewall o un proxy están bloqueando la conexión? Intente `curl http://127.0.0.1:8188/system_stats`.
 
 ### `[Servidor]` — ComfyUI devolvió un error
 
-- Verifique la terminal o consola de ComfyUI para buscar rastros de errores.
-- Causa común: falta de un archivo de modelo o de un nodo personalizado.
-- Asegúrese de que su instalación de ComfyUI tenga los nodos necesarios para el flujo de trabajo predefinido.
+- Revise la terminal/consola de ComfyUI para ver los rastros de pila.
+- Causa común: falta un modelo o un nodo personalizado.
+- Asegúrese de que ComfyUI tenga los nodos requeridos por el flujo de trabajo predefinido.
 
 ### `[API]` — Error en la estructura de la respuesta
 
-- Es posible que su versión de ComfyUI sea demasiado antigua o demasiado reciente para los ajustes predefinidos incluidos.
-- Un servidor proxy inverso o una CDN podrían estar alterando las respuestas en formato JSON.
-- Intente acceder directamente a las rutas `/prompt` y `/history` para examinar la estructura de la respuesta.
+- Es posible que su versión de ComfyUI sea demasiado antigua o demasiado nueva para los flujos de trabajo predefinidos.
+- Un proxy inverso o una CDN podría estar alterando las respuestas JSON.
+- Intente acceder directamente a `/prompt` y `/history` para inspeccionar la estructura de la respuesta.
 
-### `[IO]` — Problemas de permisos de archivo o de disco
+### `[E/S]` — Problemas de permisos de archivo o del disco
 
-- Asegúrese de que la carpeta de su espacio de trabajo tenga permisos de escritura.
-- Verifique el espacio disponible en el disco, ya que las descargas de archivos de video pueden ser muy grandes.
-- En Windows, evite utilizar espacios de trabajo en unidades de red para obtener el mejor rendimiento.
+- Asegúrese de que la carpeta de su espacio de trabajo sea de escritura.
+- Verifique el espacio disponible en el disco; las descargas de fotogramas pueden ser grandes para videos.
+- En Windows, evite usar espacios de trabajo en unidades de red para obtener el mejor rendimiento.
 
-### FFmpeg no encontrado
+### No se encontró FFmpeg
 
-- Instale FFmpeg y asegúrese de que `ffmpeg.exe` esté en la ruta de acceso (PATH) de su sistema.
-- O bien, configure la variable `codecomfy.ffmpegPath` con la **ruta absoluta completa** (por ejemplo, `C:\ffmpeg\bin\ffmpeg.exe`).
-- Las rutas relativas y los nombres sin especificar (excepto el `ffmpeg` que se encuentra en la ruta de acceso) no son aceptados por motivos de seguridad.
+- Instale FFmpeg y asegúrese de que `ffmpeg.exe` esté en la ruta del sistema.
+- O configure `codecomfy.ffmpegPath` con la **ruta absoluta completa** (por ejemplo, `C:\ffmpeg\bin\ffmpeg.exe`).
+- Las rutas relativas y los nombres sin ruta (aparte de `ffmpeg` resuelto por la ruta) se rechazan por motivos de seguridad.
 
-### "La generación ya está en marcha."
+### "La generación ya está en curso"
 
-Solo una generación puede ejecutarse a la vez.
-Cancela la generación actual ("CodeComfy: Cancelar Generación") o espera a que finalice.
-Existe un período de enfriamiento de 2 segundos entre tareas consecutivas.
+Solo se puede ejecutar una generación a la vez.
+Cancela la generación actual (`CodeComfy: Cancelar generación`) o espera a que finalice.
+Hay un período de espera de 2 segundos entre trabajos consecutivos.
 
-### Validación de la semilla/instrucción inicial
+### Validación de semilla/indicación
 
-- Los valores de "seed" deben ser números enteros entre 0 y 2.147.483.647.
-- Las indicaciones (prompts) no pueden estar vacías y deben tener como máximo 8.000 caracteres.
+- Las semillas deben ser números enteros entre 0 y 2.147.483.647.
+- Las indicaciones deben tener al menos un carácter y no pueden exceder los 8.000 caracteres.
+
+## Seguridad y alcance de los datos
+
+- **Red:** se conecta solo a la URL de ComfyUI configurada por el usuario (por defecto `127.0.0.1:8188`) — no se realizan otras solicitudes salientes.
+- **Archivos:** los archivos se guardan en `.codecomfy/outputs/` y `.codecomfy/runs/` en el espacio de trabajo — no se modifican archivos fuera del espacio de trabajo.
+- **FFmpeg:** se eliminó `shell: true` de todos los procesos; la ruta debe ser absoluta, existente y ejecutable.
+- No se recopila ni se envía **telemetría** — consulte [SECURITY.md](SECURITY.md) para obtener la política completa.
 
 ## Limitaciones conocidas
 
-| Area | Estado. |
-| Por favor, proporciona el texto que deseas que traduzca. | Please provide the English text you would like me to translate. I am ready to translate it into Spanish. |
-| **Windows** | Completamente probado (en Windows 10/11). Plataforma principal. |
-| macOS. | Se espera que esta función se utilice para la generación de imágenes y videos. Es posible que NextGallery aún no esté disponible. |
-| **Linux** | Se espera que esta herramienta se utilice para la generación de imágenes y videos. Es posible que NextGallery aún no esté disponible. |
-| **Remote / WSL** | La dirección URL de ComfyUI debe ser accesible desde el equipo que ejecuta Visual Studio Code. |
+| Área. | Estado. |
+|------|--------|
+| **Windows** | Completamente probado (Windows 10/11). Plataforma principal. |
+| **macOS** | Se espera que funcione para la generación de imágenes y videos. Es posible que NextGallery no esté disponible todavía. |
+| **Linux** | Se espera que funcione para la generación de imágenes y videos. Es posible que NextGallery no esté disponible todavía. |
+| **Remote / WSL** | La URL de ComfyUI debe ser accesible desde el host que ejecuta VS Code. |
 
-La funcionalidad principal (prompt → ComfyUI → descarga → ensamblaje de FFmpeg) es independiente de la plataforma. La única característica específica de Windows es la detección automática de NextGallery, que en otras plataformas recurre a un mensaje que indica al usuario que "configure la ruta en la configuración".
+La funcionalidad principal (indicación → ComfyUI → descarga → ensamblaje de FFmpeg) es
+independiente de la plataforma. La única función específica de Windows es la detección automática de NextGallery, que, en otras plataformas, muestra un mensaje para "establecer la ruta en la configuración".
 
-Si encuentra un problema específico de una plataforma, por favor,
-[registre un problema](https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues)
-indicando su sistema operativo, la versión de VS Code y la versión de ComfyUI.
+Si encuentra un problema específico de la plataforma,
+[abra un problema](https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues)
+con su sistema operativo, versión de VS Code y versión de ComfyUI.
 
 ## Cómo funciona
 
@@ -184,4 +184,8 @@ FFmpeg        ─── (video only) assemble frames → MP4
 
 ## Licencia
 
-MIT.
+MIT — consulte [LICENSE](LICENSE) para obtener más detalles.
+
+---
+
+Creado por [MCP Tool Shop](https://mcp-tool-shop.github.io/)
