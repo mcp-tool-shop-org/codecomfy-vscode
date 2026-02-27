@@ -9,6 +9,11 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-02-27
+
+### Added
+- 80 new unit tests covering engine, router, ffmpeg, and type contracts (235 total).
+
 ## [0.5.4] - 2026-02-27
 
 ### Changed
