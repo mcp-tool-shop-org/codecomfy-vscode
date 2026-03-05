@@ -15,7 +15,7 @@ export const config: SiteConfig = {
     headlineAccent: 'without leaving your editor.',
     description: 'Prompt, generate, download, and assemble images and videos with ComfyUI directly from VS Code. Status bar polling, auto-gallery, and FFmpeg assembly built in.',
     primaryCta: { href: '#quickstart', label: 'Get started' },
-    secondaryCta: { href: '#features', label: 'Features' },
+    secondaryCta: { href: 'handbook/', label: 'Read the Handbook' },
     previews: [
       { label: 'Command', code: 'Ctrl+Shift+P → CodeComfy: Generate Image (HQ)' },
       { label: 'Prompt', code: 'masterpiece, dynamic pose, soft lighting, 8k' },
