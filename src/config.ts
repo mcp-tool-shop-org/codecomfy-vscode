@@ -9,6 +9,7 @@
 import * as vscode from 'vscode';
 import { CodeComfyConfig, DEFAULT_CONFIG } from './types';
 import { validateExecutablePath } from './validation/paths';
+import { validateComfyUrl } from './validation/url';
 
 /**
  * Read and validate extension configuration.
@@ -38,9 +39,21 @@ export function getConfig(): CodeComfyConfig {
         ffmpegPath = undefined; // PATH lookup
     }
 
+    // --- ComfyUI URL validation ---
+    const rawComfyUrl = config.get<string>('comfyuiUrl') || DEFAULT_CONFIG.comfyuiUrl;
+    const urlResult = validateComfyUrl(rawComfyUrl);
+
+    let comfyuiUrl: string;
+    if (!urlResult.valid) {
+        vscode.window.showWarningMessage(`Invalid ComfyUI URL: ${urlResult.error} Using default.`);
+        comfyuiUrl = DEFAULT_CONFIG.comfyuiUrl;
+    } else {
+        comfyuiUrl = urlResult.value!;
+    }
+
     return {
         nextGalleryPath: config.get<string>('nextGalleryPath') || undefined,
-        comfyuiUrl: config.get<string>('comfyuiUrl') || DEFAULT_CONFIG.comfyuiUrl,
+        comfyuiUrl,
         autoOpenGalleryOnComplete: config.get<boolean>('autoOpenGalleryOnComplete') ?? DEFAULT_CONFIG.autoOpenGalleryOnComplete,
         ffmpegPath,
     };

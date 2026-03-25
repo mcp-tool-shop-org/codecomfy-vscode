@@ -9,6 +9,13 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-03-25
+
+### Added
+- ComfyUI URL validation — `comfyuiUrl` setting now validates protocol (http/https only), hostname, and format before use
+- `validateComfyUrl()` in `src/validation/url.ts` with trailing-slash normalization
+- 12 new tests for URL validation (247 total)
+
 ## [1.0.0] - 2026-02-27
 
 ### Added
