@@ -12,7 +12,9 @@ CodeComfy bridges your editor and your ComfyUI server so you never have to switc
 ## What you will find here
 
 - **[Getting Started](getting-started/)** — prerequisites, installation, configuration, and your first generation.
+- **[Usage Guide](usage/)** — daily workflow patterns, prompt tips, output management, and run pruning.
 - **[Reference](reference/)** — generation limits, architecture overview, troubleshooting, platform notes, and security scope.
+- **[For Beginners](beginners/)** — new to AI image generation or VS Code extensions? Start here.
 
 ## Quick links
 

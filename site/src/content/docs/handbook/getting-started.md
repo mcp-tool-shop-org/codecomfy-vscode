@@ -62,7 +62,7 @@ Open **Settings > Extensions > CodeComfy** in VS Code, or add the keys directly 
 ```json
 {
   "codecomfy.comfyuiUrl": "http://127.0.0.1:8188",
-  "codecomfy.ffmpegPath": "C:\ffmpeg\bin\ffmpeg.exe",
+  "codecomfy.ffmpegPath": "C:\\ffmpeg\\bin\\ffmpeg.exe",
   "codecomfy.autoOpenGalleryOnComplete": true,
   "codecomfy.defaultNegativePrompt": "blurry, watermark, low quality"
 }
