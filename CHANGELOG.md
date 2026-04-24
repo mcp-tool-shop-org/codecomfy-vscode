@@ -23,6 +23,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   call: 30 s for `/view` downloads, 10 s for `POST /prompt`, 5 s for
   `/history` polling. The extension no longer hangs indefinitely when
   ComfyUI stalls mid-request.
+- **Dependency audit.** Closed 8 transitive CVEs via `npm audit fix`
+  (ajv, brace-expansion, flatted, lodash, minimatch, underscore, undici).
+  Forced `serialize-javascript@^7.0.5` via npm `overrides` to patch a
+  HIGH RCE CVE in the transitive `mocha` dep chain (upstream mocha has
+  not yet bumped). Dev-only surface; runtime is unaffected. 4 remaining
+  MODERATE vulns in the `@vscode/vsce → @azure/identity → uuid (<14)`
+  chain are packaging-tool-only; tracked for a follow-up when upstream
+  lands a `@azure/identity` bump.
 
 ### Added
 - **Structured filename validation error.** `ComfyResponseError` now carries
