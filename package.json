@@ -100,6 +100,12 @@
           "default": "",
           "description": "Default negative prompt pre-filled during generation. Common values: blurry, distorted, low quality, text, watermark.",
           "markdownDescription": "Default negative prompt pre-filled during generation. Describes what to **avoid** in the output. Common values: `blurry, distorted, low quality, text, watermark, deformed hands`. See the [ComfyUI prompt guide](https://github.com/comfyanonymous/ComfyUI#workflow-examples) for examples."
+        },
+        "codecomfy.defaultCheckpoint": {
+          "type": "string",
+          "default": "",
+          "description": "Override the model checkpoint baked into shipped HQ presets. Filename from your ComfyUI models/checkpoints/ directory. Leave empty to use the preset's built-in default.",
+          "markdownDescription": "Override the model checkpoint baked into the **shipped HQ presets** (`hq-image`, `hq-video`). Set to a `.safetensors` filename from your `ComfyUI/models/checkpoints/` directory (e.g. `sd_xl_base_1.0.safetensors`). Leave empty to use each preset's built-in default (requires `juggernautXL_v9Rundiffusionphoto2.safetensors`). If generation fails with a 'model not found' error, set this to a checkpoint you actually have installed."
         }
       }
     }

@@ -274,7 +274,7 @@ async function generateImageHQCommand(): Promise<void> {
     // Pre-flight ComfyUI reachability BEFORE prompting for input
     // (UX F-256918-015). Don't make the user type a prompt only to be
     // told ComfyUI is down seconds later.
-    const preflightEngine = new ComfyServerEngine(config.comfyuiUrl);
+    const preflightEngine = new ComfyServerEngine(config.comfyuiUrl, undefined, { checkpoint: config.defaultCheckpoint });
     const health = await ensureComfyReachable(preflightEngine, config.comfyuiUrl);
     if (!health.ok) {
         vscode.window.showErrorMessage(health.message ?? 'ComfyUI is not reachable.');
@@ -329,7 +329,7 @@ async function generateImageHQCommand(): Promise<void> {
         return;
     }
 
-    const engine = new ComfyServerEngine(config.comfyuiUrl);
+    const engine = new ComfyServerEngine(config.comfyuiUrl, undefined, { checkpoint: config.defaultCheckpoint });
     const logger = createChannelLogger('JobRouter', outputChannel);
     const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath, logger });
     currentRouter = router;
@@ -375,7 +375,7 @@ async function generateVideoHQCommand(): Promise<void> {
     writeCommandHeader('Generate Video (HQ)', config);
     outputChannel.show(true);
 
-    const preflightEngine = new ComfyServerEngine(config.comfyuiUrl);
+    const preflightEngine = new ComfyServerEngine(config.comfyuiUrl, undefined, { checkpoint: config.defaultCheckpoint });
     const health = await ensureComfyReachable(preflightEngine, config.comfyuiUrl);
     if (!health.ok) {
         vscode.window.showErrorMessage(health.message ?? 'ComfyUI is not reachable.');
@@ -448,7 +448,7 @@ async function generateVideoHQCommand(): Promise<void> {
         return;
     }
 
-    const engine = new ComfyServerEngine(config.comfyuiUrl);
+    const engine = new ComfyServerEngine(config.comfyuiUrl, undefined, { checkpoint: config.defaultCheckpoint });
     const logger = createChannelLogger('JobRouter', outputChannel);
     const router = new JobRouter(workspacePath, engine, { ffmpegPath: config.ffmpegPath, logger });
     currentRouter = router;

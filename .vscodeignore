@@ -19,5 +19,6 @@ assets/SCREENSHOTS.md
 assets/screenshot-*.svg
 assets/logo.png
 assets/icon.svg
+.scoping/
 CONTRIBUTING.md
 site/**

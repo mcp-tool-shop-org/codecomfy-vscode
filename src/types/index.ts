@@ -160,6 +160,13 @@ export interface CodeComfyConfig {
     comfyuiUrl: string;
     autoOpenGalleryOnComplete: boolean;
     ffmpegPath?: string;
+    /**
+     * Override the `ckpt_name` baked into the shipped HQ presets. If set and
+     * non-empty, buildWorkflow() substitutes this value into every
+     * `CheckpointLoaderSimple` node. Empty means "use the preset's
+     * hard-coded value as-is" (backward-compatible default).
+     */
+    defaultCheckpoint?: string;
 }
 
 export const DEFAULT_CONFIG: CodeComfyConfig = {

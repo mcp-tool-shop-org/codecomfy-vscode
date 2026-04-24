@@ -51,10 +51,18 @@ export function getConfig(): CodeComfyConfig {
         comfyuiUrl = urlResult.value!;
     }
 
+    // --- Default checkpoint override ---
+    // Empty string → use preset's hardcoded ckpt_name (backward-compatible).
+    // Non-empty → substituted into every CheckpointLoaderSimple node at
+    //              buildWorkflow() time by ComfyServerEngine.
+    const rawCheckpoint = (config.get<string>('defaultCheckpoint') ?? '').trim();
+    const defaultCheckpoint = rawCheckpoint.length > 0 ? rawCheckpoint : undefined;
+
     return {
         nextGalleryPath: config.get<string>('nextGalleryPath') || undefined,
         comfyuiUrl,
         autoOpenGalleryOnComplete: config.get<boolean>('autoOpenGalleryOnComplete') ?? DEFAULT_CONFIG.autoOpenGalleryOnComplete,
         ffmpegPath,
+        defaultCheckpoint,
     };
 }

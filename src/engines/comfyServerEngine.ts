@@ -56,6 +56,20 @@ export type AvailabilityResult =
         detail: string;
     };
 
+/**
+ * Per-instance overrides applied at workflow-build time. Used today to
+ * substitute a user-specified checkpoint into shipped HQ presets so that
+ * Marketplace installs without the preset's hardcoded model don't fail
+ * on first run.
+ */
+export interface WorkflowOverrides {
+    /**
+     * If set, replaces `ckpt_name` on every `CheckpointLoaderSimple` node
+     * in the preset workflow. Empty/undefined → preset value wins.
+     */
+    checkpoint?: string;
+}
+
 export class ComfyServerEngine implements IGenerationEngine {
     readonly id = 'comfy-server';
     readonly name = 'ComfyUI Server';
@@ -64,15 +78,22 @@ export class ComfyServerEngine implements IGenerationEngine {
     private currentPromptId: string | null = null;
     private canceled = false;
     private logger: Logger;
+    private overrides: WorkflowOverrides;
 
     /**
      * Construct a new engine. The optional `logger` argument is injected by
      * the router; tests pass `undefined` and get a silent null-logger so
-     * output channels are not required.
+     * output channels are not required. The optional `overrides` argument
+     * supplies per-session workflow substitutions (e.g. checkpoint name).
      */
-    constructor(serverUrl: string = 'http://127.0.0.1:8188', logger?: Logger) {
+    constructor(
+        serverUrl: string = 'http://127.0.0.1:8188',
+        logger?: Logger,
+        overrides: WorkflowOverrides = {},
+    ) {
         this.serverUrl = serverUrl.replace(/\/$/, '');
         this.logger = logger ?? createNullLogger('ComfyServerEngine');
+        this.overrides = overrides;
     }
 
     /**
@@ -232,6 +253,13 @@ export class ComfyServerEngine implements IGenerationEngine {
                 if (request.inputs.cfg_scale !== undefined) {
                     inputs.cfg = request.inputs.cfg_scale;
                 }
+            }
+
+            // CheckpointLoaderSimple - substitute user's default checkpoint if set.
+            // Shipped HQ presets hardcode juggernautXL_v9; the override lets
+            // users redirect without authoring a new preset.
+            if (classType === 'CheckpointLoaderSimple' && this.overrides.checkpoint) {
+                inputs.ckpt_name = this.overrides.checkpoint;
             }
 
             // EmptyLatentImage - apply dimensions and batch_size (for video frames)
@@ -846,7 +874,11 @@ export function categorizeError(err: unknown): string {
 function extractMissingModelHint(raw: string): string {
     const match = raw.match(/['"`]?([\w.\-]+\.(?:safetensors|ckpt|pt|bin|gguf))['"`]?/i);
     if (match) {
-        return `The model "${match[1]}" appears to be missing. `;
+        return (
+            `The model "${match[1]}" appears to be missing. ` +
+            `If this is a shipped preset, set \`codecomfy.defaultCheckpoint\` ` +
+            `to a model you have installed in ComfyUI/models/checkpoints/. `
+        );
     }
     return '';
 }

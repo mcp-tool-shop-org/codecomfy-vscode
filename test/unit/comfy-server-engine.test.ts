@@ -415,6 +415,82 @@ describe('ComfyServerEngine', () => {
                 );
             });
         });
+
+        // ── Checkpoint override (FT-3) ──────────────────────────────────────
+        //
+        // Shipped HQ presets hardcode `juggernautXL_v9Rundiffusionphoto2.safetensors`
+        // in CheckpointLoaderSimple nodes. Users without that exact model hit
+        // "model not found" on first run. The engine accepts a `checkpoint`
+        // override that substitutes the ckpt_name at build time.
+
+        describe('checkpoint override (FT-3)', () => {
+            const makeCheckpointWorkflow = () => ({
+                '4': {
+                    class_type: 'CheckpointLoaderSimple',
+                    inputs: { ckpt_name: 'juggernautXL_v9Rundiffusionphoto2.safetensors' },
+                },
+            });
+
+            it('substitutes ckpt_name when override is set', () => {
+                const engine = new ComfyServerEngine('http://localhost:8188', undefined, {
+                    checkpoint: 'sd_xl_base_1.0.safetensors',
+                });
+                const result = buildWorkflow(engine, makePreset(makeCheckpointWorkflow()), makeRequest());
+                const inner = (result as any).prompt;
+                assert.strictEqual(inner['4'].inputs.ckpt_name, 'sd_xl_base_1.0.safetensors');
+            });
+
+            it('leaves ckpt_name untouched when no override', () => {
+                const engine = new ComfyServerEngine();
+                const result = buildWorkflow(engine, makePreset(makeCheckpointWorkflow()), makeRequest());
+                const inner = (result as any).prompt;
+                assert.strictEqual(inner['4'].inputs.ckpt_name, 'juggernautXL_v9Rundiffusionphoto2.safetensors');
+            });
+
+            it('leaves ckpt_name untouched when override is empty string', () => {
+                const engine = new ComfyServerEngine('http://localhost:8188', undefined, {
+                    checkpoint: '',
+                });
+                const result = buildWorkflow(engine, makePreset(makeCheckpointWorkflow()), makeRequest());
+                const inner = (result as any).prompt;
+                assert.strictEqual(inner['4'].inputs.ckpt_name, 'juggernautXL_v9Rundiffusionphoto2.safetensors');
+            });
+
+            it('substitutes across multiple CheckpointLoaderSimple nodes (e.g. refiner pipelines)', () => {
+                const workflow = {
+                    '4': {
+                        class_type: 'CheckpointLoaderSimple',
+                        inputs: { ckpt_name: 'base.safetensors' },
+                    },
+                    '5': {
+                        class_type: 'CheckpointLoaderSimple',
+                        inputs: { ckpt_name: 'refiner.safetensors' },
+                    },
+                };
+                const engine = new ComfyServerEngine('http://localhost:8188', undefined, {
+                    checkpoint: 'custom.safetensors',
+                });
+                const result = buildWorkflow(engine, makePreset(workflow), makeRequest());
+                const inner = (result as any).prompt;
+                assert.strictEqual(inner['4'].inputs.ckpt_name, 'custom.safetensors');
+                assert.strictEqual(inner['5'].inputs.ckpt_name, 'custom.safetensors');
+            });
+
+            it('ignores non-CheckpointLoaderSimple nodes even if they have ckpt_name', () => {
+                const workflow = {
+                    '4': {
+                        class_type: 'OtherLoader',
+                        inputs: { ckpt_name: 'base.safetensors' },
+                    },
+                };
+                const engine = new ComfyServerEngine('http://localhost:8188', undefined, {
+                    checkpoint: 'should-not-apply.safetensors',
+                });
+                const result = buildWorkflow(engine, makePreset(workflow), makeRequest());
+                const inner = (result as any).prompt;
+                assert.strictEqual(inner['4'].inputs.ckpt_name, 'base.safetensors');
+            });
+        });
     });
 
     describe('cancel', () => {

@@ -65,6 +65,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `context.subscriptions` so VS Code disposes it uniformly on deactivation.
 - **Idle timer cleanup.** `deactivate()` clears any pending idle timer so
   it cannot fire against a disposed UI.
+- **Checkpoint no longer hardcoded.** Shipped HQ presets referenced a
+  specific checkpoint (`juggernautXL_v9Rundiffusionphoto2.safetensors`),
+  causing first-run failures for users without that exact model. A new
+  setting `codecomfy.defaultCheckpoint` overrides the `ckpt_name` on every
+  `CheckpointLoaderSimple` node at workflow-build time. When the setting
+  is empty (default), the preset's original value wins — fully
+  backward-compatible. When ComfyUI reports a missing-model error, the
+  user-facing message now suggests setting `codecomfy.defaultCheckpoint`
+  to a model they actually have installed.
 
 ## [1.0.2] - 2026-03-25
 

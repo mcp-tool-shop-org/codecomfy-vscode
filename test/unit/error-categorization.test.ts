@@ -55,6 +55,19 @@ describe('categorizeError', () => {
         assert.match(result, /^\[IO\]/);
     });
 
+    // FT-3: node error on a missing shipped-preset model now suggests the
+    // defaultCheckpoint setting in the hint.
+    it('hints defaultCheckpoint when a node error names a .safetensors file', () => {
+        const raw = 'ComfyUI node error: node 4: model "juggernautXL_v9Rundiffusionphoto2.safetensors" not found';
+        const result = categorizeError(new Error(raw));
+        assert.match(result, /^\[Node\]/);
+        assert.ok(result.includes('juggernautXL_v9Rundiffusionphoto2.safetensors'));
+        assert.ok(
+            result.includes('codecomfy.defaultCheckpoint'),
+            `expected hint to mention the setting; got: ${result}`,
+        );
+    });
+
     it('passes through uncategorised errors as-is', () => {
         const result = categorizeError(new Error('something unexpected'));
         assert.strictEqual(result, 'something unexpected');
