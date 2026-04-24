@@ -17,6 +17,7 @@ node_modules/**
 .github/**
 assets/SCREENSHOTS.md
 assets/screenshot-*.svg
+assets/screenshot-*.png
 assets/logo.png
 assets/icon.svg
 .scoping/

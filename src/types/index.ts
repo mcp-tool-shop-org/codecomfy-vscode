@@ -17,6 +17,20 @@ export interface OutputIndex {
     items: IndexedArtifact[];
 }
 
+/**
+ * An artifact as it appears in the output index (gallery/TreeView).
+ *
+ * Fields TreeView requires writers to populate (see jobRouter.updateIndex):
+ * - `provenance.prompt` — rendered as the primary label
+ * - `provenance.preset_id` — TreeView groups by preset
+ * - For `type === 'video'`: `meta.thumbnail_path`, `meta.duration_seconds`,
+ *   `meta.fps` — needed for thumbnail preview and duration badge
+ *
+ * These are typed as optional for backward-compat with older index.json
+ * files on disk, but writers MUST populate them on new entries. When any
+ * of the required fields are missing on a written artifact, jobRouter
+ * logs a WARN (it does NOT throw — leniency is intentional for old data).
+ */
 export interface IndexedArtifact {
     id: string;
     type: 'image' | 'video';
@@ -45,6 +59,21 @@ export interface ArtifactMeta {
     [key: string]: unknown;
 }
 
+/**
+ * Provenance fields for a generated artifact.
+ *
+ * Shape note: several fields are declared optional here for backward-compat
+ * with index.json files written by older versions, but the current writer
+ * contract (enforced by JobRouter.updateIndex) requires `prompt` and
+ * `preset_id` to be populated on every new entry. TreeView groups artifacts
+ * by `preset_id` and renders `prompt` as the primary label.
+ *
+ * `checkpoint` is the effective `ckpt_name` after any `defaultCheckpoint`
+ * config override is applied — populate this when known so the gallery
+ * can show which model produced the artifact.
+ *
+ * The index signature keeps this type extensible for engine-specific fields.
+ */
 export interface ArtifactProvenance {
     prompt?: string;
     negative_prompt?: string;
@@ -52,7 +81,11 @@ export interface ArtifactProvenance {
     model?: string;
     steps?: number;
     cfg_scale?: number;
+    /** TreeView groups by preset. Writers MUST populate this on new entries. */
     preset_id?: string;
+    /** Effective ckpt_name after config overrides, when known. */
+    checkpoint?: string;
+    /** Extensible tail — keep open-map compatibility for engine-specific fields. */
     [key: string]: unknown;
 }
 
@@ -128,6 +161,12 @@ export interface Preset {
     id: string;
     name: string;
     kind: GenerationKind;
+    /**
+     * Optional human-readable description. Rendered in QuickPick
+     * labels and gallery detail views. Pure UI field — no runtime
+     * behavior depends on it.
+     */
+    description?: string;
     defaults: Partial<GenerationInputs>;
     /** ComfyUI workflow JSON template */
     workflow?: Record<string, unknown>;

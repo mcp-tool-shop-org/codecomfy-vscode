@@ -17,7 +17,7 @@ The two generate commands (`Generate Image (HQ)` and `Generate Video (HQ)`) both
 
 ## All settings
 
-CodeComfy exposes five settings under the `codecomfy.*` namespace. You can edit them in the VS Code Settings UI (**Settings > Extensions > CodeComfy**) or directly in your `settings.json`.
+CodeComfy exposes seven settings under the `codecomfy.*` namespace. You can edit them in the VS Code Settings UI (**Settings > Extensions > CodeComfy**) or directly in your `settings.json`.
 
 ### codecomfy.comfyuiUrl
 
@@ -96,6 +96,30 @@ blurry, distorted, low quality, text, watermark, deformed hands
 You can still edit or clear the pre-filled value during each generation -- it is a convenience default, not a locked setting.
 
 The negative prompt has the same 8,000-character limit as the positive prompt.
+
+### codecomfy.defaultCheckpoint
+
+| | |
+|--|--|
+| **Type** | `string` |
+| **Default** | `""` (use each preset's built-in default) |
+| **Purpose** | Override the model checkpoint baked into the shipped HQ presets. |
+
+Set this to a `.safetensors` filename from your `ComfyUI/models/checkpoints/` directory (e.g. `sd_xl_base_1.0.safetensors`). When set and non-empty, CodeComfy substitutes the value into every `CheckpointLoaderSimple` node in the shipped HQ presets (`hq-image`, `hq-video`).
+
+Leave empty to use each preset's built-in default (which expects `juggernautXL_v9Rundiffusionphoto2.safetensors`). If generation fails with a "model not found" error, set this to a checkpoint you actually have installed.
+
+User-authored presets in `.codecomfy/presets/` use whatever `ckpt_name` is written into their `CheckpointLoaderSimple` node — this setting does not override those.
+
+### codecomfy.notifyOnComplete
+
+| | |
+|--|--|
+| **Type** | `boolean` |
+| **Default** | `true` |
+| **Purpose** | Show a VS Code notification when a generation completes. |
+
+Set to `false` for silent status-bar-only updates — useful if you batch long video renders and do not want a notification popping up each time. Errors are always shown regardless of this setting.
 
 ## Example settings.json
 

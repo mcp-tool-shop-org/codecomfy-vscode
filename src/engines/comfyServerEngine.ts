@@ -6,6 +6,56 @@
  *
  * For video: collects frames into run folder for FFmpeg assembly.
  * For image: saves directly to outputs folder.
+ *
+ * ──────────────────────────────────────────────────────────────────────────
+ * HTTP CONTRACT (for test fixture recording — FT-017)
+ *
+ * The engine makes exactly these calls against the configured ComfyUI server,
+ * in this order, during a successful run. Test helpers that want to record or
+ * replay real traffic (e.g. a future `stubFetchFromFixtures(presetId)`) must
+ * cover every URL pattern listed below.
+ *
+ *   1. getAvailability()  [called from generate() at entry, and standalone]
+ *        GET  {serverUrl}/system_stats
+ *        Timeout: 5s (AbortSignal.timeout)
+ *        Expected: 200 { system: {...}, devices: [...] }
+ *        Non-2xx → reason: 'http-error'; network → 'refused' | 'timeout' | 'bad-url' | 'unknown'.
+ *
+ *   2. submitPrompt(workflow)
+ *        POST {serverUrl}/prompt
+ *        Headers: Content-Type: application/json
+ *        Body: { prompt: <workflow_nodes_by_id> }
+ *               (no client_id is sent; ComfyUI assigns one server-side)
+ *        Timeout: 10s
+ *        Expected: 200 { prompt_id: string, number: int, node_errors: {} }
+ *        Validated by `validatePromptResponse()`.
+ *
+ *   3. pollForCompletion(promptId)
+ *        GET  {serverUrl}/history/{promptId}
+ *        Timeout per attempt: 5s
+ *        Poll cadence: exponential backoff via BackoffTimer (≈500ms → 8s cap)
+ *        Budget: 300s (image) or 600s (video)
+ *        Expected: 200 { [promptId]: { status: { completed: bool, ... }, outputs: { [nodeId]: { images?: [...] } } } }
+ *        Validated by `validateHistoryResponse()`.
+ *        Non-2xx while polling is treated as "not ready yet" and retried.
+ *
+ *   4. collectImages / collectFrames (one GET per output image)
+ *        GET  {serverUrl}/view?filename=<name>&subfolder=<sub>&type=<type>
+ *        Timeout: 30s
+ *        Expected: 200 image/png | image/jpeg (streamed to disk)
+ *        Filename is first passed through `sanitizeComfyFilename()`.
+ *
+ *   5. cancel()  [only if a prompt is in flight]
+ *        POST {serverUrl}/interrupt
+ *        No body; response body ignored; errors swallowed.
+ *
+ * Notes for fixture recorders:
+ *   • ORDER MATTERS — a recorder that replays calls in the wrong order will
+ *     mismatch because pollForCompletion depends on submitPrompt's id.
+ *   • /view may be called many times (1× per image, N× for video frames).
+ *   • A cancel may happen mid-poll; a fixture player should be tolerant of
+ *     a short-circuited `/history/...` loop followed by a POST /interrupt.
+ * ──────────────────────────────────────────────────────────────────────────
  */
 
 import * as fs from 'fs';
@@ -70,6 +120,145 @@ export interface WorkflowOverrides {
     checkpoint?: string;
 }
 
+/**
+ * Metadata emitted alongside the GenerationResult via the optional
+ * `onComplete` callback on `generate()`. Added for FT-015 so router/extcore
+ * can log structured run summaries without re-deriving timing.
+ *
+ * `phase_breakdown` is populated when the engine tracks each phase; fields
+ * are optional because today's implementation only measures the total and
+ * frame count. Callers should treat missing fields as "not measured".
+ */
+export interface CompletionMetadata {
+    /** Total time from `generate()` entry to return, in milliseconds. */
+    total_elapsed_ms: number;
+    /** Per-phase timing when available (currently submit + poll + download + assemble). */
+    phase_breakdown?: {
+        submit_ms?: number;
+        poll_ms?: number;
+        download_ms?: number;
+        assemble_ms?: number;
+    };
+    /** Number of frames actually collected (video only). Undefined for images. */
+    frames_collected?: number;
+    /** Final count of artifacts returned in the GenerationResult. */
+    final_artifact_count: number;
+}
+
+/**
+ * Callback invoked exactly once per `generate()` call, immediately before
+ * the method returns, regardless of success or failure. Router/extcore
+ * subscribers use it to emit structured "generation complete" events.
+ */
+export type OnCompleteCallback = (
+    result: GenerationResult,
+    metadata: CompletionMetadata,
+) => void;
+
+/**
+ * Context passed to each injector. `id` is the node's key in the workflow
+ * JSON object; `title` is the user-authored `_meta.title` if present.
+ */
+interface InjectionContext {
+    id: string;
+    title?: string;
+}
+
+/**
+ * Declarative map of `class_type → injector` used by `buildWorkflow()`.
+ * (FT-018) Refactored out of an inline if/else chain so:
+ *   • ci-docs can enumerate supported node types by importing `INJECTABLE_CLASS_TYPES`;
+ *   • new node types can be added with one new entry instead of another branch;
+ *   • the workflow warning in `buildWorkflow()` has a single source of truth
+ *     for "which class_types are auto-injectable".
+ *
+ * Injectors mutate `inputs` in place and should be defensive: they run only
+ * when the node actually has an `inputs` object, and they must tolerate
+ * missing fields on the `request.inputs` side.
+ */
+type NodeInjector = (
+    inputs: Record<string, unknown>,
+    request: JobRequest,
+    ctx: InjectionContext,
+    overrides: WorkflowOverrides,
+) => void;
+
+const INJECTABLE_NODES: Record<string, NodeInjector> = {
+    CLIPTextEncode: (inputs, request, ctx) => {
+        if (inputs.text === undefined) return;
+        const isNegative =
+            ctx.title?.toLowerCase().includes('negative') || ctx.id.includes('neg');
+        inputs.text = isNegative
+            ? (request.inputs.negative_prompt || '')
+            : request.inputs.prompt;
+    },
+    KSampler: (inputs, request) => {
+        if (request.inputs.seed !== undefined) {
+            inputs.seed = request.inputs.seed;
+        }
+        if (request.inputs.steps !== undefined) {
+            inputs.steps = request.inputs.steps;
+        }
+        if (request.inputs.cfg_scale !== undefined) {
+            inputs.cfg = request.inputs.cfg_scale;
+        }
+    },
+    EmptyLatentImage: (inputs, request) => {
+        if (request.inputs.width !== undefined) {
+            inputs.width = request.inputs.width;
+        }
+        if (request.inputs.height !== undefined) {
+            inputs.height = request.inputs.height;
+        }
+        // For video: batch_size = frame_count
+        if (request.kind === 'video' && request.inputs.frame_count !== undefined) {
+            inputs.batch_size = request.inputs.frame_count;
+        }
+    },
+    CheckpointLoaderSimple: (inputs, _request, _ctx, overrides) => {
+        if (overrides.checkpoint) {
+            inputs.ckpt_name = overrides.checkpoint;
+        }
+    },
+};
+
+/**
+ * Ordered list of `class_type` strings that `buildWorkflow()` will auto-inject.
+ * Exported so `ci-docs` (or any schema generator) can list the supported
+ * node types in the handbook without depending on engine internals.
+ *
+ * NOTE: `CLIPTextEncode` and `KSampler` are matched by `includes()` in
+ * `buildWorkflow()` (to catch variants like `CLIPTextEncodeSDXL` or
+ * `KSamplerAdvanced`). The entries below are the canonical keys only.
+ */
+export const INJECTABLE_CLASS_TYPES: readonly string[] = Object.freeze(
+    Object.keys(INJECTABLE_NODES),
+);
+
+/**
+ * Find the injector whose key matches a node's class_type. `CLIPTextEncode`
+ * and `KSampler` use substring match to support SDXL/Advanced variants;
+ * others require exact equality.
+ */
+function resolveInjector(classType: string | undefined): {
+    key: string;
+    fn: NodeInjector;
+} | null {
+    if (!classType) return null;
+    // Substring-matched keys come first because the original inline code
+    // used `classType?.includes(...)` for these.
+    if (classType.includes('CLIPTextEncode')) {
+        return { key: 'CLIPTextEncode', fn: INJECTABLE_NODES.CLIPTextEncode };
+    }
+    if (classType.includes('KSampler')) {
+        return { key: 'KSampler', fn: INJECTABLE_NODES.KSampler };
+    }
+    if (INJECTABLE_NODES[classType]) {
+        return { key: classType, fn: INJECTABLE_NODES[classType] };
+    }
+    return null;
+}
+
 export class ComfyServerEngine implements IGenerationEngine {
     readonly id = 'comfy-server';
     readonly name = 'ComfyUI Server';
@@ -132,70 +321,123 @@ export class ComfyServerEngine implements IGenerationEngine {
         }
     }
 
-    async generate(request: JobRequest, preset: Preset): Promise<GenerationResult> {
+    /**
+     * Run a generation against ComfyUI. The optional `onComplete` callback
+     * (FT-015) is invoked exactly once, just before this method returns,
+     * with the final `GenerationResult` and a `CompletionMetadata` record
+     * (total elapsed time, per-phase breakdown where tracked, frame count
+     * for video, final artifact count). It fires on success and failure —
+     * router/extcore can use it as a single "this run ended" event hook
+     * without reimplementing phase timing.
+     *
+     * The callback signature is additive and optional; existing two-arg
+     * callers (`engine.generate(request, preset)`) are unaffected.
+     */
+    async generate(
+        request: JobRequest,
+        preset: Preset,
+        onComplete?: OnCompleteCallback,
+    ): Promise<GenerationResult> {
         this.canceled = false;
+
+        const generateStart = Date.now();
+        const phaseBreakdown: NonNullable<CompletionMetadata['phase_breakdown']> = {};
+        let framesCollected: number | undefined;
+
+        const finish = (result: GenerationResult): GenerationResult => {
+            if (onComplete) {
+                const metadata: CompletionMetadata = {
+                    total_elapsed_ms: Date.now() - generateStart,
+                    phase_breakdown: phaseBreakdown,
+                    final_artifact_count: result.artifacts.length,
+                };
+                if (framesCollected !== undefined) {
+                    metadata.frames_collected = framesCollected;
+                }
+                try {
+                    onComplete(result, metadata);
+                } catch (cbErr) {
+                    // Don't let a buggy callback take down the run — log and
+                    // swallow. The result itself is still returned below.
+                    this.logger.warn(
+                        'onComplete callback threw; ignoring',
+                        cbErr instanceof Error ? cbErr.message : String(cbErr),
+                    );
+                }
+            }
+            return result;
+        };
 
         const availability = await this.getAvailability();
         if (!availability.ok) {
-            return {
+            return finish({
                 success: false,
                 artifacts: [],
                 error: composeAvailabilityMessage(availability, this.serverUrl),
-            };
+            });
         }
 
         const workflow = this.buildWorkflow(preset, request);
         if (!workflow) {
-            return {
+            return finish({
                 success: false,
                 artifacts: [],
                 error: 'Preset has no workflow defined.',
-            };
+            });
         }
 
         try {
+            const submitStart = Date.now();
             const promptResponse = await this.submitPrompt(workflow);
+            phaseBreakdown.submit_ms = Date.now() - submitStart;
             if (!promptResponse) {
-                return {
+                return finish({
                     success: false,
                     artifacts: [],
                     error: 'Failed to submit prompt to ComfyUI.',
-                };
+                });
             }
 
             this.currentPromptId = promptResponse.prompt_id;
 
             // Video generation can take much longer
             const timeoutMs = request.kind === 'video' ? 600000 : 300000;
+            const pollStart = Date.now();
             const history = await this.pollForCompletion(promptResponse.prompt_id, timeoutMs);
+            phaseBreakdown.poll_ms = Date.now() - pollStart;
 
             if (!history) {
                 if (this.canceled) {
-                    return { success: false, artifacts: [], error: 'Generation canceled.' };
+                    return finish({ success: false, artifacts: [], error: 'Generation canceled.' });
                 }
-                return { success: false, artifacts: [], error: 'Generation timed out or failed.' };
+                return finish({ success: false, artifacts: [], error: 'Generation timed out or failed.' });
             }
 
             // Collect outputs based on kind
+            const downloadStart = Date.now();
             const artifacts = request.kind === 'video'
                 ? await this.collectFrames(history, request)
                 : await this.collectImages(history, request);
+            phaseBreakdown.download_ms = Date.now() - downloadStart;
+            if (request.kind === 'video') {
+                framesCollected = artifacts.length;
+            }
 
             if (artifacts.length === 0) {
-                return {
+                return finish({
                     success: false,
                     artifacts: [],
                     error: 'No outputs received from ComfyUI.',
-                };
+                });
             }
 
-            return { success: true, artifacts };
+            return finish({ success: true, artifacts });
         } catch (err) {
-            return {
+            return finish({
                 success: false,
                 artifacts: [],
                 error: categorizeError(err),
-            };
+            });
         } finally {
             this.currentPromptId = null;
         }
@@ -216,65 +458,82 @@ export class ComfyServerEngine implements IGenerationEngine {
     // Workflow Building
     // =========================================================================
 
+    /**
+     * Build the workflow JSON object posted to ComfyUI's `/prompt` endpoint.
+     *
+     * Rather than an inline if/else chain, per-node injection rules live in
+     * the exported `INJECTABLE_NODES` map (FT-018). Every node in the
+     * preset is walked; matching class_types get their `inputs` mutated
+     * in place, non-matching nodes are left alone.
+     *
+     * Observability (FT-013 + FT-014):
+     *   • `unhandled` → counts each non-injectable class_type; a single
+     *     aggregated WARN is emitted so user-authored workflows with
+     *     custom samplers / LoRA loaders / AnimateDiff nodes don't have
+     *     their prompt/seed silently dropped.
+     *   • If ZERO nodes matched, emit a prominent WARN — the run still
+     *     proceeds (ComfyUI may well handle a hardcoded workflow) but
+     *     the user has a diagnostic line in the output channel to
+     *     explain why their prompt didn't take effect.
+     */
     private buildWorkflow(preset: Preset, request: JobRequest): Record<string, unknown> | null {
         if (!preset.workflow) {
             return null;
         }
 
         const workflow = JSON.parse(JSON.stringify(preset.workflow));
+        const buildLog = this.logger.child('buildWorkflow');
+        const unhandled = new Map<string, number>();
+        let injectionCount = 0;
 
         for (const nodeId of Object.keys(workflow)) {
             const node = workflow[nodeId] as Record<string, unknown>;
             const inputs = node.inputs as Record<string, unknown> | undefined;
             if (!inputs) continue;
 
-            const classType = node.class_type as string;
+            const classType = node.class_type as string | undefined;
+            const resolved = resolveInjector(classType);
 
-            // CLIP Text Encode - apply prompts
-            if (classType?.includes('CLIPTextEncode')) {
-                if (inputs.text !== undefined) {
-                    const nodeTitle = (node._meta as Record<string, unknown>)?.title as string;
-                    if (nodeTitle?.toLowerCase().includes('negative') || nodeId.includes('neg')) {
-                        inputs.text = request.inputs.negative_prompt || '';
-                    } else {
-                        inputs.text = request.inputs.prompt;
-                    }
+            if (!resolved) {
+                if (classType) {
+                    unhandled.set(classType, (unhandled.get(classType) ?? 0) + 1);
                 }
+                continue;
             }
 
-            // KSampler - apply seed, steps, cfg
-            if (classType?.includes('KSampler')) {
-                if (request.inputs.seed !== undefined) {
-                    inputs.seed = request.inputs.seed;
-                }
-                if (request.inputs.steps !== undefined) {
-                    inputs.steps = request.inputs.steps;
-                }
-                if (request.inputs.cfg_scale !== undefined) {
-                    inputs.cfg = request.inputs.cfg_scale;
-                }
-            }
+            const meta = node._meta as Record<string, unknown> | undefined;
+            const title = meta && typeof meta.title === 'string' ? meta.title : undefined;
 
-            // CheckpointLoaderSimple - substitute user's default checkpoint if set.
-            // Shipped HQ presets hardcode juggernautXL_v9; the override lets
-            // users redirect without authoring a new preset.
-            if (classType === 'CheckpointLoaderSimple' && this.overrides.checkpoint) {
-                inputs.ckpt_name = this.overrides.checkpoint;
-            }
+            resolved.fn(inputs, request, { id: nodeId, title }, this.overrides);
+            injectionCount++;
+        }
 
-            // EmptyLatentImage - apply dimensions and batch_size (for video frames)
-            if (classType === 'EmptyLatentImage') {
-                if (request.inputs.width !== undefined) {
-                    inputs.width = request.inputs.width;
-                }
-                if (request.inputs.height !== undefined) {
-                    inputs.height = request.inputs.height;
-                }
-                // For video: batch_size = frame_count
-                if (request.kind === 'video' && request.inputs.frame_count !== undefined) {
-                    inputs.batch_size = request.inputs.frame_count;
-                }
-            }
+        // FT-013: aggregated warning for unhandled node types. We only warn
+        // when the user's workflow contains nodes we don't know how to
+        // inject into — shipped HQ presets are well-understood, so this
+        // path is quiet for the default case.
+        if (unhandled.size > 0) {
+            const summary = Array.from(unhandled.entries())
+                .map(([cls, n]) => `${n} ${cls}`)
+                .join(', ');
+            buildLog.warn(
+                `Workflow contains non-injectable node types — ${summary}. ` +
+                `If these nodes need prompt/seed/dimensions, edit the workflow JSON directly. ` +
+                `Auto-injected types: ${INJECTABLE_CLASS_TYPES.join(', ')}.`,
+            );
+        }
+
+        // FT-014: no-injection signal. Fail-softer — let the run proceed
+        // (ComfyUI will either succeed with the hardcoded values or produce
+        // its own error), but make sure the user has a log line explaining
+        // why their prompt/seed didn't take effect if things go sideways.
+        if (injectionCount === 0) {
+            buildLog.warn(
+                'No injection rules matched this workflow. ' +
+                'Your prompt and seed were not applied — the generation may use ' +
+                'whatever values are hardcoded in the workflow JSON. ' +
+                `Auto-injected types: ${INJECTABLE_CLASS_TYPES.join(', ')}.`,
+            );
         }
 
         return { prompt: workflow };

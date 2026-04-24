@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CodeComfy Preset",
+  "description": "User-authored ComfyUI workflow preset for codecomfy-vscode.",
+  "type": "object",
+  "required": ["id", "name", "kind", "defaults"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Unique preset identifier. Letters, digits, underscores, and hyphens only."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable preset name shown in the QuickPick."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description rendered in QuickPick labels and gallery detail views."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["image", "video"],
+      "description": "Generation kind. Determines which command surfaces the preset."
+    },
+    "defaults": {
+      "type": "object",
+      "description": "Default input values (width, height, steps, cfg_scale, fps for video, etc).",
+      "additionalProperties": true
+    },
+    "workflow": {
+      "type": "object",
+      "description": "ComfyUI workflow JSON (node-id -> node object mapping). Each node has class_type + inputs.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["class_type"],
+        "properties": {
+          "class_type": { "type": "string", "minLength": 1 },
+          "inputs": { "type": "object" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -92,6 +92,16 @@ Run metadata lives in `.codecomfy/runs/`.
 Run `CodeComfy: Cancel Generation` from the Command Palette or click the
 status bar item while a generation is in progress.
 
+## Features
+
+- Built-in HQ image + video presets.
+- **User-authored workflow presets** (NEW) — drop any ComfyUI workflow JSON in `.codecomfy/presets/`.
+- **Activity-bar run history** (NEW) — browse and re-run past generations.
+- Real-time progress in the status bar.
+- **Completion notifications** (NEW, opt-out) — know when a slow video is done.
+- Structured output channel for diagnostics.
+- Cross-platform (Windows-first, macOS + Linux expected).
+
 ## Generation Limits
 
 Video generation enforces safety limits to prevent accidental resource exhaustion:

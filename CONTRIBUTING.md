@@ -31,6 +31,11 @@ npm test          # compile:test + mocha (headless, no Electron needed)
 Tests use a lightweight VS Code stub (`test/stubs/vscode.ts`) instead
 of the real `vscode` module, so they run in any Node.js environment.
 
+Integration tests use **fixture-recorded** ComfyUI responses so the full
+job router → engine → filesystem path runs without a live ComfyUI server.
+See [`docs/integration-testing.md`](docs/integration-testing.md) for how
+to record new fixtures and when to re-record existing ones.
+
 ### Run lint
 
 ```bash

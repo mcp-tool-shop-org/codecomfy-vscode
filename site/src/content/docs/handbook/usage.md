@@ -121,6 +121,8 @@ The CodeComfy status bar item sits on the left side of the VS Code status bar. I
 - **Failed** — generation encountered an error. Check the Output channel for details.
 - **Canceled** — you canceled the generation.
 
+A notification appears when generation completes; disable via `codecomfy.notifyOnComplete` if you prefer silent status-bar-only updates.
+
 ## Concurrency and cooldown
 
 Only one generation can run at a time. If you try to start a second generation while one is active, CodeComfy shows a warning and blocks the request.

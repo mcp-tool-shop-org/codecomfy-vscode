@@ -66,8 +66,54 @@
         "command": "codecomfy.openOutputChannel",
         "title": "Open Output Channel",
         "category": "CodeComfy"
+      },
+      {
+        "command": "codecomfy.customWorkflow",
+        "title": "Generate from Custom Workflow",
+        "category": "CodeComfy"
+      },
+      {
+        "command": "codecomfy.newPresetFromHQ",
+        "title": "Create Preset from HQ Template",
+        "category": "CodeComfy"
+      },
+      {
+        "command": "codecomfy.rerunJob",
+        "title": "Re-run Previous Generation",
+        "category": "CodeComfy"
       }
     ],
+    "jsonValidation": [
+      {
+        "fileMatch": ".codecomfy/presets/*.json",
+        "url": "./schemas/codecomfy-preset.schema.json"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codecomfy-activity",
+          "title": "CodeComfy",
+          "icon": "assets/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "codecomfy-activity": [
+        {
+          "id": "codecomfy.runHistory",
+          "name": "Run History"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "codecomfy.rerunJob",
+          "when": "view == codecomfy.runHistory && viewItem == run"
+        }
+      ]
+    },
     "configuration": {
       "title": "CodeComfy",
       "properties": {
@@ -106,6 +152,12 @@
           "default": "",
           "description": "Override the model checkpoint baked into shipped HQ presets. Filename from your ComfyUI models/checkpoints/ directory. Leave empty to use the preset's built-in default.",
           "markdownDescription": "Override the model checkpoint baked into the **shipped HQ presets** (`hq-image`, `hq-video`). Set to a `.safetensors` filename from your `ComfyUI/models/checkpoints/` directory (e.g. `sd_xl_base_1.0.safetensors`). Leave empty to use each preset's built-in default (requires `juggernautXL_v9Rundiffusionphoto2.safetensors`). If generation fails with a 'model not found' error, set this to a checkpoint you actually have installed."
+        },
+        "codecomfy.notifyOnComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a notification when generation completes.",
+          "markdownDescription": "Show a notification when generation completes. Set to `false` for silent status-bar-only updates. Errors are always shown regardless."
         }
       }
     }

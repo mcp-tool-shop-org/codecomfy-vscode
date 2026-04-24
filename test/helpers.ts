@@ -223,6 +223,320 @@ export function stubFetch(
     };
 }
 
+// ---------------------------------------------------------------------------
+// fakeResponse — minimal Response-shaped object the engine is willing to consume
+// ---------------------------------------------------------------------------
+//
+// F-904559-038: every test previously hand-built an object with `.ok`, `.status`,
+// `.json()`, `.text()`, `.body`. That duplication lives in one place now.
+//
+// Node 22 exposes a real `Response` global, but tests often want:
+//   - JSON bodies without hand-stringifying
+//   - to control `ok`/`status` independently
+//   - a throwing `.json()` to simulate parse failures
+//   - a binary body (Uint8Array) for /view responses
+//
+// The helper favours that flexibility over strict Response fidelity. If a
+// test needs strict fidelity it can pass a real `Response` through — code
+// under test works with either shape because it only reads a small surface.
+
+/**
+ * Options for `fakeResponse()`.
+ *
+ * Pass exactly as much as the code under test reads — nothing more.
+ * For the ComfyUI engine that means `.ok`, `.status`, `.json()`, `.text()`,
+ * and for binary endpoints (`/view`) `.body` (any — the engine pipes it).
+ */
+export interface FakeResponseInit {
+    /** Override the default `.ok` derivation from status. */
+    ok?: boolean;
+    /** HTTP status code. Default 200. */
+    status?: number;
+    /** Custom `.json()` — if provided, overrides `jsonValue`. */
+    json?: () => Promise<unknown>;
+    /** Value `.json()` should resolve to. */
+    jsonValue?: unknown;
+    /** Value `.text()` should resolve to. Default `''`. */
+    text?: string;
+    /** Raw body — opaque pass-through for binary streaming paths. */
+    body?: unknown;
+    /** Response headers, attached to `.headers` (plain object, Headers-like). */
+    headers?: Record<string, string>;
+}
+
+/** Duck-typed Response for tests. Matches the slice of `Response` the engine reads. */
+export interface FakeResponse {
+    ok: boolean;
+    status: number;
+    headers: Record<string, string>;
+    text(): Promise<string>;
+    json(): Promise<unknown>;
+    body: unknown;
+}
+
+/**
+ * Build a Response-shaped object for test fetch stubs.
+ *
+ * Typical usage in a test:
+ * ```ts
+ * const stub = stubFetch(async () => fakeResponse({ jsonValue: { ok: true } }));
+ * ```
+ *
+ * Passing a raw JSON value (as `jsonValue`) is the common case — `fakeResponse`
+ * will mark `.ok = true` unless `status >= 400` or `ok` is explicitly set.
+ */
+export function fakeResponse(init: FakeResponseInit = {}): FakeResponse {
+    const status = init.status ?? 200;
+    const ok = init.ok ?? (status >= 200 && status < 300);
+    const text = init.text ?? '';
+    const headers = init.headers ?? {};
+    const jsonFn =
+        init.json ??
+        (async () => {
+            if ('jsonValue' in init) return init.jsonValue;
+            throw new SyntaxError('Unexpected end of JSON input');
+        });
+
+    return {
+        ok,
+        status,
+        headers,
+        text: async () => text,
+        json: jsonFn,
+        body: init.body,
+    };
+}
+
+// ---------------------------------------------------------------------------
+// playbackFetch — replay recorded ComfyUI HTTP responses (FT-5 / F-904558-033)
+// ---------------------------------------------------------------------------
+//
+// Record the ComfyUI wire protocol once (against Mike's live server), replay
+// forever in CI. Fixture layout on disk:
+//
+//   test/fixtures/comfy/<preset-id>/
+//     index.json               # sequence of {method, urlPattern, body-or-file}
+//     01-prompt-response.json  # referenced by index.json entries
+//     02-history-poll-01.json
+//     ...
+//     04-view-frame_00001.png
+//     04-view-frame_00001.meta.json
+//
+// index.json shape:
+// ```json
+// {
+//   "sequence": [
+//     {
+//       "method": "POST",
+//       "urlPattern": "*/prompt",
+//       "status": 200,
+//       "bodyFile": "01-prompt-response.json",
+//       "bodyKind": "json"
+//     },
+//     {
+//       "method": "GET",
+//       "urlPattern": "*/history/*",
+//       "status": 200,
+//       "bodyFile": "02-history-poll-01.json",
+//       "bodyKind": "json"
+//     },
+//     {
+//       "method": "GET",
+//       "urlPattern": "*/view*",
+//       "status": 200,
+//       "bodyFile": "04-view-frame_00001.png",
+//       "bodyKind": "binary",
+//       "headers": { "content-type": "image/png" }
+//     }
+//   ]
+// }
+// ```
+//
+// urlPattern is a glob: `*` matches any run of non-`/` characters by default
+// (simple substring match for fixtures). The playbackFetch loop walks entries
+// in order; each live fetch() call shifts the next entry, fails loudly on a
+// mismatch (so re-records are noticed instead of silently breaking tests).
+
+interface PlaybackEntry {
+    /** HTTP method — match is exact, case-insensitive. */
+    method: string;
+    /** Glob pattern for the URL. `*` is a permissive "anything" wildcard. */
+    urlPattern: string;
+    /** Status to return. Default 200. */
+    status?: number;
+    /** Inline JSON body (overrides bodyFile). */
+    body?: unknown;
+    /** Relative filename under fixtureDir. */
+    bodyFile?: string;
+    /** `json` (default) → parsed; `binary` → Buffer; `text` → string. */
+    bodyKind?: 'json' | 'binary' | 'text';
+    /** Headers to attach. */
+    headers?: Record<string, string>;
+}
+
+interface PlaybackIndex {
+    sequence: PlaybackEntry[];
+}
+
+export interface PlaybackFetchCall {
+    /** The URL the source code requested, coerced to a string. */
+    url: string;
+    /** The method the source code supplied (defaults to GET when init absent). */
+    method: string;
+}
+
+export interface PlaybackFetchStub {
+    /** Every call recorded in the order it was made. */
+    calls: PlaybackFetchCall[];
+    /** Replay cursor — the index of the next entry to serve. */
+    cursor(): number;
+    /** Remaining entries not yet consumed. */
+    remaining(): PlaybackEntry[];
+    /** Restore `globalThis.fetch`. */
+    restore: () => void;
+}
+
+/**
+ * Minimal glob: supports `*` as "any characters up to next literal". Used for
+ * fixtures where full regex is overkill. Matches greedily from left to right.
+ */
+function globMatch(pattern: string, value: string): boolean {
+    // Escape regex metacharacters except `*`, then replace `*` with `.*`.
+    const re = new RegExp(
+        '^' +
+            pattern
+                .split('*')
+                .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&'))
+                .join('.*') +
+            '$',
+    );
+    return re.test(value);
+}
+
+/**
+ * Replay recorded ComfyUI HTTP responses from a fixture directory.
+ *
+ * See the fixture README at `test/fixtures/comfy/README.md` for the
+ * recording protocol. `fixtureDir` must contain an `index.json` with a
+ * `sequence` array; binary `bodyFile` entries are read raw and attached to
+ * the response's `.body` as a `Uint8Array`, JSON entries are parsed.
+ *
+ * Usage:
+ * ```ts
+ * const stub = playbackFetch(path.join(__dirname, '../fixtures/comfy/hq-image'));
+ * try {
+ *   await runGeneration();
+ *   assert.strictEqual(stub.remaining().length, 0, 'all fixture entries consumed');
+ * } finally {
+ *   stub.restore();
+ * }
+ * ```
+ *
+ * Failure modes that throw descriptively:
+ *   - `index.json` missing or malformed
+ *   - fixture directory missing
+ *   - incoming fetch() doesn't match the next entry (method or pattern mismatch)
+ *   - sequence exhausted but source still calls fetch()
+ */
+export function playbackFetch(fixtureDir: string): PlaybackFetchStub {
+    const indexPath = path.join(fixtureDir, 'index.json');
+    if (!fs.existsSync(indexPath)) {
+        throw new Error(`[playbackFetch] missing index.json at ${indexPath}`);
+    }
+    let parsed: PlaybackIndex;
+    try {
+        parsed = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(`[playbackFetch] failed to parse ${indexPath}: ${message}`);
+    }
+    if (!parsed || !Array.isArray(parsed.sequence)) {
+        throw new Error(`[playbackFetch] index.json must have a "sequence" array`);
+    }
+
+    const sequence = parsed.sequence.slice();
+    let cursor = 0;
+    const calls: PlaybackFetchCall[] = [];
+    const g = globalThis as { fetch?: typeof fetch };
+    const original = g.fetch;
+    let restored = false;
+
+    g.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+        const urlStr = typeof url === 'string' ? url : String(url);
+        const method = (init?.method ?? 'GET').toUpperCase();
+        calls.push({ url: urlStr, method });
+        // The returned object is a duck-typed Response — same surface used by
+        // stubFetch. Cast through `unknown` to silence the strictness-check
+        // without losing the real-fetch signature for callers.
+
+        if (cursor >= sequence.length) {
+            throw new Error(
+                `[playbackFetch] fixture exhausted; extra call: ${method} ${urlStr}`,
+            );
+        }
+        const entry = sequence[cursor++];
+        const expectedMethod = entry.method.toUpperCase();
+        if (expectedMethod !== method) {
+            throw new Error(
+                `[playbackFetch] expected ${expectedMethod} ${entry.urlPattern}, got ${method} ${urlStr}`,
+            );
+        }
+        if (!globMatch(entry.urlPattern, urlStr)) {
+            throw new Error(
+                `[playbackFetch] URL mismatch at entry ${cursor - 1}: pattern "${entry.urlPattern}" vs actual "${urlStr}"`,
+            );
+        }
+
+        const status = entry.status ?? 200;
+        const kind = entry.bodyKind ?? 'json';
+        let text = '';
+        let jsonFn: (() => Promise<unknown>) | undefined;
+        let body: unknown = undefined;
+
+        if (entry.body !== undefined) {
+            if (kind === 'binary') {
+                body = entry.body;
+            } else {
+                text = typeof entry.body === 'string' ? entry.body : JSON.stringify(entry.body);
+                jsonFn = async () => entry.body;
+            }
+        } else if (entry.bodyFile) {
+            const filePath = path.join(fixtureDir, entry.bodyFile);
+            if (!fs.existsSync(filePath)) {
+                throw new Error(`[playbackFetch] bodyFile missing: ${filePath}`);
+            }
+            if (kind === 'binary') {
+                body = fs.readFileSync(filePath);
+            } else if (kind === 'text') {
+                text = fs.readFileSync(filePath, 'utf-8');
+            } else {
+                const raw = fs.readFileSync(filePath, 'utf-8');
+                text = raw;
+                jsonFn = async () => JSON.parse(raw);
+            }
+        }
+
+        return fakeResponse({
+            status,
+            body,
+            text,
+            json: jsonFn,
+            headers: entry.headers,
+        });
+    }) as unknown as typeof fetch;
+
+    return {
+        calls,
+        cursor: () => cursor,
+        remaining: () => sequence.slice(cursor),
+        restore: () => {
+            if (restored) return;
+            g.fetch = original;
+            restored = true;
+        },
+    };
+}
+
 /**
  * Remove all registered temp paths.
  *

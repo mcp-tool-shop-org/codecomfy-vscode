@@ -1,0 +1,4 @@
+{
+  "_comment": "PLACEHOLDER fixture for the hq-image preset. Mike records the real transcript locally against his live ComfyUI server and commits the populated sequence here. Until then, this file documents the expected structure so tests can typecheck; tests that actually consume it are marked .skip().",
+  "sequence": []
+}

@@ -55,11 +55,19 @@ export class JobRouter {
 
     /**
      * Run a generation job.
+     *
+     * @param onProgress invoked on every status transition with the current JobRun.
+     * @param onComplete invoked exactly once after the terminal `status.json`
+     *   is written (both success and failure paths — including cancel).
+     *   Receives the final GenerationResult and the terminal JobRun snapshot
+     *   so callers can react to "this run is fully finalized on disk" without
+     *   having to infer it from onProgress transitions.
      */
     async run(
         input: JobRequestInput,
         preset: Preset,
-        onProgress?: (run: JobRun) => void
+        onProgress?: (run: JobRun) => void,
+        onComplete?: (result: GenerationResult, run: JobRun) => void
     ): Promise<GenerationResult> {
         this.cancelRequested = false;
 
@@ -112,7 +120,7 @@ export class JobRouter {
 
             if (!result.success) {
                 this.log.warn(`Run ${runId} engine returned failure`, result.error);
-                return this.handleFailure(runDir, result.error, onProgress);
+                return this.handleFailure(runDir, result.error, onProgress, onComplete);
             }
 
             // For video: assemble frames into MP4
@@ -122,7 +130,7 @@ export class JobRouter {
                 const videoResult = await this.assembleVideoFromFrames(request, result.artifacts);
                 if (!videoResult.success) {
                     this.log.warn(`Run ${runId} video assembly failed`, videoResult.error);
-                    return this.handleFailure(runDir, videoResult.error, onProgress);
+                    return this.handleFailure(runDir, videoResult.error, onProgress, onComplete);
                 }
                 finalArtifacts = videoResult.artifacts;
             } else {
@@ -146,6 +154,16 @@ export class JobRouter {
 
             this.log.info(`Run ${runId} succeeded — ${finalArtifacts.length} artifact(s)`);
 
+            const successResult: GenerationResult = { success: true, artifacts: finalArtifacts };
+            // Fire onComplete AFTER status.json is written so callers see a
+            // finalized on-disk state. Guard with try/catch — a buggy
+            // listener must not corrupt the router's post-success cleanup.
+            try {
+                onComplete?.(successResult, this.currentRun);
+            } catch (cbErr) {
+                this.log.warn('onComplete callback threw (non-fatal)', String(cbErr));
+            }
+
             // Best-effort pruning — never let it fail the run
             try {
                 const pruneResult = pruneRuns(this.workspacePath, { logger: this.log });
@@ -158,14 +176,15 @@ export class JobRouter {
                 this.log.warn('Pruning failed (non-fatal)', String(pruneErr));
             }
 
-            return { success: true, artifacts: finalArtifacts };
+            return successResult;
         } catch (err) {
             const errMsg = err instanceof Error ? err.message : String(err);
             this.log.error(`Run ${runId} threw`, errMsg);
             return this.handleFailure(
                 runDir,
                 errMsg,
-                onProgress
+                onProgress,
+                onComplete
             );
         } finally {
             this.currentRun = null;
@@ -316,7 +335,8 @@ export class JobRouter {
     private handleFailure(
         runDir: string,
         error: string | undefined,
-        onProgress?: (run: JobRun) => void
+        onProgress?: (run: JobRun) => void,
+        onComplete?: (result: GenerationResult, run: JobRun) => void,
     ): GenerationResult {
         if (!this.currentRun) {
             return { success: false, artifacts: [], error };
@@ -337,7 +357,16 @@ export class JobRouter {
             fs.appendFileSync(stderrPath, `${error}\n`);
         }
 
-        return { success: false, artifacts: [], error };
+        const failureResult: GenerationResult = { success: false, artifacts: [], error };
+        // Fire onComplete AFTER status.json is written. Guarded so a buggy
+        // listener can't prevent us from returning the failure to the caller.
+        try {
+            onComplete?.(failureResult, this.currentRun);
+        } catch (cbErr) {
+            this.log.warn('onComplete callback threw (non-fatal)', String(cbErr));
+        }
+
+        return failureResult;
     }
 
     private generateRunId(): string {
@@ -419,6 +448,36 @@ export class JobRouter {
                     preset_id: request.preset_id,
                 },
             };
+
+            // TreeView-required fields check — be lenient (warn, don't throw)
+            // so legacy data and partial writers don't break generation.
+            // Fields TreeView requires on every new entry:
+            //   provenance.prompt, provenance.preset_id
+            //   (video only) meta.thumbnail_path, meta.duration_seconds, meta.fps
+            const missing: string[] = [];
+            if (!indexed.provenance?.prompt) {
+                missing.push('provenance.prompt');
+            }
+            if (!indexed.provenance?.preset_id) {
+                missing.push('provenance.preset_id');
+            }
+            if (indexed.type === 'video') {
+                if (!indexed.meta?.thumbnail_path) {
+                    missing.push('meta.thumbnail_path');
+                }
+                if (typeof indexed.meta?.duration_seconds !== 'number') {
+                    missing.push('meta.duration_seconds');
+                }
+                if (typeof indexed.meta?.fps !== 'number') {
+                    missing.push('meta.fps');
+                }
+            }
+            if (missing.length > 0) {
+                this.log.warn(
+                    `Run ${runId} artifact ${indexed.id} missing TreeView-required field(s): ${missing.join(', ')}. Entry written anyway; gallery may render it with placeholder labels.`,
+                );
+            }
+
             index.items.push(indexed);
         }
 

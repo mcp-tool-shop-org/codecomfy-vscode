@@ -9,7 +9,9 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as sinon from 'sinon';
 import { PresetRegistry } from '../../src/presets/registry';
+import { Logger } from '../../src/logging/logger';
 import { makeTempDir as sharedMakeTempDir, cleanupTempPaths } from '../helpers';
 
 // ---------------------------------------------------------------------------
@@ -203,3 +205,145 @@ describe('PresetRegistry — loadFromDirectory', () => {
         assert.strictEqual(preset.defaults.width, 2048);
     });
 });
+
+// =============================================================================
+// FT-1 / F-904558-034: Logger warn spying + shadowing + corrupt-sibling
+//
+// Covers the error-path behaviour the bundled-preset tests above do not:
+//   - malformed JSON emits a WARN via logger.warn
+//   - corrupt preset doesn't break loading of valid siblings
+//   - user preset "shadows" bundled preset (confirms override semantics)
+//   - workspace-relative `.codecomfy/presets/` loads when used that way
+// =============================================================================
+
+describe('PresetRegistry — loader diagnostics and shadowing (FT-1)', () => {
+    function makeSpyLogger(): { logger: Logger; warnSpy: sinon.SinonSpy } {
+        // The Logger contract only exposes `info | warn | error` → `sink(line)`.
+        // We spy the sink directly because that's the integration boundary
+        // loadFromDirectory relies on when it emits WARN lines.
+        const sink = sinon.spy();
+        const logger = new Logger({ component: 'test', sink });
+        return { logger, warnSpy: sink };
+    }
+
+    it('emits a WARN via logger.warn on malformed JSON', () => {
+        const dir = makeTempDir();
+        fs.writeFileSync(path.join(dir, 'broken.json'), 'NOT VALID JSON {{{');
+
+        const { logger, warnSpy } = makeSpyLogger();
+        const registry = new PresetRegistry();
+        registry.loadFromDirectory(dir, logger);
+
+        assert.ok(warnSpy.called, 'logger warn sink should have been called');
+        const lines = warnSpy.getCalls().map((c) => c.args[0] as string);
+        // WARN lines include the filename so users can jump to the offender.
+        assert.ok(
+            lines.some((l) => l.includes('broken.json') && l.toUpperCase().includes('WARN')),
+            `expected WARN line mentioning broken.json; got: ${JSON.stringify(lines)}`,
+        );
+    });
+
+    it('emits a WARN when required fields (id/kind) are missing', () => {
+        const dir = makeTempDir();
+        writePresetFile(dir, 'no-kind.json', {
+            id: 'no-kind',
+            name: 'No Kind',
+            defaults: {},
+        });
+        const { logger, warnSpy } = makeSpyLogger();
+        new PresetRegistry().loadFromDirectory(dir, logger);
+        assert.ok(warnSpy.called, 'WARN expected for missing-kind preset');
+        const line = warnSpy.firstCall.args[0] as string;
+        assert.match(line, /no-kind\.json/);
+        assert.match(line, /missing required fields|missing|required/i);
+    });
+
+    it('corrupt preset does NOT prevent valid siblings from loading', () => {
+        const dir = makeTempDir();
+        fs.writeFileSync(path.join(dir, 'broken.json'), '{ not valid');
+        writePresetFile(dir, 'good.json', {
+            id: 'sibling-good',
+            name: 'Good Sibling',
+            kind: 'image',
+            defaults: { width: 1024, height: 1024, steps: 20 },
+        });
+
+        const { logger, warnSpy } = makeSpyLogger();
+        const registry = new PresetRegistry();
+        registry.loadFromDirectory(dir, logger);
+
+        const good = registry.get('sibling-good');
+        assert.ok(good, 'valid sibling should still load');
+        assert.strictEqual(good.id, 'sibling-good');
+        assert.ok(warnSpy.called, 'broken sibling should have emitted WARN');
+    });
+
+    it('user preset shadows bundled preset by id (user wins)', () => {
+        // Regression guard: loadFromDirectory overwrites `hq-image` via
+        // Map.set — this test prevents a future change from accidentally
+        // turning it into "bundled-wins".
+        const dir = makeTempDir();
+        writePresetFile(dir, 'user-hq-image.json', {
+            id: 'hq-image',
+            name: 'User Portrait',
+            kind: 'image',
+            defaults: { width: 3072, height: 3072, steps: 40, cfg_scale: 6 },
+        });
+        const registry = new PresetRegistry();
+        registry.loadFromDirectory(dir);
+        const merged = registry.get('hq-image')!;
+        assert.strictEqual(merged.name, 'User Portrait');
+        assert.strictEqual(merged.defaults.width, 3072);
+    });
+
+    it('loads from a workspace-relative `.codecomfy/presets/` layout', () => {
+        // Mirrors the real extension activation flow where the user directory
+        // is `<workspace>/.codecomfy/presets/`.
+        const workspace = makeTempDir();
+        const presetsDir = path.join(workspace, '.codecomfy', 'presets');
+        fs.mkdirSync(presetsDir, { recursive: true });
+        writePresetFile(presetsDir, 'ws-preset.json', {
+            id: 'ws-relative',
+            name: 'Workspace-Relative Preset',
+            kind: 'image',
+            defaults: { width: 512, height: 512, steps: 20 },
+        });
+        const registry = new PresetRegistry();
+        registry.loadFromDirectory(presetsDir);
+        const preset = registry.get('ws-relative');
+        assert.ok(preset, 'workspace-relative preset should load');
+        assert.strictEqual(preset.kind, 'image');
+    });
+
+    it('invalid workflow shape (FT-027) emits WARN and skips the preset', () => {
+        const dir = makeTempDir();
+        writePresetFile(dir, 'bad-workflow.json', {
+            id: 'bad-workflow',
+            name: 'Broken',
+            kind: 'image',
+            defaults: {},
+            workflow: {}, // empty workflow is one of the declared failure modes
+        });
+        const { logger, warnSpy } = makeSpyLogger();
+        const registry = new PresetRegistry();
+        registry.loadFromDirectory(dir, logger);
+
+        assert.strictEqual(
+            registry.get('bad-workflow'),
+            undefined,
+            'broken-workflow preset should NOT be registered',
+        );
+        assert.ok(warnSpy.called, 'WARN expected for broken workflow shape');
+        const line = warnSpy.firstCall.args[0] as string;
+        assert.match(line, /workflow/i);
+    });
+
+    it('without a logger, malformed preset is skipped silently (pre-FT-1 behaviour preserved)', () => {
+        const dir = makeTempDir();
+        fs.writeFileSync(path.join(dir, 'broken.json'), 'garbage');
+        const registry = new PresetRegistry();
+        // No logger supplied — must not throw.
+        assert.doesNotThrow(() => registry.loadFromDirectory(dir));
+    });
+});
+
