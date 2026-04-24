@@ -16,15 +16,10 @@ import {
 import type {
     OutputIndex,
     IndexedArtifact,
-    ArtifactMeta,
-    ArtifactProvenance,
     JobRequest,
-    JobRequestInput,
     JobRun,
     Preset,
-    GenerationResult,
     IGenerationEngine,
-    CodeComfyConfig,
     Artifact,
 } from '../../src/types';
 

@@ -30,11 +30,19 @@
 
 ## 安装
 
-CodeComfy 尚未在 VS Code Marketplace 上发布。
-从 `.vsix` 文件安装：
+### 从 VS Code Marketplace 安装（推荐）
+
+1. 打开**扩展**侧边栏（`Ctrl+Shift+X`）。
+2. 搜索 **CodeComfy**，或访问
+   [Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode)。
+3. 点击**安装**，并在提示时重新加载窗口。
+
+### 从 `.vsix` 文件安装（替代方案）
+
+适用于开发构建或离线安装：
 
 1. 从 [发布版本](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases) 下载最新的 `.vsix` 文件。
-2. 在 VS Code 中：**扩展** 侧边栏 → `···` 菜单 → **从 VSIX 安装…**
+2. 在 VS Code 中：**扩展**侧边栏 → `···` 菜单 → **从 VSIX 安装…**
 3. 提示时重新加载窗口。
 
 ### 设置

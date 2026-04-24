@@ -5,15 +5,17 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
 import { pruneRuns, createEmptyIndex, MAX_RUNS, MAX_AGE_DAYS } from '../../src/pruning/pruner';
 import { CODECOMFY_DIR, RUNS_DIR, OUTPUTS_DIR, INDEX_FILENAME } from '../../src/types';
+import { makeTempDir } from '../helpers';
 
 // ── Test helpers ──────────────────────────────────────────────────────────────
 
 function makeTmpWorkspace(): string {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'codecomfy-prune-'));
-    return dir;
+    // Shared helper handles mkdtempSync + cleanup registration.
+    // We still rm -rf the dir in afterEach (fast path) but the registry
+    // ensures any straggler is caught at process exit.
+    return makeTempDir('codecomfy-prune-');
 }
 
 function createRunDir(

@@ -138,3 +138,59 @@ describe('BackoffTimer (stateful wrapper)', () => {
         assert.strictEqual(delayAfterReset, DEFAULT_BASE_MS);
     });
 });
+
+// ── Statistical jitter distribution (F-863253-026) ───────────────────────────
+//
+// The earlier tests verify the jitter FORMULA with fixed `random` seeds.
+// This test verifies the DISTRIBUTION you actually observe when `random`
+// is left to `Math.random()` — catches regressions where jitter gets
+// clamped to zero or accidentally reduced to a tiny band.
+
+describe('nextDelay — jitter distribution (statistical)', () => {
+    it('spreads across >50 % of the expected [min, max] range over 1000 samples', () => {
+        const attempts = 1000;
+        const baseMs = 1000;
+        const jitter = 0.2; // ±20 %
+
+        // Expected full range for attempt 0: [baseMs * (1 - jitter), baseMs * (1 + jitter)]
+        const expectedMin = baseMs * (1 - jitter);
+        const expectedMax = baseMs * (1 + jitter);
+        const expectedSpan = expectedMax - expectedMin;
+
+        const samples: number[] = [];
+        for (let i = 0; i < attempts; i++) {
+            samples.push(nextDelay(0, { baseMs, jitter }));
+        }
+
+        const min = Math.min(...samples);
+        const max = Math.max(...samples);
+        const observedSpan = max - min;
+
+        // All samples within the theoretical range (allow 1 ms rounding slack).
+        assert.ok(
+            min >= expectedMin - 1,
+            `min=${min} should be >= expectedMin=${expectedMin}`,
+        );
+        assert.ok(
+            max <= expectedMax + 1,
+            `max=${max} should be <= expectedMax=${expectedMax}`,
+        );
+
+        // Observed span should cover > 50 % of the theoretical range —
+        // otherwise jitter has regressed to a narrow band.
+        assert.ok(
+            observedSpan > expectedSpan * 0.5,
+            `observed span ${observedSpan} should exceed 50% of expected ${expectedSpan}`,
+        );
+
+        // All samples non-negative (clamp contract).
+        assert.ok(samples.every((d) => d >= 0), 'no sample should be negative');
+
+        // Not all identical — proves randomness reached the formula.
+        const unique = new Set(samples);
+        assert.ok(
+            unique.size > 10,
+            `expected >10 distinct values over ${attempts} samples, got ${unique.size}`,
+        );
+    });
+});

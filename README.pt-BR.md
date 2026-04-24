@@ -30,11 +30,19 @@ gerencia o envio do fluxo de trabalho, a verificação do status, o download dos
 
 ## Instalação
 
-O CodeComfy ainda não está disponível no Marketplace do VS Code.
-Instale a partir de um arquivo `.vsix`:
+### No Marketplace do VS Code (recomendado)
+
+1. Abra a barra lateral de **Extensões** (`Ctrl+Shift+X`).
+2. Pesquise por **CodeComfy** ou acesse a
+   [página do Marketplace](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode).
+3. Clique em **Instalar** e recarregue a janela quando solicitado.
+
+### A partir de um arquivo `.vsix` (alternativa)
+
+Para builds de desenvolvimento ou instalações offline:
 
 1. Baixe o arquivo `.vsix` mais recente em
-[Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases).
+   [Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases).
 2. No VS Code: Barra lateral de **Extensões** → menu `···` → **Instalar a partir de VSIX…**
 3. Recarregue a janela quando solicitado.
 

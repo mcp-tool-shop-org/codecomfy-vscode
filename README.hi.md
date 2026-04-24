@@ -29,11 +29,19 @@
 
 ## इंस्टॉलेशन
 
-CodeComfy अभी तक VS Code मार्केटप्लेस पर उपलब्ध नहीं है।
-`.vsix` फ़ाइल से इंस्टॉल करें:
+### VS Code मार्केटप्लेस से (अनुशंसित)
 
-1. नवीनतम `.vsix` फ़ाइल को यहां से डाउनलोड करें:
-[रिलीज़](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases)।
+1. **एक्सटेंशन** साइडबार (`Ctrl+Shift+X`) खोलें।
+2. **CodeComfy** खोजें या
+   [मार्केटप्लेस पेज](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode) पर जाएं।
+3. **Install** पर क्लिक करें और संकेत मिलने पर विंडो को रीलोड करें।
+
+### `.vsix` फ़ाइल से (वैकल्पिक)
+
+डेवलपमेंट बिल्ड या ऑफ़लाइन इंस्टॉलेशन के लिए:
+
+1. नवीनतम `.vsix` फ़ाइल को
+   [रिलीज़](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases) से डाउनलोड करें।
 2. VS Code में: **एक्सटेंशन** साइडबार → `···` मेनू → **VSIX से इंस्टॉल करें...**
 3. जब संकेत मिले तो विंडो को रीलोड करें।
 

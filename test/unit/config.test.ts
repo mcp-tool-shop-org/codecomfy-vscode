@@ -6,41 +6,23 @@
  */
 
 import * as assert from 'node:assert/strict';
-import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
 // The vscode stub is resolved via tsconfig paths
 import { workspace } from 'vscode';
 import { getConfig } from '../../src/config';
+import { makeTempFile, cleanupTempPaths } from '../helpers';
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Shared cleanup
 // ---------------------------------------------------------------------------
-
-const tmpFiles: string[] = [];
-
-function makeTempFile(name: string, content = ''): string {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'codecomfy-cfg-'));
-    const filePath = path.join(dir, name);
-    fs.writeFileSync(filePath, content);
-    tmpFiles.push(filePath);
-    tmpFiles.push(dir);
-    return filePath;
-}
 
 after(() => {
-    for (const p of tmpFiles.reverse()) {
-        try {
-            const stat = fs.statSync(p);
-            if (stat.isDirectory()) {
-                fs.rmdirSync(p);
-            } else {
-                fs.unlinkSync(p);
-            }
-        } catch {
-            // Best effort
-        }
+    const { failed } = cleanupTempPaths();
+    if (failed.length > 0) {
+        // Surface a leak loudly — better than silent accumulation in tmpdir.
+        console.warn(`[config.test] ${failed.length} temp path(s) left behind:`, failed);
     }
 });
 
@@ -112,12 +94,38 @@ describe('getConfig', () => {
 
     if (process.platform === 'win32') {
         it('returns resolved path for a valid absolute .exe path', () => {
-            const p = makeTempFile('ffmpeg.exe', 'fake');
+            const p = makeTempFile('ffmpeg.exe', 'fake', 'codecomfy-cfg-');
             (workspace as any)._setFakeConfig({ ffmpegPath: p });
             const cfg = getConfig();
             assert.strictEqual(cfg.ffmpegPath, path.normalize(p));
         });
     }
+
+    // Platform-independent equivalent (F-863253-020): verify absolute-path
+    // acceptance WITHOUT fs stubbing. Node 22 + the TS `__importStar` helper
+    // bind `fs.*Sync` as non-configurable getters that Sinon cannot stub,
+    // so we just create a real file with the right extension in a temp dir.
+    it('accepts absolute-path acceptance logic on the current platform', () => {
+        // On Windows we need an executable extension (looksExecutable); on
+        // non-Windows any existing file is accepted.
+        const fname = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+        const realPath = makeTempFile(fname, 'fake', 'codecomfy-abs-');
+
+        (workspace as any)._setFakeConfig({ ffmpegPath: realPath });
+        const cfg = getConfig();
+
+        assert.strictEqual(cfg.ffmpegPath, path.normalize(realPath));
+    });
+
+    // Negative side of F-863253-020: a non-existent absolute path is rejected.
+    it('rejects an absolute path whose file does not exist', () => {
+        const fakePath = process.platform === 'win32'
+            ? path.join(os.tmpdir(), 'codecomfy-does-not-exist-xyz.exe')
+            : path.join(os.tmpdir(), 'codecomfy-does-not-exist-xyz');
+        (workspace as any)._setFakeConfig({ ffmpegPath: fakePath });
+        const cfg = getConfig();
+        assert.strictEqual(cfg.ffmpegPath, undefined);
+    });
 
     // --- nextGalleryPath ---
 

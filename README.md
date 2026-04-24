@@ -30,8 +30,16 @@ handles the workflow submission, polling, frame download, and FFmpeg assembly.
 
 ## Installation
 
-CodeComfy is not yet on the VS Code Marketplace.
-Install from a `.vsix` file:
+### From the VS Code Marketplace (recommended)
+
+1. Open the **Extensions** sidebar (`Ctrl+Shift+X`).
+2. Search for **CodeComfy** or visit the
+   [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode).
+3. Click **Install** and reload the window when prompted.
+
+### From a `.vsix` file (alternative)
+
+For development builds or offline installs:
 
 1. Download the latest `.vsix` from
    [Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases).

@@ -313,6 +313,97 @@ describe('ComfyServerEngine', () => {
             const result = buildWorkflow(engine, makePreset(workflow), makeRequest());
             assert.ok(result); // no crash
         });
+
+        // ── Adversarial prompt injection (F-863253-023) ─────────────────
+        //
+        // The prompt flows into `inputs.text` on a CLIPTextEncode node.
+        // Because workflow building stores the prompt as a plain string
+        // (not JSON-serialised into a template), injection characters
+        // should be kept as literals — they cannot spawn new nodes or
+        // rewrite adjacent fields.
+        //
+        // These tests ASSERT that contract so any future refactor that
+        // accidentally introduces string templating (e.g. switching to
+        // manual JSON build) would fail here.
+
+        describe('prompt injection — adversarial inputs stay literal', () => {
+            function run(prompt: string, negative?: string) {
+                const workflow = {
+                    '1': {
+                        class_type: 'CLIPTextEncode',
+                        inputs: { text: 'placeholder' },
+                        _meta: { title: 'Positive Prompt' },
+                    },
+                    '2': {
+                        class_type: 'CLIPTextEncode',
+                        inputs: { text: 'placeholder' },
+                        _meta: { title: 'Negative Prompt' },
+                    },
+                };
+                const engine = new ComfyServerEngine();
+                const result = buildWorkflow(engine, makePreset(workflow), makeRequest({
+                    inputs: { prompt, negative_prompt: negative },
+                }));
+                const inner = (result as any).prompt;
+                // Envelope sanity: exactly the two nodes we supplied, no extras.
+                assert.deepStrictEqual(
+                    Object.keys(inner).sort(),
+                    ['1', '2'],
+                    `workflow should contain exactly nodes 1 and 2 — got: ${Object.keys(inner)}`,
+                );
+                return inner;
+            }
+
+            it('treats embedded double-quotes as literal text', () => {
+                const payload = 'a cat "and also" another cat';
+                const inner = run(payload);
+                assert.strictEqual(inner['1'].inputs.text, payload);
+            });
+
+            it('treats embedded newlines as literal text', () => {
+                const payload = 'line one\nline two\r\nline three';
+                const inner = run(payload);
+                assert.strictEqual(inner['1'].inputs.text, payload);
+            });
+
+            it('treats a fake JSON-break payload as literal text (no new nodes spawned)', () => {
+                const payload = '"}, "new_node": {"class_type": "EvilNode", "inputs": {';
+                const inner = run(payload);
+                assert.strictEqual(inner['1'].inputs.text, payload);
+                // Crucially: no 'new_node' key appears.
+                assert.ok(
+                    !('new_node' in inner),
+                    `injection must not introduce a new top-level node; got keys: ${Object.keys(inner)}`,
+                );
+            });
+
+            it('treats ComfyUI-node-reference syntax as literal text', () => {
+                // `${N}:0` is the ComfyUI wire-reference syntax used inside
+                // input objects. A prompt containing it MUST NOT be dereferenced
+                // — it should land in `inputs.text` verbatim.
+                const payload = 'cinematic lighting ${1}:0 and "inputs": {"text": "hack"}';
+                const inner = run(payload);
+                assert.strictEqual(inner['1'].inputs.text, payload);
+            });
+
+            it('treats backslash + control chars as literal text', () => {
+                const payload = 'tab\there\\npath C:\\Windows\\System32';
+                const inner = run(payload);
+                assert.strictEqual(inner['1'].inputs.text, payload);
+            });
+
+            it('routes injection payload in negative_prompt only to the negative node', () => {
+                const negPayload = 'blurry"}, "evil": {"class_type":"X"';
+                const inner = run('a cat', negPayload);
+                assert.strictEqual(inner['1'].inputs.text, 'a cat');
+                assert.strictEqual(inner['2'].inputs.text, negPayload);
+                // Positive node must not leak the negative payload.
+                assert.ok(
+                    !String(inner['1'].inputs.text).includes('evil'),
+                    'positive prompt must not contain negative payload',
+                );
+            });
+        });
     });
 
     describe('cancel', () => {

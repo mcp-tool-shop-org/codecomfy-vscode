@@ -8,20 +8,16 @@
 
 import * as assert from 'node:assert/strict';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import { PresetRegistry } from '../../src/presets/registry';
+import { makeTempDir as sharedMakeTempDir, cleanupTempPaths } from '../helpers';
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Helpers — defer to shared helpers for temp-dir management.
 // ---------------------------------------------------------------------------
-
-const tmpDirs: string[] = [];
 
 function makeTempDir(): string {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'codecomfy-presets-'));
-    tmpDirs.push(dir);
-    return dir;
+    return sharedMakeTempDir('codecomfy-presets-');
 }
 
 function writePresetFile(dir: string, filename: string, content: object): void {
@@ -29,17 +25,9 @@ function writePresetFile(dir: string, filename: string, content: object): void {
 }
 
 after(() => {
-    for (const dir of tmpDirs.reverse()) {
-        try {
-            // Remove all files in dir, then dir itself
-            const files = fs.readdirSync(dir);
-            for (const f of files) {
-                fs.unlinkSync(path.join(dir, f));
-            }
-            fs.rmdirSync(dir);
-        } catch {
-            // Best effort
-        }
+    const { failed } = cleanupTempPaths();
+    if (failed.length > 0) {
+        console.warn(`[presets-registry.test] ${failed.length} temp path(s) left behind:`, failed);
     }
 });
 

@@ -77,6 +77,7 @@ function canStartGeneration(): boolean {
 
 export function activate(context: vscode.ExtensionContext) {
     outputChannel = vscode.window.createOutputChannel('CodeComfy');
+    context.subscriptions.push(outputChannel);
 
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     statusBarItem.text = '$(sparkle) CodeComfy: Idle';
@@ -452,7 +453,11 @@ function findNextGalleryExecutable(): string | undefined {
 }
 
 export function deactivate() {
-    if (outputChannel) {
-        outputChannel.dispose();
+    // Clear any pending idle timer before disposal so it can't fire
+    // against a disposed statusBarItem after deactivate() returns.
+    if (idleTimer !== undefined) {
+        clearTimeout(idleTimer);
+        idleTimer = undefined;
     }
+    // outputChannel is managed via context.subscriptions; no manual dispose needed.
 }

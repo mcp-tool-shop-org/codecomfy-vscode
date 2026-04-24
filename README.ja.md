@@ -29,11 +29,20 @@
 
 ## インストール
 
-CodeComfyはまだVS Code Marketplaceには登録されていません。
-`.vsix`ファイルからインストールします。
+### VS Code Marketplace から（推奨）
 
-1. 最新の`.vsix`ファイルを[Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases)からダウンロードします。
-2. VS Codeで：**Extensions** パネル → `···` メニュー → **Install from VSIX…**
+1. **拡張機能**サイドバー（`Ctrl+Shift+X`）を開きます。
+2. **CodeComfy** を検索するか、
+   [Marketplace のページ](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode)を開きます。
+3. **Install** をクリックし、プロンプトが表示されたらウィンドウを再読み込みします。
+
+### `.vsix` ファイルから（代替手段）
+
+開発ビルドやオフラインインストールの場合：
+
+1. 最新の `.vsix` ファイルを
+   [Releases](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases) からダウンロードします。
+2. VS Code で：**Extensions** パネル → `···` メニュー → **Install from VSIX…**
 3. プロンプトが表示されたら、ウィンドウを再読み込みします。
 
 ### 設定

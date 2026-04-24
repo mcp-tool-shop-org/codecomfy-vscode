@@ -206,6 +206,7 @@ export class ComfyServerEngine implements IGenerationEngine {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(workflow),
+                signal: AbortSignal.timeout(10000),
             });
 
             if (!response.ok) {
@@ -233,7 +234,9 @@ export class ComfyServerEngine implements IGenerationEngine {
             }
 
             try {
-                const response = await fetch(`${this.serverUrl}/history/${promptId}`);
+                const response = await fetch(`${this.serverUrl}/history/${promptId}`, {
+                    signal: AbortSignal.timeout(5000),
+                });
                 if (!response.ok) {
                     await this.sleep(backoff.next());
                     continue;
@@ -382,7 +385,9 @@ export class ComfyServerEngine implements IGenerationEngine {
                 type: type || 'output',
             });
 
-            const response = await fetch(`${this.serverUrl}/view?${params}`);
+            const response = await fetch(`${this.serverUrl}/view?${params}`, {
+                signal: AbortSignal.timeout(30000),
+            });
             if (!response.ok) {
                 return null;
             }
@@ -392,7 +397,7 @@ export class ComfyServerEngine implements IGenerationEngine {
             }
 
             // Stream response body → temp file
-            const nodeStream = Readable.fromWeb(response.body as any);
+            const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
             const fileStream = fs.createWriteStream(tmpPath);
             await pipeline(nodeStream, fileStream);
 

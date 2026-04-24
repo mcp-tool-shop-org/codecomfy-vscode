@@ -15,35 +15,16 @@ import {
     looksExecutable,
     validateExecutablePath,
 } from '../../src/validation/paths';
+import { makeTempFile, registerCleanup, cleanupTempPaths } from '../helpers';
 
 // ---------------------------------------------------------------------------
-// Helpers — create and clean up temp files
+// Shared cleanup — helpers module owns the temp registry across test files.
 // ---------------------------------------------------------------------------
-
-const tmpFiles: string[] = [];
-
-function makeTempFile(name: string, content = ''): string {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'codecomfy-test-'));
-    const filePath = path.join(dir, name);
-    fs.writeFileSync(filePath, content);
-    tmpFiles.push(filePath);
-    tmpFiles.push(dir);
-    return filePath;
-}
 
 after(() => {
-    // Clean up temp files in reverse order (files before dirs)
-    for (const p of tmpFiles.reverse()) {
-        try {
-            const stat = fs.statSync(p);
-            if (stat.isDirectory()) {
-                fs.rmdirSync(p);
-            } else {
-                fs.unlinkSync(p);
-            }
-        } catch {
-            // Best effort
-        }
+    const { failed } = cleanupTempPaths();
+    if (failed.length > 0) {
+        console.warn(`[validation-paths.test] ${failed.length} temp path(s) left behind:`, failed);
     }
 });
 
@@ -98,7 +79,7 @@ describe('existsFile', () => {
 
     it('returns false for a directory', () => {
         const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'codecomfy-dir-'));
-        tmpFiles.push(dir);
+        registerCleanup(dir);
         assert.strictEqual(existsFile(dir), false);
     });
 });
