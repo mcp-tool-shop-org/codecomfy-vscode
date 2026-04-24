@@ -4,7 +4,7 @@
 
 VS Code extension that drives a local (or remote) **ComfyUI** server to generate images and videos from inside the editor. The extension submits a workflow to ComfyUI, polls `/history`, streams frames via `/view`, and (for video) assembles frames with **FFmpeg**. Outputs land in `.codecomfy/outputs/` and run metadata in `.codecomfy/runs/` in the user's workspace.
 
-This is a shipping extension (v1.0.2 on the VS Code Marketplace under publisher `mcp-tool-shop`). It is **not** a prototype, a formatting helper, a snippet manager, or a theme. Any prior description along those lines is stale scaffold — trust `src/` and `README.md`.
+This is a shipping extension (v1.1.0 in-repo; v1.0.2 live on the VS Code Marketplace under publisher `mcp-tool-shop` at time of writing — Phase-10 publish bumps the Marketplace to match). It is **not** a prototype, a formatting helper, a snippet manager, or a theme. Any prior description along those lines is stale scaffold — trust `src/` and `README.md`.
 
 ## Stack
 

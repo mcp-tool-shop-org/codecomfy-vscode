@@ -9,71 +9,158 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Security
-- **Path-traversal hardening.** Added `sanitizeComfyFilename()` to reject
-  path-traversal segments (`../`), absolute paths, null bytes, and path
-  separators in filenames returned by ComfyUI. Applied at every untrusted
-  filename touchpoint in the download path. A compromised ComfyUI server
-  (or a hostile proxy) can no longer write outside the workspace run folder.
-- **Documented threat model.** `SECURITY.md` now includes a "Threat Model &
-  Mitigations" section describing the trust boundary (the user-configured
-  ComfyUI server), the known attack surface (malicious filenames in `/view`
-  responses), the defense, and explicit scope limits.
-- **Request timeouts.** `AbortSignal.timeout` now bounds every ComfyUI HTTP
-  call: 30 s for `/view` downloads, 10 s for `POST /prompt`, 5 s for
-  `/history` polling. The extension no longer hangs indefinitely when
-  ComfyUI stalls mid-request.
-- **Dependency audit.** Closed 8 transitive CVEs via `npm audit fix`
-  (ajv, brace-expansion, flatted, lodash, minimatch, underscore, undici).
-  Forced `serialize-javascript@^7.0.5` via npm `overrides` to patch a
-  HIGH RCE CVE in the transitive `mocha` dep chain (upstream mocha has
-  not yet bumped). Dev-only surface; runtime is unaffected. 4 remaining
-  MODERATE vulns in the `@vscode/vsce → @azure/identity → uuid (<14)`
-  chain are packaging-tool-only; tracked for a follow-up when upstream
-  lands a `@azure/identity` bump.
+## [1.1.0] - 2026-04-24
+
+This release is the output of a 10-phase dogfood swarm: full health pass
+(bug/security → proactive → humanization), a 6-feature pass, and a
+complete treatment sweep. 247 → 427 tests; `.vsix` 2.74 MB → 176 KB.
 
 ### Added
-- **Structured filename validation error.** `ComfyResponseError` now carries
-  an optional `fieldPath` so the Output channel can show which field
-  rejected a response (e.g. `filename`, `status.completed`).
-- **Test coverage.** 39 new tests covering previously-uncovered critical
-  paths — FFmpeg resolution order, video assembly pipeline, spawn safety,
-  SSRF / prompt-injection adversarial cases. 28 additional tests on
-  `ComfyServerEngine` (submitPrompt, pollForCompletion, collectImages,
-  collectFrames) including adversarial sanitizer coverage. Total went from
-  247 to 308 passing, 0 failing.
+
+- **Custom workflow picker (FT-1).** `CodeComfy: Generate from Custom
+  Workflow` command lets you run any ComfyUI workflow JSON from
+  `.codecomfy/presets/*.json` in your workspace — not just the shipped
+  HQ presets. QuickPick shows bundled + user-authored presets.
+- **Completion notification (FT-2).** `showInformationMessage` on
+  success with three actions: **Open Output**, **Open Gallery**, **Open
+  Outputs Folder**. New opt-out setting `codecomfy.notifyOnComplete`
+  (default `true`) for users who prefer silent status-bar-only updates.
+  Errors are always shown regardless.
+- **Run history TreeView (FT-4).** Activity-bar tree of previous
+  generations, read from `.codecomfy/outputs/index.json`. Right-click
+  any run to **Re-run** it with the same request. Auto-refreshes on
+  file change. Minimum-viable scope (no filters, tags, rename, or bulk
+  ops — those can come later if needed).
+- **Preset authoring command (FT-6).** `CodeComfy: Create Preset from
+  HQ Template` copies a bundled HQ preset to
+  `.codecomfy/presets/<your-name>.json` with name validation and opens
+  it in the built-in JSON editor.
+- **JSON Schema for user presets (FT-6).**
+  `schemas/codecomfy-preset.schema.json` + `contributes.jsonValidation`
+  auto-associates the schema with `.codecomfy/presets/*.json` so VS
+  Code renders inline validation errors while you edit.
+- **`Preset.description` field.** Optional human-readable description
+  used in QuickPick labels and the handbook. Fully backward-compat.
+- **`onComplete` callback.** Both `IGenerationEngine.generate()` and
+  `JobRouter.run()` now accept an optional callback that fires once per
+  run with `CompletionMetadata` (total elapsed ms, phase breakdown,
+  frame count, artifact count). Backward-compat additive.
+- **Integration test harness (FT-5).** `playbackFetch(fixtureDir)` +
+  `fakeResponse()` helpers in `test/helpers.ts` let tests replay
+  recorded ComfyUI HTTP responses for deterministic full-stack flows.
+  Fixture contract documented in `test/fixtures/comfy/README.md`.
+  Dev-facing guide at `docs/integration-testing.md`.
+- **Node-injection observability (FT-1).** `buildWorkflow()` now warns
+  when user-authored workflows contain class_types outside the
+  auto-injectable set (`CLIPTextEncode`, `KSampler`, `EmptyLatentImage`,
+  `CheckpointLoaderSimple`) — and prominently when zero nodes matched
+  any rule.
+- **HTTP contract docstring** at the top of `ComfyServerEngine` lists
+  every endpoint the engine calls, in order, with shapes and timeouts.
+  Reference for future test-fixture recorders.
+- **`ArtifactProvenance` interface.** Typed replacement for the
+  previously-open `provenance: Record<string, unknown>` field on
+  `IndexedArtifact`. Documents the fields TreeView reads
+  (`prompt`, `preset_id`, `checkpoint`, and for video
+  `meta.thumbnail_path` / `duration_seconds` / `fps`).
+- **Declarative injection map.** Refactored `buildWorkflow()` into an
+  `INJECTABLE_NODES` table; exported `INJECTABLE_CLASS_TYPES` so the
+  handbook and JSON Schema can enumerate supported node types.
+- **Handbook pages.** New `presets.md` (user-authored preset guide) and
+  `run-history.md` (TreeView walkthrough). `configuration.md` gains
+  rows for `defaultCheckpoint` and `notifyOnComplete`. `usage.md`
+  mentions the completion notification + opt-out.
+- **README Features section.** English README lists the new
+  capabilities; translations refreshed at release time.
+- **Structured filename validation error.** `ComfyResponseError` now
+  carries an optional `fieldPath` so the Output channel can name which
+  field rejected a response (e.g. `filename`, `status.completed`).
+- **Test coverage** grew from 247 to 427 passing tests: adversarial
+  path-traversal tests (43), ComfyServerEngine public-API coverage
+  (28), tree-view / extension-activation / new-preset command tests
+  (36), integration test helpers (18), plus misc hardening. 0 failing,
+  0 lint warnings.
 
 ### Changed
-- **README install section** rewritten across all 8 languages to lead with
-  the VS Code Marketplace (published since v1.0.1) and treat VSIX as the
-  alternative path.
-- **CLAUDE.md** rewritten to reflect the ComfyUI-driver reality — the
-  extension is a shipping VS Code extension (v1.0.2 on the Marketplace),
-  not the stale scaffold description it used to carry.
-- **Extension branding.** Refreshed logo and icon; brand assets now load
-  from the shared `mcp-tool-shop-org/brand` repo instead of being bundled
+
+- **Cancel UX.** Status bar flips to `$(circle-slash) Cancelling...`
+  **synchronously** on Cancel click, before awaiting the async cancel
+  — no more multi-second "still generating?" confusion.
+- **Output channel headers.** Every generation starts with a structured
+  header block (command name, timestamp, ComfyUI URL, FFmpeg status)
+  so back-to-back runs are easy to scan in the output channel.
+- **Activation health check.** Before prompting for input on the first
+  command, the extension now verifies ComfyUI is reachable (cached for
+  60 s) — no more committing to a prompt only to be told the server is
+  down.
+- **README install section** rewritten across all 8 languages to lead
+  with the VS Code Marketplace (published since v1.0.1) and treat VSIX
+  as the alternative path.
+- **CLAUDE.md** rewritten to reflect the ComfyUI-driver reality — not
+  the stale scaffold description it used to carry.
+- **Extension branding.** Refreshed logo and icon; brand assets load
+  from the shared `mcp-tool-shop-org/brand` repo instead of shipping
   in every `.vsix`.
+- **VS Code settings UI.** All configuration entries migrated from
+  plain `description` to `markdownDescription` with links, defaults
+  formatted as code, and clearer requirement language.
+- **TreeView-required writer contract.** `updateIndex()` logs a WARN
+  when any artifact is written without the fields TreeView needs.
+  Lenient with old data (no throw) — guides writers without breaking
+  existing indexes.
 
 ### Fixed
-- **`.vsix` size reduced from 2.74 MB to 131 KB** by moving large brand
-  assets out of the package and into the shared brand repo.
-- **`package-lock.json`** synced to `package.json` v1.0.2 (was one patch
+
+- **Hardcoded checkpoint (FT-3).** Shipped HQ presets referenced
+  `juggernautXL_v9Rundiffusionphoto2.safetensors`, causing first-run
+  failures for users without that exact model. New
+  `codecomfy.defaultCheckpoint` setting overrides `ckpt_name` on every
+  `CheckpointLoaderSimple` node at workflow-build time. Empty default
+  → preset value wins (backward-compat). When ComfyUI reports
+  "model not found", the user-facing message now suggests setting
+  `codecomfy.defaultCheckpoint` to an installed model.
+- **`.vsix` size reduced from 2.74 MB to 176 KB** by moving large brand
+  assets to the shared brand repo and tightening `.vscodeignore`.
+- **Output channel lifecycle.** Now registered with
+  `context.subscriptions` so VS Code disposes it uniformly on
+  deactivation.
+- **Idle timer cleanup.** `deactivate()` clears any pending idle timer
+  so it cannot fire against a disposed UI.
+- **Silent fallbacks now loud.** Index-file parse errors, atomic-rename
+  failures, sanitizer rejections, and malformed user-preset loads all
+  log actionable warnings instead of silently absorbing the problem.
+- **`package-lock.json`** synced to `package.json` (was one patch
   version behind; `npm ci` could fail in CI).
-- **ESLint** now ignores the Astro build output (`site/.astro`) so lint
-  is clean even when the handbook site has been built locally.
-- **Output channel lifecycle.** The output channel is now registered with
-  `context.subscriptions` so VS Code disposes it uniformly on deactivation.
-- **Idle timer cleanup.** `deactivate()` clears any pending idle timer so
-  it cannot fire against a disposed UI.
-- **Checkpoint no longer hardcoded.** Shipped HQ presets referenced a
-  specific checkpoint (`juggernautXL_v9Rundiffusionphoto2.safetensors`),
-  causing first-run failures for users without that exact model. A new
-  setting `codecomfy.defaultCheckpoint` overrides the `ckpt_name` on every
-  `CheckpointLoaderSimple` node at workflow-build time. When the setting
-  is empty (default), the preset's original value wins — fully
-  backward-compatible. When ComfyUI reports a missing-model error, the
-  user-facing message now suggests setting `codecomfy.defaultCheckpoint`
-  to a model they actually have installed.
+- **ESLint** now ignores the Astro build output (`site/.astro`,
+  `site/dist`) so lint is clean even when the handbook site has been
+  built locally.
+
+### Security
+
+- **Path-traversal hardening.** Added `sanitizeComfyFilename()` to
+  reject path-traversal segments (`../`), absolute paths, null bytes,
+  and path separators in filenames returned by ComfyUI. Applied at
+  every untrusted filename touchpoint in the download path. A
+  compromised ComfyUI server (or a hostile proxy) can no longer write
+  outside the workspace run folder.
+- **Documented threat model.** `SECURITY.md` now includes a "Threat
+  Model & Mitigations" section describing the trust boundary, the
+  attack surface, the defense, and explicit scope limits.
+- **Request timeouts.** `AbortSignal.timeout` now bounds every ComfyUI
+  HTTP call: 30 s for `/view` downloads, 10 s for `POST /prompt`, 5 s
+  for `/history` polling. The extension no longer hangs indefinitely
+  when ComfyUI stalls mid-request.
+- **Dependency audit.** Closed 8 transitive CVEs via `npm audit fix`
+  (ajv, brace-expansion, flatted, lodash, minimatch, underscore,
+  undici). Forced `serialize-javascript@^7.0.5` via npm `overrides` to
+  patch a HIGH RCE CVE in the transitive `mocha` dep chain (upstream
+  mocha has not yet bumped). Dev-only surface; runtime is unaffected.
+  4 remaining MODERATE vulns in the `@vscode/vsce → @azure/identity →
+  uuid (<14)` chain are packaging-tool-only; tracked for a follow-up
+  when upstream lands a `@azure/identity` bump.
+- **`npm audit` in CI** is no longer silenced — removed the `|| true`
+  on the audit step and added `--audit-level=high` so real CVEs fail
+  the build going forward.
 
 ## [1.0.2] - 2026-03-25
 
