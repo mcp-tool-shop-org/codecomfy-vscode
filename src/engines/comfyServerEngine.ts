@@ -30,6 +30,7 @@ import {
     ValidatedPromptResponse,
     ValidatedHistoryEntry,
     ComfyResponseError,
+    sanitizeComfyFilename,
 } from './comfyValidation';
 
 export class ComfyServerEngine implements IGenerationEngine {
@@ -285,12 +286,20 @@ export class ComfyServerEngine implements IGenerationEngine {
             if (!nodeOutput.images) continue;
 
             for (const img of nodeOutput.images) {
-                const ext = path.extname(img.filename) || '.png';
+                // Sanitise untrusted filename from ComfyUI response before any
+                // path.* / fs.* use. See sanitizeComfyFilename() for rejection rules.
+                let safeName: string;
+                try {
+                    safeName = sanitizeComfyFilename(img.filename);
+                } catch {
+                    continue;
+                }
+                const ext = path.extname(safeName) || '.png';
                 const outputFilename = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
                 const outputPath = path.join(outputDir, outputFilename);
 
                 const sizeBytes = await this.downloadToFile(
-                    img.filename, img.subfolder, img.type, outputPath,
+                    safeName, img.subfolder, img.type, outputPath,
                 );
                 if (sizeBytes === null) continue;
 
@@ -339,10 +348,20 @@ export class ComfyServerEngine implements IGenerationEngine {
         // Download and save each frame (streamed to disk)
         for (let i = 0; i < allImages.length; i++) {
             const img = allImages[i];
-            const outputPath = path.join(framesDir, img.filename);
+
+            // Sanitise untrusted filename from ComfyUI response before any
+            // path.* / fs.* use. A compromised server could otherwise craft
+            // names like "../../etc/shadow.png" to escape the frames folder.
+            let safeName: string;
+            try {
+                safeName = sanitizeComfyFilename(img.filename);
+            } catch {
+                continue;
+            }
+            const outputPath = path.join(framesDir, safeName);
 
             const sizeBytes = await this.downloadToFile(
-                img.filename, img.subfolder, img.type, outputPath,
+                safeName, img.subfolder, img.type, outputPath,
             );
             if (sizeBytes === null) continue;
 
@@ -352,7 +371,7 @@ export class ComfyServerEngine implements IGenerationEngine {
                 RUNS_DIR,
                 request.run_id,
                 'frames',
-                img.filename
+                safeName
             );
 
             artifacts.push({

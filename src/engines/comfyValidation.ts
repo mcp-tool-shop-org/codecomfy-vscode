@@ -6,6 +6,8 @@
  * with enough detail for the Output channel when something unexpected arrives.
  */
 
+import * as path from 'path';
+
 // ── Typed error ───────────────────────────────────────────────────────────────
 
 export class ComfyResponseError extends Error {
@@ -195,6 +197,97 @@ export function validateHistoryResponse(
     }
 
     return validateHistoryEntry(entry);
+}
+
+// ── Filename sanitisation ─────────────────────────────────────────────────────
+
+/**
+ * Patterns that indicate a filename is unsafe for local filesystem writes.
+ *
+ * ComfyUI returns filenames in history responses. A compromised or malicious
+ * server could craft names like `../../../etc/shadow.png` or `C:\\Windows\\x.png`
+ * to escape the intended run folder. We reject anything that isn't a plain
+ * leaf name (no separators, no traversal segments, no null bytes, not absolute).
+ */
+const TRAVERSAL_PATTERN = /(^|[\\/])\.\.([\\/]|$)/;
+
+/**
+ * Validate and return a safe leaf filename from an untrusted ComfyUI response.
+ *
+ * Throws `ComfyResponseError` on any unsafe input. Callers should pass the
+ * returned string into `path.join(safeDir, result)` — the result is guaranteed
+ * to be a bare basename with no separators, null bytes, or traversal segments.
+ *
+ * Rejects:
+ *   - Empty or whitespace-only strings
+ *   - Null bytes (`\0`)
+ *   - Path separators (`/` or `\`)
+ *   - Parent-traversal segments (`..`)
+ *   - Absolute paths (POSIX `/foo` or Windows `C:\foo`)
+ *   - Anything where `path.basename(input) !== input` (catches platform-specific edge cases)
+ */
+export function sanitizeComfyFilename(raw: unknown): string {
+    if (typeof raw !== 'string') {
+        throw new ComfyResponseError(
+            'filename',
+            `Expected filename to be a string (got ${typeof raw}).`,
+            raw,
+        );
+    }
+
+    const name = raw;
+
+    if (name.trim().length === 0) {
+        throw new ComfyResponseError(
+            'filename',
+            'Filename is empty or whitespace-only.',
+            raw,
+        );
+    }
+
+    if (name.includes('\0')) {
+        throw new ComfyResponseError(
+            'filename',
+            'Filename contains a null byte.',
+            raw,
+        );
+    }
+
+    if (name.includes('/') || name.includes('\\')) {
+        throw new ComfyResponseError(
+            'filename',
+            `Filename must be a bare leaf name (no path separators): "${name}".`,
+            raw,
+        );
+    }
+
+    if (TRAVERSAL_PATTERN.test(name) || name === '..' || name === '.') {
+        throw new ComfyResponseError(
+            'filename',
+            `Filename contains path-traversal segment: "${name}".`,
+            raw,
+        );
+    }
+
+    // Absolute-path guards (covers POSIX `/foo`, Windows `C:\foo`, `\\server\share`)
+    if (path.isAbsolute(name)) {
+        throw new ComfyResponseError(
+            'filename',
+            `Filename must not be absolute: "${name}".`,
+            raw,
+        );
+    }
+
+    // Defence-in-depth: basename must round-trip to itself.
+    if (path.basename(name) !== name) {
+        throw new ComfyResponseError(
+            'filename',
+            `Filename failed basename round-trip check: "${name}".`,
+            raw,
+        );
+    }
+
+    return name;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
