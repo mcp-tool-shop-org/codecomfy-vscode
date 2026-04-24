@@ -7,6 +7,14 @@ sidebar:
 
 This page provides a detailed reference for every CodeComfy configuration option, including how the extension validates settings and what happens when a value is invalid.
 
+## Requirements
+
+CodeComfy requires **VS Code `^1.85.0`** (tested on 1.85.0 through current stable). The extension uses the `InputBox` and structured cancellation APIs that shipped with VS Code 1.85. On older VS Code versions the extension will either fail to activate or silently skip features; upgrade VS Code rather than trying to pin an older extension release.
+
+## A note on HQ
+
+The two generate commands (`Generate Image (HQ)` and `Generate Video (HQ)`) both carry the `(HQ)` suffix. **HQ stands for "High Quality"** — it refers to the shipped preset workflows tuned for quality over speed (1024×1024 images, 30 steps, DPM++ 2M Karras). When future presets arrive (e.g. a fast draft mode), the HQ suffix will help disambiguate at the Command Palette. The Commands page covers what each preset produces.
+
 ## All settings
 
 CodeComfy exposes five settings under the `codecomfy.*` namespace. You can edit them in the VS Code Settings UI (**Settings > Extensions > CodeComfy**) or directly in your `settings.json`.

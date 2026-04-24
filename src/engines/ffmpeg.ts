@@ -7,6 +7,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { spawn } from 'child_process';
+import type { Logger } from '../logging/logger';
 
 /**
  * Common FFmpeg locations, OS-dependent.
@@ -75,16 +76,28 @@ function isFfmpegOnPath(): Promise<boolean> {
  *  1. Configured path (if supplied and file exists)
  *  2. Common install locations on disk
  *  3. System PATH lookup (async, no shell)
+ *
+ * When `logger` is supplied, the first successful resolve also probes
+ * `ffmpeg -version` (once per module) and logs the detected version at info
+ * level. Old FFmpeg (< 4.0) logs a warn — the `-movflags +faststart` flag
+ * used by assembleVideo requires 4.x+ and the user sees a cryptic error
+ * otherwise. Missing/unparseable versions are logged at info with
+ * "version unknown".
  */
-export async function findFfmpeg(configuredPath?: string): Promise<string | undefined> {
+export async function findFfmpeg(
+    configuredPath?: string,
+    logger?: Logger,
+): Promise<string | undefined> {
     // 1. Configured path
     if (configuredPath && configuredPath !== 'ffmpeg' && fs.existsSync(configuredPath)) {
+        await maybeReportVersion(configuredPath, logger);
         return configuredPath;
     }
 
     // 2. Common filesystem locations
     for (const candidate of getCommonFfmpegPaths()) {
         if (candidate && fs.existsSync(candidate)) {
+            await maybeReportVersion(candidate, logger);
             return candidate;
         }
     }
@@ -92,10 +105,114 @@ export async function findFfmpeg(configuredPath?: string): Promise<string | unde
     // 3. System PATH — the 'ffmpeg' bare name is safe to pass to spawn()
     //    on Windows because Node's spawn resolves .exe via PATH without shell.
     if (await isFfmpegOnPath()) {
+        await maybeReportVersion('ffmpeg', logger);
         return 'ffmpeg';
     }
 
     return undefined;
+}
+
+/**
+ * Cached version report keyed by resolved ffmpeg path. Prevents spawning
+ * `ffmpeg -version` on every call when the caller re-resolves (e.g. each
+ * job). Cache survives for the lifetime of the extension host.
+ */
+const versionReportCache = new Map<string, string>();
+
+/**
+ * Probe `ffmpeg -version` (once per path) and log the detected version.
+ * Never throws — version probing is best-effort. If probing fails, logs
+ * "version unknown" at info so the user at least knows which binary was
+ * picked.
+ */
+async function maybeReportVersion(ffmpegPath: string, logger?: Logger): Promise<void> {
+    if (!logger) return;
+    if (versionReportCache.has(ffmpegPath)) return;
+
+    const version = await probeFfmpegVersion(ffmpegPath);
+    versionReportCache.set(ffmpegPath, version ?? 'unknown');
+
+    if (!version) {
+        logger.info(`FFmpeg detected at ${ffmpegPath} (version unknown — probe failed or output unparseable)`);
+        return;
+    }
+
+    const major = parseMajorVersion(version);
+    if (major !== null && major < 4) {
+        logger.warn(
+            `FFmpeg ${version} detected at ${ffmpegPath}. ` +
+            `CodeComfy uses -movflags +faststart which requires FFmpeg 4.0+. ` +
+            `Please upgrade — see https://ffmpeg.org/download.html`,
+        );
+    } else {
+        logger.info(`FFmpeg ${version} detected at ${ffmpegPath}`);
+    }
+}
+
+/**
+ * Spawn `ffmpeg -version` and extract the version string from the first line.
+ * Returns null on any failure (spawn error, timeout, non-zero exit, unparseable
+ * output). 2-second timeout — an un-responsive ffmpeg binary should not stall
+ * the activation path.
+ */
+function probeFfmpegVersion(ffmpegPath: string): Promise<string | null> {
+    return new Promise((resolve) => {
+        try {
+            const proc = spawn(ffmpegPath, ['-version'], {
+                stdio: ['ignore', 'pipe', 'pipe'],
+                shell: false,
+                windowsHide: true,
+            });
+
+            let stdout = '';
+            proc.stdout?.on('data', (data) => {
+                stdout += data.toString();
+            });
+
+            const timeout = setTimeout(() => {
+                proc.kill();
+                resolve(null);
+            }, 2000);
+
+            proc.on('error', () => {
+                clearTimeout(timeout);
+                resolve(null);
+            });
+
+            proc.on('close', (code) => {
+                clearTimeout(timeout);
+                if (code !== 0) {
+                    resolve(null);
+                    return;
+                }
+                resolve(parseFfmpegVersionLine(stdout));
+            });
+        } catch {
+            resolve(null);
+        }
+    });
+}
+
+/**
+ * Parse `ffmpeg version 4.4.1 Copyright (c) …` → `4.4.1`.
+ * Returns null if the expected shape is absent.
+ */
+export function parseFfmpegVersionLine(versionOutput: string): string | null {
+    const firstLine = versionOutput.split('\n')[0] ?? '';
+    const match = firstLine.match(/ffmpeg version\s+(\S+)/i);
+    return match ? match[1] : null;
+}
+
+/**
+ * Extract the major version from a parsed version string.
+ * Handles `4.4.1`, `4.4`, `n4.4.1`, `4.4.1-full_build-…`. Returns null
+ * if no leading digit is found.
+ */
+function parseMajorVersion(version: string): number | null {
+    const match = version.match(/^[a-zA-Z]?(\d+)/);
+    if (!match) return null;
+    const n = Number(match[1]);
+    return Number.isFinite(n) ? n : null;
 }
 
 /**

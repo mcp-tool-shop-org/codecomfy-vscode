@@ -15,12 +15,22 @@ export class ComfyResponseError extends Error {
     readonly responseKind: string;
     /** The raw body that failed validation (truncated for safety). */
     readonly rawBody: string;
+    /**
+     * Optional dotted path of the field that failed validation, e.g.
+     * `status.completed` or `outputs[9].images[0].filename`. When present,
+     * callers can surface a version-mismatch hint with the exact field that
+     * broke. Undefined when the error is not tied to a single field
+     * (e.g. "response is not a JSON object").
+     */
+    readonly fieldPath?: string;
 
-    constructor(kind: string, message: string, rawBody: unknown) {
+    constructor(kind: string, message: string, rawBody: unknown, fieldPath?: string) {
         super(message);
         this.name = 'ComfyResponseError';
         this.responseKind = kind;
-        this.rawBody = truncate(JSON.stringify(rawBody), 2000);
+        // JSON.stringify returns undefined for undefined/function/symbol; fall back to String().
+        this.rawBody = truncate(JSON.stringify(rawBody) ?? String(rawBody), 2000);
+        this.fieldPath = fieldPath;
     }
 }
 
@@ -52,6 +62,7 @@ export function validatePromptResponse(body: unknown): ValidatedPromptResponse {
             'prompt_response',
             `Missing or invalid "prompt_id" (got ${typeof obj.prompt_id}).`,
             body,
+            'prompt_id',
         );
     }
 
@@ -60,6 +71,7 @@ export function validatePromptResponse(body: unknown): ValidatedPromptResponse {
             'prompt_response',
             `Missing or invalid "number" field (got ${typeof obj.number}).`,
             body,
+            'number',
         );
     }
 
@@ -77,6 +89,7 @@ export function validatePromptResponse(body: unknown): ValidatedPromptResponse {
             'prompt_response',
             `ComfyUI reported node errors:\n${summary}`,
             body,
+            'node_errors',
         );
     }
 
@@ -118,7 +131,12 @@ export function validateHistoryEntry(body: unknown): ValidatedHistoryEntry {
 
     // --- status ---
     if (!isObject(obj.status)) {
-        throw new ComfyResponseError('history_entry', 'Missing or invalid "status" object.', body);
+        throw new ComfyResponseError(
+            'history_entry',
+            'Missing or invalid "status" object.',
+            body,
+            'status',
+        );
     }
 
     const statusObj = obj.status as Record<string, unknown>;
@@ -127,6 +145,7 @@ export function validateHistoryEntry(body: unknown): ValidatedHistoryEntry {
             'history_entry',
             `Missing or invalid "status.completed" (got ${typeof statusObj.completed}).`,
             body,
+            'status.completed',
         );
     }
 
@@ -137,7 +156,12 @@ export function validateHistoryEntry(body: unknown): ValidatedHistoryEntry {
 
     // --- outputs ---
     if (!isObject(obj.outputs)) {
-        throw new ComfyResponseError('history_entry', 'Missing or invalid "outputs" object.', body);
+        throw new ComfyResponseError(
+            'history_entry',
+            'Missing or invalid "outputs" object.',
+            body,
+            'outputs',
+        );
     }
 
     const rawOutputs = obj.outputs as Record<string, unknown>;
@@ -232,6 +256,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             `Expected filename to be a string (got ${typeof raw}).`,
             raw,
+            'non-string',
         );
     }
 
@@ -242,6 +267,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             'Filename is empty or whitespace-only.',
             raw,
+            'empty',
         );
     }
 
@@ -250,6 +276,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             'Filename contains a null byte.',
             raw,
+            'null-byte',
         );
     }
 
@@ -258,6 +285,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             `Filename must be a bare leaf name (no path separators): "${name}".`,
             raw,
+            'path-separator',
         );
     }
 
@@ -266,6 +294,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             `Filename contains path-traversal segment: "${name}".`,
             raw,
+            'path-traversal',
         );
     }
 
@@ -275,6 +304,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             `Filename must not be absolute: "${name}".`,
             raw,
+            'absolute-path',
         );
     }
 
@@ -284,6 +314,7 @@ export function sanitizeComfyFilename(raw: unknown): string {
             'filename',
             `Filename failed basename round-trip check: "${name}".`,
             raw,
+            'basename-mismatch',
         );
     }
 

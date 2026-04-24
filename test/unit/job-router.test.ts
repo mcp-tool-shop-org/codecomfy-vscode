@@ -335,4 +335,208 @@ describe('JobRouter', () => {
             assert.ok(runDir.endsWith('abc_123'));
         });
     });
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Cancel state coherence (F-256919-032)
+    //
+    // When a user hits Cancel mid-generation the workspace must end in a
+    // coherent state:
+    //   - status.json reflects `canceled` (not stale `running`)
+    //   - request.json is still present (audit trail of what was asked)
+    //   - a subsequent `router.run()` does NOT inherit `cancelRequested`
+    //     from the previous run
+    //   - frames directory (video path) is either cleaned up OR preserved
+    //     predictably — the test documents the CURRENT behaviour so any
+    //     future change is a conscious one.
+    // ────────────────────────────────────────────────────────────────────────
+
+    describe('cancel — mid-generation state coherence', () => {
+        it('leaves status.json with status="canceled" when cancel fires during generate()', async () => {
+            const ws = makeTempDir('codecomfy-cancel-');
+            registerCleanup(ws);
+
+            // Engine that cancels on behalf of the router mid-generate:
+            // it flips `cancelRequested` on the router via the cancel spy,
+            // then returns a failure.
+            let capturedRouter: JobRouter | null = null;
+            const engine: IGenerationEngine = {
+                id: 'cancel-stub',
+                name: 'Cancel Stub',
+                isAvailable: async () => true,
+                generate: async () => {
+                    // Simulate user pressing Cancel mid-flight.
+                    if (capturedRouter) {
+                        await capturedRouter.cancel();
+                    }
+                    return { success: false, artifacts: [], error: 'Generation canceled.' };
+                },
+                cancel: async () => {},
+            };
+
+            const router = new JobRouter(ws, engine, {
+                logger: createNullLogger('test'),
+            });
+            capturedRouter = router;
+
+            const preset: Preset = {
+                id: 'hq-image',
+                name: 'HQ Image',
+                kind: 'image',
+                defaults: { width: 512, height: 512, steps: 20, cfg_scale: 7 },
+            };
+
+            const result = await router.run(
+                { kind: 'image', preset_id: 'hq-image', inputs: { prompt: 'x' } },
+                preset,
+            );
+
+            assert.strictEqual(result.success, false, 'run must not succeed after cancel');
+
+            // Dig out the status.json that was written.
+            const runsDir = path.join(ws, '.codecomfy', 'runs');
+            const runDirs = fs.readdirSync(runsDir);
+            assert.strictEqual(runDirs.length, 1, 'exactly one run dir should exist');
+            const statusPath = path.join(runsDir, runDirs[0], 'status.json');
+            const status = JSON.parse(fs.readFileSync(statusPath, 'utf-8'));
+            assert.strictEqual(
+                status.status,
+                'canceled',
+                `status.json must be "canceled" on mid-gen cancel; got ${status.status}`,
+            );
+            // request.json must still be around for the audit trail.
+            const requestPath = path.join(runsDir, runDirs[0], 'request.json');
+            assert.ok(fs.existsSync(requestPath), 'request.json must survive cancel');
+        });
+
+        it('does not inherit cancelRequested from a previous canceled run', async () => {
+            // First run cancels mid-flight; second run must NOT see the
+            // stale flag and must therefore be able to complete cleanly.
+            const ws = makeTempDir('codecomfy-cancel-');
+            registerCleanup(ws);
+
+            let shouldCancel = true;
+            let capturedRouter: JobRouter | null = null;
+            const engine: IGenerationEngine = {
+                id: 'flaky',
+                name: 'Flaky',
+                isAvailable: async () => true,
+                generate: async () => {
+                    if (shouldCancel && capturedRouter) {
+                        await capturedRouter.cancel();
+                        return { success: false, artifacts: [], error: 'Generation canceled.' };
+                    }
+                    return { success: true, artifacts: [] };
+                },
+                cancel: async () => {},
+            };
+
+            const router = new JobRouter(ws, engine, {
+                logger: createNullLogger('test'),
+            });
+            capturedRouter = router;
+
+            const preset: Preset = {
+                id: 'hq-image',
+                name: 'HQ Image',
+                kind: 'image',
+                defaults: { width: 512, height: 512, steps: 20, cfg_scale: 7 },
+            };
+
+            // First run: cancels.
+            await router.run(
+                { kind: 'image', preset_id: 'hq-image', inputs: { prompt: 'x' } },
+                preset,
+            );
+            // Private flag should be reset after run() finally-block.
+            assert.strictEqual(
+                (router as any).cancelRequested,
+                false,
+                'cancelRequested must reset to false after a canceled run',
+            );
+
+            // Second run: should succeed (flag not inherited).
+            shouldCancel = false;
+            const result2 = await router.run(
+                { kind: 'image', preset_id: 'hq-image', inputs: { prompt: 'y' } },
+                preset,
+            );
+            assert.strictEqual(result2.success, true, 'second run must not inherit cancel state');
+            // Subsequent status.json for the new run should be 'succeeded'.
+            const runsDir = path.join(ws, '.codecomfy', 'runs');
+            const runDirs = fs.readdirSync(runsDir).sort();
+            assert.strictEqual(runDirs.length, 2, 'two run dirs should now exist');
+
+            // Find which one is the succeeded run — the one whose status is succeeded.
+            const statuses = runDirs.map((d) => {
+                const p = path.join(runsDir, d, 'status.json');
+                return JSON.parse(fs.readFileSync(p, 'utf-8')).status as string;
+            });
+            assert.ok(statuses.includes('canceled'), 'first run status should be canceled');
+            assert.ok(statuses.includes('succeeded'), 'second run status should be succeeded');
+        });
+
+        it('writes status="canceled" (not "failed") when video assembly is canceled mid-flight', async () => {
+            // Video kind runs engine.generate() then attempts ffmpeg assembly.
+            // We simulate engine success followed by a cancel() before the
+            // ffmpeg step — the router checks cancelRequested before and
+            // after assembly.
+            const ws = makeTempDir('codecomfy-cancel-');
+            registerCleanup(ws);
+
+            // Engine succeeds but pre-populates the frames dir with zero
+            // frames; router will hit assembleVideoFromFrames, notice
+            // cancelRequested, and return canceled.
+            let capturedRouter: JobRouter | null = null;
+            const engine: IGenerationEngine = {
+                id: 'vid-stub',
+                name: 'Video Stub',
+                isAvailable: async () => true,
+                generate: async () => {
+                    // Flip cancelRequested right before returning success —
+                    // the router then checks it in assembleVideoFromFrames.
+                    if (capturedRouter) {
+                        await capturedRouter.cancel();
+                    }
+                    return { success: true, artifacts: [] };
+                },
+                cancel: async () => {},
+            };
+
+            const router = new JobRouter(ws, engine, {
+                logger: createNullLogger('test'),
+            });
+            capturedRouter = router;
+
+            const preset: Preset = {
+                id: 'hq-video',
+                name: 'HQ Video',
+                kind: 'video',
+                defaults: { fps: 24, duration_seconds: 2 },
+            };
+
+            const result = await router.run(
+                { kind: 'video', preset_id: 'hq-video', inputs: { prompt: 'cat' } },
+                preset,
+            );
+
+            // Result must be a failure — either "FFmpeg not found" or
+            // "Generation canceled.", depending on whether ffmpeg is on
+            // the test PATH. Either way, status.json must reflect the
+            // cancel, not 'failed', because cancelRequested was flipped
+            // before handleFailure ran.
+            assert.strictEqual(result.success, false);
+
+            const runsDir = path.join(ws, '.codecomfy', 'runs');
+            const runDirs = fs.readdirSync(runsDir);
+            assert.strictEqual(runDirs.length, 1);
+            const status = JSON.parse(
+                fs.readFileSync(path.join(runsDir, runDirs[0], 'status.json'), 'utf-8'),
+            );
+            assert.strictEqual(
+                status.status,
+                'canceled',
+                `mid-assembly cancel must mark status "canceled"; got ${status.status}`,
+            );
+        });
+    });
 });

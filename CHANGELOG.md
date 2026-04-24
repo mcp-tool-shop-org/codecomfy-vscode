@@ -9,6 +9,55 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Security
+- **Path-traversal hardening.** Added `sanitizeComfyFilename()` to reject
+  path-traversal segments (`../`), absolute paths, null bytes, and path
+  separators in filenames returned by ComfyUI. Applied at every untrusted
+  filename touchpoint in the download path. A compromised ComfyUI server
+  (or a hostile proxy) can no longer write outside the workspace run folder.
+- **Documented threat model.** `SECURITY.md` now includes a "Threat Model &
+  Mitigations" section describing the trust boundary (the user-configured
+  ComfyUI server), the known attack surface (malicious filenames in `/view`
+  responses), the defense, and explicit scope limits.
+- **Request timeouts.** `AbortSignal.timeout` now bounds every ComfyUI HTTP
+  call: 30 s for `/view` downloads, 10 s for `POST /prompt`, 5 s for
+  `/history` polling. The extension no longer hangs indefinitely when
+  ComfyUI stalls mid-request.
+
+### Added
+- **Structured filename validation error.** `ComfyResponseError` now carries
+  an optional `fieldPath` so the Output channel can show which field
+  rejected a response (e.g. `filename`, `status.completed`).
+- **Test coverage.** 39 new tests covering previously-uncovered critical
+  paths — FFmpeg resolution order, video assembly pipeline, spawn safety,
+  SSRF / prompt-injection adversarial cases. 28 additional tests on
+  `ComfyServerEngine` (submitPrompt, pollForCompletion, collectImages,
+  collectFrames) including adversarial sanitizer coverage. Total went from
+  247 to 308 passing, 0 failing.
+
+### Changed
+- **README install section** rewritten across all 8 languages to lead with
+  the VS Code Marketplace (published since v1.0.1) and treat VSIX as the
+  alternative path.
+- **CLAUDE.md** rewritten to reflect the ComfyUI-driver reality — the
+  extension is a shipping VS Code extension (v1.0.2 on the Marketplace),
+  not the stale scaffold description it used to carry.
+- **Extension branding.** Refreshed logo and icon; brand assets now load
+  from the shared `mcp-tool-shop-org/brand` repo instead of being bundled
+  in every `.vsix`.
+
+### Fixed
+- **`.vsix` size reduced from 2.74 MB to 131 KB** by moving large brand
+  assets out of the package and into the shared brand repo.
+- **`package-lock.json`** synced to `package.json` v1.0.2 (was one patch
+  version behind; `npm ci` could fail in CI).
+- **ESLint** now ignores the Astro build output (`site/.astro`) so lint
+  is clean even when the handbook site has been built locally.
+- **Output channel lifecycle.** The output channel is now registered with
+  `context.subscriptions` so VS Code disposes it uniformly on deactivation.
+- **Idle timer cleanup.** `deactivate()` clears any pending idle timer so
+  it cannot fire against a disposed UI.
+
 ## [1.0.2] - 2026-03-25
 
 ### Added

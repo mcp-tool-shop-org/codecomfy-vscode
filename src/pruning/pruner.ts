@@ -72,31 +72,35 @@ export function pruneRuns(workspacePath: string, opts: PruneOptions = {}): Prune
 
     // ── Enumerate runs ────────────────────────────────────────────────────
     const runEntries = listRuns(runsDir);
+    const ageCutoff = new Date(now.getTime() - maxAgeDays * MS_PER_DAY);
+
+    let toPrune: RunEntry[];
+    let remaining: RunEntry[];
     if (runEntries.length <= maxRuns) {
         // Still check age policy even when count is within limit
-        const ageCutoff = new Date(now.getTime() - maxAgeDays * MS_PER_DAY);
-        const expired = runEntries.filter((r) => r.createdAt < ageCutoff);
-        if (expired.length === 0) {
-            return result;
-        }
-        return pruneSelected(expired, workspacePath, log, result);
+        toPrune = runEntries.filter((r) => r.createdAt < ageCutoff);
+        remaining = runEntries.filter((r) => r.createdAt >= ageCutoff);
+    } else {
+        // Sort newest-first
+        runEntries.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        const kept = runEntries.slice(0, maxRuns);
+        const excess = runEntries.slice(maxRuns);
+        // Apply age filter as well: only prune if older than maxAgeDays
+        toPrune = excess.filter((r) => r.createdAt < ageCutoff);
+        const spared = excess.filter((r) => r.createdAt >= ageCutoff);
+        remaining = kept.concat(spared);
     }
-
-    // Sort newest-first
-    runEntries.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-    // Keep the most recent maxRuns — anything past that is a candidate
-    const excess = runEntries.slice(maxRuns);
-
-    // Apply age filter as well: only prune if older than maxAgeDays
-    const ageCutoff = new Date(now.getTime() - maxAgeDays * MS_PER_DAY);
-    const toPrune = excess.filter((r) => r.createdAt < ageCutoff);
 
     if (toPrune.length === 0) {
         return result;
     }
 
-    return pruneSelected(toPrune, workspacePath, log, result);
+    // Opening summary line — retention policy in human terms.
+    log.info(
+        `Pruning ${path.join(CODECOMFY_DIR, RUNS_DIR).replace(/\\/g, '/')} — retention: keep ${maxRuns} runs, ${maxAgeDays} days`,
+    );
+
+    return pruneSelected(toPrune, workspacePath, log, result, remaining);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -168,15 +172,40 @@ function pruneSelected(
     workspacePath: string,
     log: Logger,
     result: PruneResult,
+    remaining: RunEntry[] = [],
 ): PruneResult {
     const prunedRunIds = new Set<string>();
+    const now = Date.now();
+    let totalBytesFreed = 0;
 
     for (const entry of toPrune) {
+        // Best-effort size + artifact-count calc BEFORE deletion (skip on error).
+        let sizeBytes: number | undefined;
+        let artifactCount: number | undefined;
+        try {
+            const stats = dirSizeAndArtifactCount(entry.dirPath);
+            sizeBytes = stats.bytes;
+            artifactCount = stats.artifactCount;
+        } catch {
+            // Size calc is cosmetic — never block pruning on it.
+        }
+
         try {
             fs.rmSync(entry.dirPath, { recursive: true, force: true });
             prunedRunIds.add(entry.runId);
             result.prunedRuns++;
-            log.info(`Pruned run ${entry.runId}`);
+            if (typeof sizeBytes === 'number') {
+                totalBytesFreed += sizeBytes;
+            }
+            const ageDays = Math.max(
+                0,
+                Math.floor((now - entry.createdAt.getTime()) / MS_PER_DAY),
+            );
+            const sizeStr = typeof sizeBytes === 'number' ? `, ${formatBytes(sizeBytes)}` : '';
+            const artStr = typeof artifactCount === 'number'
+                ? `, ${artifactCount} artifact${artifactCount === 1 ? '' : 's'}`
+                : '';
+            log.info(`Pruned run ${entry.runId} (${ageDays} day${ageDays === 1 ? '' : 's'}${sizeStr}${artStr})`);
         } catch (err) {
             const msg = `Failed to prune ${entry.runId}: ${err instanceof Error ? err.message : String(err)}`;
             log.warn(msg);
@@ -193,7 +222,66 @@ function pruneSelected(
         }
     }
 
+    // ── Closing summary ──────────────────────────────────────────────────
+    if (result.prunedRuns > 0) {
+        const oldestKept = remaining
+            .map((r) => r.createdAt.getTime())
+            .filter((t) => t > 0)
+            .reduce<number | undefined>((acc, t) => (acc === undefined || t < acc ? t : acc), undefined);
+        const oldestStr = typeof oldestKept === 'number'
+            ? new Date(oldestKept).toISOString().slice(0, 10)
+            : 'none';
+        const freedStr = totalBytesFreed > 0 ? `, freed ~${formatBytes(totalBytesFreed)}` : '';
+        log.info(
+            `Pruning done: removed ${result.prunedRuns} run${result.prunedRuns === 1 ? '' : 's'}${freedStr}, oldest kept: ${oldestStr}`,
+        );
+    }
+
     return result;
+}
+
+/**
+ * Best-effort directory size + artifact count.
+ * Counts files under `outputs/` and `frames/` as artifacts if present;
+ * otherwise counts all regular files.
+ */
+function dirSizeAndArtifactCount(dirPath: string): { bytes: number; artifactCount: number } {
+    let bytes = 0;
+    let artifactCount = 0;
+    const walk = (p: string): void => {
+        let entries: fs.Dirent[];
+        try {
+            entries = fs.readdirSync(p, { withFileTypes: true });
+        } catch {
+            return;
+        }
+        for (const ent of entries) {
+            const full = path.join(p, ent.name);
+            if (ent.isDirectory()) {
+                walk(full);
+            } else if (ent.isFile()) {
+                try {
+                    const st = fs.statSync(full);
+                    bytes += st.size;
+                    // Count images/videos/frames as artifacts
+                    if (/\.(png|jpg|jpeg|webp|mp4|gif|mov)$/i.test(ent.name)) {
+                        artifactCount++;
+                    }
+                } catch {
+                    // Skip unreadable file
+                }
+            }
+        }
+    };
+    walk(dirPath);
+    return { bytes, artifactCount };
+}
+
+function formatBytes(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${Math.round(bytes / (1024 * 1024))} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
 function pruneIndexEntries(

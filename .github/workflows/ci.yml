@@ -38,9 +38,13 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
 
+      # `npm ci` is a silent install — audit warnings here would be noise
+      # because we run a dedicated, loud `dep-audit` job below. This split
+      # keeps install failures distinct from vulnerability failures.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --audit=false
 
       - name: Lint
         run: npm run lint
@@ -52,6 +56,8 @@ jobs:
         run: npm run compile
 
   dep-audit:
+    # Dedicated job that fails the build on real HIGH/CRITICAL CVEs.
+    # MODERATE and below are handled by Dependabot so they don't block PRs.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,4 +65,6 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm audit --omit=dev || true
+          cache-dependency-path: 'package-lock.json'
+      - name: Audit production dependencies (fail on HIGH+)
+        run: npm audit --omit=dev --audit-level=high

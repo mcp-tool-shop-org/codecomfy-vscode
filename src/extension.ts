@@ -41,6 +41,28 @@ let statusBarItem: vscode.StatusBarItem;
 let outputChannel: vscode.OutputChannel;
 let currentRouter: JobRouter | null = null;
 
+/** Short ISO timestamp for output-channel lines. */
+function ts(): string {
+    return new Date().toISOString();
+}
+
+// ---------------------------------------------------------------------------
+// Fine-grained progress detail (UX F-256918-018)
+// ---------------------------------------------------------------------------
+/**
+ * Optional, fine-grained progress detail for the status bar. Threaded from
+ * JobRouter to onProgress alongside the coarse JobRun status so long video
+ * runs can display "frame 42 / 96" instead of a static "Generating video...".
+ *
+ * Router/engine must populate these for full effect — see cross_domain_notes
+ * on F-256918-018. When absent, the status bar falls back to coarse status.
+ */
+export interface ProgressDetail {
+    frameCurrent?: number;
+    frameTotal?: number;
+    phase?: 'polling' | 'downloading' | 'assembling';
+}
+
 // ---------------------------------------------------------------------------
 // Concurrency guard — only one generation at a time, with cooldown
 // ---------------------------------------------------------------------------
@@ -50,6 +72,84 @@ const GENERATION_COOLDOWN_MS = 2_000;
 let generationActive = false;
 let lastGenerationEndedAt = 0;
 let idleTimer: ReturnType<typeof setTimeout> | undefined;
+
+// ---------------------------------------------------------------------------
+// Activation health cache (UX F-256918-015)
+// ---------------------------------------------------------------------------
+/**
+ * Short TTL cache so rapid-fire commands don't re-ping ComfyUI. 60 seconds
+ * is long enough to skip the re-check on a second command invocation, short
+ * enough that a user who just started ComfyUI will see the recovery on the
+ * next attempt.
+ */
+const HEALTH_CACHE_TTL_MS = 60_000;
+let lastHealthOkAt = 0;
+let lastHealthUrl: string | undefined;
+
+interface HealthResult {
+    ok: boolean;
+    message?: string;
+}
+
+/**
+ * Lightweight pre-flight: ensure ComfyUI is reachable before we prompt the
+ * user for input. Cached for {@link HEALTH_CACHE_TTL_MS} ms per URL so the
+ * user doesn't pay the latency twice in a row.
+ */
+async function ensureComfyReachable(engine: ComfyServerEngine, url: string): Promise<HealthResult> {
+    const now = Date.now();
+    if (lastHealthUrl === url && now - lastHealthOkAt < HEALTH_CACHE_TTL_MS) {
+        return { ok: true };
+    }
+
+    outputChannel.appendLine(`[${ts()}] Checking ComfyUI at ${url}...`);
+    const prevStatus = statusBarItem.text;
+    statusBarItem.text = '$(pulse) CodeComfy: Checking ComfyUI...';
+
+    try {
+        const ok = await engine.isAvailable();
+        if (ok) {
+            outputChannel.appendLine(`[${ts()}] ✓ ComfyUI is reachable. Proceeding with generation.`);
+            lastHealthOkAt = Date.now();
+            lastHealthUrl = url;
+            statusBarItem.text = prevStatus;
+            return { ok: true };
+        }
+        const message = `ComfyUI not reachable at ${url}. Start ComfyUI or update codecomfy.comfyuiUrl.`;
+        outputChannel.appendLine(`[${ts()}] ✗ ${message}`);
+        statusBarItem.text = '$(error) CodeComfy: Not reachable';
+        return { ok: false, message };
+    } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        const message = `ComfyUI health check failed: ${detail}`;
+        outputChannel.appendLine(`[${ts()}] ✗ ${message}`);
+        statusBarItem.text = '$(error) CodeComfy: Not reachable';
+        return { ok: false, message };
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Output-channel header (UX F-256918-016)
+// ---------------------------------------------------------------------------
+/**
+ * Write a structured, readable-at-a-glance header for a new generation run.
+ * Makes back-to-back runs easy to scan in the output channel.
+ */
+function writeCommandHeader(
+    commandLabel: string,
+    config: ReturnType<typeof getConfig>,
+): void {
+    const ffmpegLabel = config.ffmpegPath
+        ? config.ffmpegPath
+        : 'auto-detect (PATH)';
+    const bar = '════════════════════════════════════════';
+    outputChannel.appendLine(bar);
+    outputChannel.appendLine(` CodeComfy · ${commandLabel}`);
+    outputChannel.appendLine(` Started: ${ts()}`);
+    outputChannel.appendLine(` ComfyUI: ${config.comfyuiUrl}`);
+    outputChannel.appendLine(` FFmpeg:  ${ffmpegLabel}`);
+    outputChannel.appendLine(bar);
+}
 
 /**
  * Check whether a new generation can start.
@@ -83,6 +183,26 @@ export function activate(context: vscode.ExtensionContext) {
     statusBarItem.text = '$(sparkle) CodeComfy: Idle';
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
+
+    // Load user-authored presets from the workspace .codecomfy/presets/ folder,
+    // if any, and surface malformed-JSON failures in the output channel
+    // (UX F-256918-022) instead of silently skipping them.
+    try {
+        const presetLogger = createChannelLogger('PresetRegistry', outputChannel);
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (workspaceFolders && workspaceFolders.length > 0) {
+            const userPresetDir = path.join(
+                workspaceFolders[0].uri.fsPath,
+                '.codecomfy',
+                'presets',
+            );
+            getPresetRegistry().loadFromDirectory(userPresetDir, presetLogger);
+        }
+    } catch {
+        // Activation must never fail because of user presets. Silent catch
+        // here is safe — logger inside loadFromDirectory reports real parse
+        // failures; only unexpected FS errors reach this block.
+    }
 
     context.subscriptions.push(
         vscode.commands.registerCommand('codecomfy.openGallery', openGalleryCommand),
@@ -145,6 +265,21 @@ async function generateImageHQCommand(): Promise<void> {
 
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const config = getConfig();
+
+    // Write the command header first so users see which run started even
+    // if they cancel at the prompt (UX F-256918-016).
+    writeCommandHeader('Generate Image (HQ)', config);
+    outputChannel.show(true);
+
+    // Pre-flight ComfyUI reachability BEFORE prompting for input
+    // (UX F-256918-015). Don't make the user type a prompt only to be
+    // told ComfyUI is down seconds later.
+    const preflightEngine = new ComfyServerEngine(config.comfyuiUrl);
+    const health = await ensureComfyReachable(preflightEngine, config.comfyuiUrl);
+    if (!health.ok) {
+        vscode.window.showErrorMessage(health.message ?? 'ComfyUI is not reachable.');
+        return;
+    }
 
     // --- Prompt ---
     const rawPrompt = await vscode.window.showInputBox({
@@ -213,7 +348,7 @@ async function generateImageHQCommand(): Promise<void> {
         },
     };
 
-    outputChannel.appendLine(`[${new Date().toISOString()}] Starting image generation...`);
+    outputChannel.appendLine(`[${ts()}] Starting image generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
     if (negativePrompt) {
         outputChannel.appendLine(`Negative: ${negativePrompt}`);
@@ -221,7 +356,6 @@ async function generateImageHQCommand(): Promise<void> {
     if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
     }
-    outputChannel.show(true);
 
     await runGeneration(router, requestInput, preset, config, 'image');
 }
@@ -236,6 +370,17 @@ async function generateVideoHQCommand(): Promise<void> {
 
     const workspacePath = workspaceFolders[0].uri.fsPath;
     const config = getConfig();
+
+    // Header + pre-flight up front (UX F-256918-015, F-256918-016)
+    writeCommandHeader('Generate Video (HQ)', config);
+    outputChannel.show(true);
+
+    const preflightEngine = new ComfyServerEngine(config.comfyuiUrl);
+    const health = await ensureComfyReachable(preflightEngine, config.comfyuiUrl);
+    if (!health.ok) {
+        vscode.window.showErrorMessage(health.message ?? 'ComfyUI is not reachable.');
+        return;
+    }
 
     // --- Prompt ---
     const rawPrompt = await vscode.window.showInputBox({
@@ -324,7 +469,7 @@ async function generateVideoHQCommand(): Promise<void> {
         },
     };
 
-    outputChannel.appendLine(`[${new Date().toISOString()}] Starting video generation...`);
+    outputChannel.appendLine(`[${ts()}] Starting video generation...`);
     outputChannel.appendLine(`Prompt: ${prompt}`);
     if (negativePromptV) {
         outputChannel.appendLine(`Negative: ${negativePromptV}`);
@@ -333,18 +478,27 @@ async function generateVideoHQCommand(): Promise<void> {
     if (seed !== undefined) {
         outputChannel.appendLine(`Seed: ${seed}`);
     }
-    outputChannel.show(true);
 
     await runGeneration(router, requestInput, preset, config, 'video');
 }
 
 async function cancelGenerationCommand(): Promise<void> {
-    if (currentRouter) {
-        await currentRouter.cancel();
-        vscode.window.showInformationMessage('Generation canceled.');
-    } else {
+    if (!currentRouter) {
         vscode.window.showInformationMessage('No generation in progress.');
+        return;
     }
+
+    // Immediate synchronous UI feedback BEFORE awaiting the router
+    // (UX F-256918-014). Without this, the status bar stays on
+    // "Generating..." for seconds while the async cancel unwinds.
+    statusBarItem.text = '$(circle-slash) CodeComfy: Cancelling...';
+    statusBarItem.tooltip = 'Waiting for the active run to stop cleanly';
+    outputChannel.appendLine(`[${ts()}] ── CodeComfy · Cancel requested by user ──`);
+
+    await currentRouter.cancel();
+    // The onProgress handler finalises the status bar to "Canceled" once
+    // the router observes the canceled state — we don't overwrite it here.
+    vscode.window.showInformationMessage('Generation canceled.');
 }
 
 // =============================================================================
@@ -358,16 +512,37 @@ async function runGeneration(
     config: ReturnType<typeof getConfig>,
     type: 'image' | 'video'
 ): Promise<void> {
-    const onProgress = (run: JobRun) => {
+    /**
+     * Frame-level status-bar granularity (UX F-256918-018).
+     *
+     * If the router/engine supplies a `detail` argument populated with
+     * frameCurrent/frameTotal/phase, render a specific line such as
+     * "Generating... (frame 42 / 96)". If detail is absent (current
+     * JobRouter behavior), fall back to the coarse per-status text.
+     *
+     * See cross_domain_notes — router/engine must start calling
+     * onProgress with this second arg for the fine-grained display to
+     * appear. Surfacing the hook here is additive and harmless today.
+     */
+    const onProgress = (run: JobRun, detail?: ProgressDetail) => {
         switch (run.status) {
             case 'queued':
                 statusBarItem.text = '$(loading~spin) CodeComfy: Queued...';
                 break;
-            case 'running':
-                statusBarItem.text = type === 'video'
-                    ? '$(loading~spin) CodeComfy: Generating video...'
-                    : '$(loading~spin) CodeComfy: Generating...';
+            case 'running': {
+                if (detail?.phase === 'downloading' && detail.frameTotal) {
+                    statusBarItem.text = `$(loading~spin) CodeComfy: Downloading frame ${detail.frameCurrent ?? '?'} / ${detail.frameTotal}`;
+                } else if (detail?.phase === 'assembling') {
+                    statusBarItem.text = '$(loading~spin) CodeComfy: Assembling video (FFmpeg)';
+                } else if (detail?.frameTotal) {
+                    statusBarItem.text = `$(loading~spin) CodeComfy: Generating... (frame ${detail.frameCurrent ?? 0} / ${detail.frameTotal})`;
+                } else {
+                    statusBarItem.text = type === 'video'
+                        ? '$(loading~spin) CodeComfy: Generating video...'
+                        : '$(loading~spin) CodeComfy: Generating...';
+                }
                 break;
+            }
             case 'succeeded':
                 statusBarItem.text = '$(check) CodeComfy: Done';
                 break;

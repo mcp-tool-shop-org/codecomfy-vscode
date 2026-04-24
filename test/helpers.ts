@@ -150,6 +150,79 @@ export function makeTempDir(prefix: string = 'codecomfy-test-'): string {
     return dir;
 }
 
+// ---------------------------------------------------------------------------
+// globalThis.fetch stubbing (shared HTTP test helper)
+// ---------------------------------------------------------------------------
+//
+// Extracted from `comfy-server-engine.test.ts` where it lived as a local
+// helper across 17 call sites. Any test that needs to replace the global
+// `fetch` with a handler should use this so the shape stays consistent and
+// future network-touching tests (ComfyUI, NextGallery probe, pollers) share
+// the same contract.
+
+/**
+ * Record of a single fetch call captured by `stubFetch`.
+ *
+ * The `url` field is always a string for assertion convenience — if the
+ * source passed a `Request` or `URL` object, it is coerced via `String()`.
+ */
+export interface FetchCall {
+    /** URL string the source code passed to `fetch`. */
+    url: string;
+    /** Init object the source code passed (optional). */
+    init?: RequestInit;
+}
+
+export interface FetchStub {
+    /** Every call recorded in the order it was made. */
+    calls: FetchCall[];
+    /** Restore the original `globalThis.fetch`. Safe to call more than once. */
+    restore: () => void;
+}
+
+/**
+ * Replace `globalThis.fetch` with a handler and record every call.
+ *
+ * The handler receives the raw `url` (string | URL | Request) and `init`,
+ * and returns anything the source code is willing to await — typically a
+ * Response-shaped object. Use `fakeResponse()` in tests to build bodies.
+ *
+ * Usage:
+ * ```ts
+ * const stub = stubFetch(async (url) => fakeResponse({ ok: true, status: 200 }));
+ * try {
+ *     await sut.doNetworkThing();
+ *     assert.ok(stub.calls[0].url.endsWith('/system_stats'));
+ * } finally {
+ *     stub.restore();
+ * }
+ * ```
+ *
+ * The handler signature accepts a loose first param (`string | URL | Request`)
+ * so it matches both the high-level fetch shape the engine uses and the
+ * `fetch(request: Request)` style for future callers.
+ */
+export function stubFetch(
+    handler: (url: string | URL | Request, init?: RequestInit) => Promise<unknown> | unknown,
+): FetchStub {
+    const g = globalThis as { fetch?: typeof fetch };
+    const original = g.fetch;
+    const calls: FetchCall[] = [];
+    let restored = false;
+    g.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+        calls.push({ url: typeof url === 'string' ? url : String(url), init });
+        return handler(url, init);
+    }) as typeof fetch;
+    return {
+        calls,
+        restore: () => {
+            if (restored) return;
+            g.fetch = original;
+            restored = true;
+        },
+    };
+}
+
 /**
  * Remove all registered temp paths.
  *

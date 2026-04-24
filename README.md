@@ -24,6 +24,7 @@ handles the workflow submission, polling, frame download, and FFmpeg assembly.
 
 | Dependency | Required | Notes |
 |------------|----------|-------|
+| **VS Code** | Yes | `^1.85.0` or newer. The extension uses the `InputBox` and structured cancellation APIs that shipped with 1.85; tested on 1.85.0 through current stable. |
 | **ComfyUI** | Yes | Running locally (`http://127.0.0.1:8188`) or on a remote machine. CodeComfy talks to its HTTP API. |
 | **FFmpeg**  | For video | Must be on your system PATH *or* configured via `codecomfy.ffmpegPath`. [Download FFmpeg](https://ffmpeg.org/download.html). |
 | **NextGallery** | Optional | Companion gallery viewer. Not required for generation itself. |

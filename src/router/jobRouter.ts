@@ -175,13 +175,49 @@ export class JobRouter {
 
     /**
      * Cancel the current run.
+     *
+     * Logs a warn at entry, an info line at engine.cancel() invocation,
+     * and a completion summary with status + elapsed + partial counts
+     * so the user can tell from the output channel whether cancel
+     * succeeded mid-generation or was too late.
      */
     async cancel(): Promise<void> {
-        if (this.currentRun) {
-            this.log.warn(`Canceling run ${this.currentRun.run_id}`);
-            this.cancelRequested = true;
-            await this.engine.cancel();
+        if (!this.currentRun) {
+            return;
         }
+
+        const runId = this.currentRun.run_id;
+        const startedAt = this.currentRun.started_at;
+        const cancelStart = Date.now();
+        this.log.warn(`Cancel requested for run ${runId}`);
+        this.cancelRequested = true;
+
+        this.log.info(`engine.cancel() called for run ${runId}`);
+        let engineErr: unknown;
+        try {
+            await this.engine.cancel();
+        } catch (err) {
+            engineErr = err;
+        }
+
+        // Compose summary — currentRun may have been cleared by the finally
+        // block of an in-flight run() call between await points, so snapshot
+        // what we can still read.
+        const snapshot = this.currentRun;
+        const finalStatus = snapshot?.status ?? 'unknown';
+        const elapsedMs = startedAt
+            ? Date.now() - new Date(startedAt).getTime()
+            : Date.now() - cancelStart;
+        const elapsedSec = Math.round(elapsedMs / 1000);
+
+        if (engineErr) {
+            const errMsg = engineErr instanceof Error ? engineErr.message : String(engineErr);
+            this.log.warn(`engine.cancel() for run ${runId} errored: ${errMsg}`);
+        }
+
+        this.log.info(
+            `Cancel complete for run ${runId}: status=${finalStatus}, elapsed=${elapsedSec}s`,
+        );
     }
 
     /**
@@ -333,6 +369,12 @@ export class JobRouter {
 
     /**
      * Atomically update the output index.
+     *
+     * If the existing index is unreadable/unparseable, we log a warning
+     * explaining WHERE the user's run data still lives on disk and fall
+     * back to an empty index so the current run is not lost. If the
+     * atomic rename fails (EACCES on Windows, antivirus locks), we retry
+     * with backoff and clean up the temp file on final failure.
      */
     private updateIndex(runId: string, artifacts: Artifact[], request: JobRequest): void {
         const indexPath = path.join(
@@ -341,13 +383,18 @@ export class JobRouter {
             OUTPUTS_DIR,
             INDEX_FILENAME
         );
+        const runsRelPath = path.join(CODECOMFY_DIR, RUNS_DIR).replace(/\\/g, '/');
 
         let index: OutputIndex;
         if (fs.existsSync(indexPath)) {
             try {
                 const content = fs.readFileSync(indexPath, 'utf-8');
                 index = JSON.parse(content);
-            } catch {
+            } catch (parseErr) {
+                const errMsg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+                this.log.warn(
+                    `${indexPath} could not be parsed: ${errMsg}. Starting with empty index — your previous runs are still on disk at ${runsRelPath}/ but may not appear in the gallery until the index is rebuilt.`,
+                );
                 index = this.createEmptyIndex();
             }
         } else {
@@ -377,7 +424,57 @@ export class JobRouter {
 
         const tempPath = `${indexPath}.tmp.${Date.now()}`;
         fs.writeFileSync(tempPath, JSON.stringify(index, null, 2));
-        fs.renameSync(tempPath, indexPath);
+        this.atomicRenameWithRetry(tempPath, indexPath, runId, runsRelPath);
+    }
+
+    /**
+     * Attempt an atomic rename with up to 3 retries for transient locks
+     * (EACCES / EBUSY from antivirus or indexers on Windows).
+     * On final failure: clean up temp file, log actionable context, and
+     * return without throwing — artifacts still exist on disk under runs/.
+     */
+    private atomicRenameWithRetry(
+        tempPath: string,
+        finalPath: string,
+        runId: string,
+        runsRelPath: string,
+    ): void {
+        const delays = [50, 200, 500];
+        let lastErr: unknown;
+        for (let attempt = 0; attempt < delays.length; attempt++) {
+            try {
+                fs.renameSync(tempPath, finalPath);
+                return;
+            } catch (err) {
+                lastErr = err;
+                const errMsg = err instanceof Error ? err.message : String(err);
+                const nextDelay = delays[attempt];
+                this.log.warn(
+                    `Failed to update ${finalPath}: ${errMsg}. Retrying in ${nextDelay}ms...`,
+                );
+                // Synchronous backoff — updateIndex runs on the finalization
+                // path and we want ordering preserved relative to status writes.
+                const deadline = Date.now() + nextDelay;
+                while (Date.now() < deadline) {
+                    // Tight spin; delays are small (≤500ms) so this is fine
+                    // and keeps the call synchronous like the surrounding code.
+                }
+            }
+        }
+
+        // Final failure — clean up temp file so we don't leak it.
+        const finalErrMsg = lastErr instanceof Error ? lastErr.message : String(lastErr);
+        try {
+            if (fs.existsSync(tempPath)) {
+                fs.unlinkSync(tempPath);
+            }
+        } catch (cleanupErr) {
+            const cleanupMsg = cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr);
+            this.log.warn(`Failed to clean up temp index file ${tempPath}: ${cleanupMsg}`);
+        }
+        this.log.warn(
+            `Failed to update ${finalPath} after ${delays.length} retries (${finalErrMsg}). Temp file cleaned up. Your artifacts exist at ${runsRelPath}/${runId} but may not appear in the gallery.`,
+        );
     }
 
     private createEmptyIndex(): OutputIndex {

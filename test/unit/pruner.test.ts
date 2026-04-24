@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { pruneRuns, createEmptyIndex, MAX_RUNS, MAX_AGE_DAYS } from '../../src/pruning/pruner';
 import { CODECOMFY_DIR, RUNS_DIR, OUTPUTS_DIR, INDEX_FILENAME } from '../../src/types';
-import { makeTempDir } from '../helpers';
+import { makeTempDir, patchModule } from '../helpers';
 
 // ── Test helpers ──────────────────────────────────────────────────────────────
 
@@ -212,5 +212,130 @@ describe('pruneRuns', () => {
 
         const result = pruneRuns(tmpDir, { maxRuns: 200, maxAgeDays: 30, now });
         assert.strictEqual(result.prunedRuns, 1);
+    });
+
+    // ── Edge cases (F-256919-034) ────────────────────────────────────────────
+    //
+    // The tests above cover the happy path + single-run quirks. Real
+    // workspaces hit scale and filesystem weirdness that's worth
+    // exercising before a user does.
+
+    it('prunes cleanly at scale — 50 old runs + retention=10 leaves newest 10 intact', () => {
+        // Fixed "now" so ages are deterministic.
+        const now = new Date('2026-01-01T00:00:00Z');
+        // Create 50 runs spaced one day apart, starting 49 days ago.
+        // With maxRuns=10 and maxAgeDays=5, the 40 oldest must be pruned
+        // and the 10 newest (days 0-9) must survive.
+        for (let i = 0; i < 50; i++) {
+            const createdAt = new Date(now.getTime() - i * 86_400_000);
+            createRunDir(tmpDir, `run-${String(i).padStart(2, '0')}`, createdAt);
+        }
+
+        const result = pruneRuns(tmpDir, { maxRuns: 10, maxAgeDays: 5, now });
+
+        assert.strictEqual(
+            result.prunedRuns,
+            40,
+            `expected 40 pruned (50 − 10 newest), got ${result.prunedRuns}`,
+        );
+        assert.strictEqual(result.errors.length, 0, 'no errors at scale');
+
+        // The 10 newest (indices 0..9) should still be on disk.
+        for (let i = 0; i < 10; i++) {
+            const id = `run-${String(i).padStart(2, '0')}`;
+            assert.ok(
+                runDirExists(tmpDir, id),
+                `newest run ${id} should survive pruning`,
+            );
+        }
+        // Oldest (index 49) must be gone.
+        assert.ok(!runDirExists(tmpDir, 'run-49'), 'oldest run should be pruned');
+    });
+
+    it('reports errors but continues when a specific run cannot be deleted (locked directory)', () => {
+        // Patch fs.rmSync to throw EACCES for a specific target and
+        // succeed for the rest. Verifies the pruner does not fail-stop
+        // on a single locked directory.
+        const now = new Date();
+        const oldDate = new Date(now.getTime() - 60 * 86_400_000);
+
+        createRunDir(tmpDir, 'locked', oldDate);
+        createRunDir(tmpDir, 'free-1', oldDate);
+        createRunDir(tmpDir, 'free-2', oldDate);
+
+        const lockedPath = path.join(tmpDir, CODECOMFY_DIR, RUNS_DIR, 'locked');
+        const realFs = require('fs');
+        const originalRmSync = realFs.rmSync;
+        const patch = patchModule<typeof import('fs')>('fs', 'rmSync', ((
+            target: fs.PathLike,
+            opts?: fs.RmOptions,
+        ) => {
+            if (String(target) === lockedPath) {
+                const err = new Error('EACCES: permission denied');
+                (err as NodeJS.ErrnoException).code = 'EACCES';
+                throw err;
+            }
+            return originalRmSync(target, opts);
+        }) as typeof fs.rmSync);
+
+        try {
+            const result = pruneRuns(tmpDir, { maxRuns: 0, maxAgeDays: 1, now });
+            // Two should succeed, one should fail.
+            assert.strictEqual(
+                result.prunedRuns,
+                2,
+                `expected 2 pruned, 1 locked; got ${result.prunedRuns}`,
+            );
+            assert.strictEqual(
+                result.errors.length,
+                1,
+                `expected 1 error entry, got ${result.errors.length}`,
+            );
+            assert.ok(
+                result.errors[0].includes('locked'),
+                `error should reference the failing run id; got: ${result.errors[0]}`,
+            );
+            assert.ok(
+                /EACCES/.test(result.errors[0]),
+                `error should carry the OS error code; got: ${result.errors[0]}`,
+            );
+            // The two unlocked runs are gone, the locked one is still there.
+            assert.ok(!runDirExists(tmpDir, 'free-1'));
+            assert.ok(!runDirExists(tmpDir, 'free-2'));
+            assert.ok(runDirExists(tmpDir, 'locked'), 'locked run must remain on disk');
+        } finally {
+            patch.restore();
+        }
+    });
+
+    it('falls back to mtime when request.json is missing or unreadable', () => {
+        // A corrupted run folder (no request.json) should still be
+        // classified for retention via directory mtime rather than
+        // crashing or being treated as infinitely old.
+        const now = new Date();
+        const runsDir = path.join(tmpDir, CODECOMFY_DIR, RUNS_DIR);
+        const oldDir = path.join(runsDir, 'corrupt-old');
+        const newDir = path.join(runsDir, 'corrupt-new');
+        fs.mkdirSync(oldDir, { recursive: true });
+        fs.mkdirSync(newDir, { recursive: true });
+
+        // No request.json in either — but set mtimes explicitly:
+        // one older than maxAgeDays, one recent.
+        const oldTime = new Date(now.getTime() - 60 * 86_400_000);
+        const newTime = new Date(now.getTime() - 1 * 86_400_000);
+        fs.utimesSync(oldDir, oldTime, oldTime);
+        fs.utimesSync(newDir, newTime, newTime);
+
+        const result = pruneRuns(tmpDir, { maxRuns: 0, maxAgeDays: 30, now });
+
+        // The old-mtime folder should be pruned via mtime fallback.
+        // The recent-mtime folder should survive.
+        assert.strictEqual(
+            result.prunedRuns,
+            1,
+            `expected exactly 1 prune via mtime fallback; got ${result.prunedRuns}`,
+        );
+        assert.ok(!runDirExists(tmpDir, 'corrupt-old'));
+        assert.ok(runDirExists(tmpDir, 'corrupt-new'));
     });
 });

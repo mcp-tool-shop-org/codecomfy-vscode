@@ -17,6 +17,9 @@ import * as assert from 'node:assert/strict';
 import { ComfyServerEngine } from '../../src/engines/comfyServerEngine';
 import type { Preset, JobRequest } from '../../src/types';
 import { ComfyResponseError } from '../../src/engines/comfyValidation';
+import { JobRouter } from '../../src/router/jobRouter';
+import { Logger } from '../../src/logging/logger';
+import { stubFetch, makeTempDir, registerCleanup, cleanupTempPaths } from '../helpers';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -455,27 +458,7 @@ describe('ComfyServerEngine', () => {
         };
     }
 
-    /**
-     * Replace `globalThis.fetch` with a handler. Returns a restore function
-     * and a `calls` array that records every URL + init the engine passed.
-     */
-    function stubFetch(
-        handler: (url: string, init?: RequestInit) => Promise<any> | any,
-    ): { calls: Array<{ url: string; init?: RequestInit }>; restore: () => void } {
-        const g = globalThis as any;
-        const original = g.fetch;
-        const calls: Array<{ url: string; init?: RequestInit }> = [];
-        g.fetch = async (url: string, init?: RequestInit) => {
-            calls.push({ url, init });
-            return handler(url, init);
-        };
-        return {
-            calls,
-            restore: () => {
-                g.fetch = original;
-            },
-        };
-    }
+    // `stubFetch` has been promoted to `test/helpers.ts` — imported above.
 
     // ── isAvailable ─────────────────────────────────────────────────────────
 
@@ -1129,6 +1112,160 @@ describe('ComfyServerEngine', () => {
                 );
             } finally {
                 restore();
+            }
+        });
+    });
+
+    // ────────────────────────────────────────────────────────────────────────
+    // User-perspective degradation (F-256919-031)
+    //
+    // Unit tests above verify `isAvailable()` returns false on network
+    // failure, but the USER never sees that boolean — they see the error
+    // that bubbles out of `generate()` and into the extension's output
+    // channel. These tests assert the ACTUAL prose contract that lands in
+    // front of the user when ComfyUI is down during a real generation.
+    //
+    // If engine-domain F-256918-011 lands a structured `{ok, reason}`
+    // return from `isAvailable()`, this block still serves as a regression
+    // gate: the prose must keep the URL + actionable phrasing regardless
+    // of the internal shape change.
+    // ────────────────────────────────────────────────────────────────────────
+
+    describe('generate() — ComfyUI-down error prose (user-facing)', () => {
+        after(() => { cleanupTempPaths(); });
+
+        function makeImageRequest(): JobRequest {
+            return {
+                kind: 'image',
+                preset_id: 'hq-image',
+                inputs: { prompt: 'a beautiful sunset' },
+                run_id: 'run_user_facing',
+                workspace_path: '/tmp/ws',
+                created_at: new Date().toISOString(),
+            };
+        }
+
+        function makePresetWithWorkflow(): Preset {
+            return {
+                id: 'hq-image',
+                name: 'HQ Image',
+                kind: 'image',
+                defaults: { width: 512, height: 512, steps: 20, cfg_scale: 7 },
+                workflow: { '1': { class_type: 'CLIPTextEncode', inputs: { text: '' } } },
+            };
+        }
+
+        it('surfaces the ComfyUI URL in the error when the server is down', async () => {
+            const url = 'http://host.example:8188';
+            const fetchStub = stubFetch(async () => {
+                throw new Error('ECONNREFUSED');
+            });
+            try {
+                const engine = new ComfyServerEngine(url);
+                const result = await engine.generate(makeImageRequest(), makePresetWithWorkflow());
+                assert.strictEqual(result.success, false);
+                assert.ok(result.error, 'error prose should be set');
+                assert.ok(
+                    result.error!.includes(url),
+                    `user-facing error must include the ComfyUI URL — got: ${result.error}`,
+                );
+            } finally {
+                fetchStub.restore();
+            }
+        });
+
+        it('includes an actionable hint (Start ComfyUI / running / setting) when the server is down', async () => {
+            const fetchStub = stubFetch(async () => {
+                throw new Error('ECONNREFUSED');
+            });
+            try {
+                const engine = new ComfyServerEngine('http://127.0.0.1:8188');
+                const result = await engine.generate(makeImageRequest(), makePresetWithWorkflow());
+                assert.strictEqual(result.success, false);
+                assert.ok(result.error, 'error prose should be set');
+                const msg = result.error!;
+                // The user needs to know WHAT to do next. Accept any of the
+                // phrases the extension currently produces — if prose is
+                // ever rewritten to drop all three, this test catches it.
+                const actionable =
+                    /Start ComfyUI/i.test(msg) ||
+                    /running/i.test(msg) ||
+                    /codecomfy\.comfyuiUrl/.test(msg) ||
+                    /check your URL/i.test(msg);
+                assert.ok(
+                    actionable,
+                    `user-facing error must include an actionable hint; got: ${msg}`,
+                );
+            } finally {
+                fetchStub.restore();
+            }
+        });
+
+        it('short-circuits before submitting a prompt when ComfyUI is unreachable', async () => {
+            // /system_stats (isAvailable) fails first; we must NOT see a
+            // /prompt POST afterward because generate() should bail on
+            // isAvailable() returning false.
+            const fetchStub = stubFetch(async () => {
+                throw new Error('ECONNREFUSED');
+            });
+            try {
+                const engine = new ComfyServerEngine();
+                await engine.generate(makeImageRequest(), makePresetWithWorkflow());
+                const promptHits = fetchStub.calls.filter((c) => c.url.endsWith('/prompt'));
+                assert.strictEqual(
+                    promptHits.length,
+                    0,
+                    'generate() must not POST /prompt when isAvailable() is false',
+                );
+            } finally {
+                fetchStub.restore();
+            }
+        });
+
+        it('logged error propagates through JobRouter to the output-channel logger', async () => {
+            // The router logs `engine returned failure` + the error detail
+            // via logger.warn. This test verifies the PROSE reaches the log
+            // sink with the URL + actionable phrase — exactly what lands in
+            // the output channel when the user hits "Generate" with
+            // ComfyUI not running.
+            const lines: string[] = [];
+            const logger = new Logger({
+                component: 'JobRouter',
+                sink: (line: string) => lines.push(line),
+            });
+            const url = 'http://localhost:9999';
+            const fetchStub = stubFetch(async () => {
+                throw new Error('ECONNREFUSED');
+            });
+            try {
+                const engine = new ComfyServerEngine(url);
+                const ws = makeTempDir('codecomfy-userface-');
+                registerCleanup(ws);
+                const router = new JobRouter(ws, engine, { logger });
+                await router.run(
+                    { kind: 'image', preset_id: 'hq-image', inputs: { prompt: 'x' } },
+                    makePresetWithWorkflow(),
+                );
+                // At least one logged line must contain the URL — that's
+                // what shows in the user's output channel.
+                const urlLogged = lines.some((l) => l.includes(url));
+                assert.ok(
+                    urlLogged,
+                    `expected the ComfyUI URL in at least one logged line; got:\n${lines.join('\n')}`,
+                );
+                // And at least one line must carry an actionable hint.
+                const actionableLogged = lines.some(
+                    (l) =>
+                        /Start ComfyUI/i.test(l) ||
+                        /codecomfy\.comfyuiUrl/.test(l) ||
+                        /running/i.test(l),
+                );
+                assert.ok(
+                    actionableLogged,
+                    `expected actionable hint in logs; got:\n${lines.join('\n')}`,
+                );
+            } finally {
+                fetchStub.restore();
             }
         });
     });

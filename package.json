@@ -44,23 +44,28 @@
     "commands": [
       {
         "command": "codecomfy.openGallery",
-        "title": "CodeComfy: Open Gallery"
+        "title": "Open Gallery",
+        "category": "CodeComfy"
       },
       {
         "command": "codecomfy.generateImageHQ",
-        "title": "CodeComfy: Generate Image (HQ)"
+        "title": "Generate Image (HQ)",
+        "category": "CodeComfy"
       },
       {
         "command": "codecomfy.generateVideoHQ",
-        "title": "CodeComfy: Generate Video (HQ)"
+        "title": "Generate Video (HQ)",
+        "category": "CodeComfy"
       },
       {
         "command": "codecomfy.cancelGeneration",
-        "title": "CodeComfy: Cancel Generation"
+        "title": "Cancel Generation",
+        "category": "CodeComfy"
       },
       {
         "command": "codecomfy.openOutputChannel",
-        "title": "CodeComfy: Open Output Channel"
+        "title": "Open Output Channel",
+        "category": "CodeComfy"
       }
     ],
     "configuration": {
@@ -69,27 +74,32 @@
         "codecomfy.nextGalleryPath": {
           "type": "string",
           "default": "",
-          "description": "Path to NextGallery.exe. If not set, common install locations will be checked."
+          "description": "Path to NextGallery.exe. If not set, common install locations will be checked.",
+          "markdownDescription": "Absolute path to the **NextGallery** companion viewer executable. Leave empty to auto-detect from common install locations (`%LOCALAPPDATA%\\Programs\\NextGallery`, `%PROGRAMFILES%\\NextGallery`, and macOS/Linux equivalents). NextGallery is optional — CodeComfy works without it."
         },
         "codecomfy.comfyuiUrl": {
           "type": "string",
           "default": "http://127.0.0.1:8188",
-          "description": "URL of the ComfyUI server."
+          "description": "URL of the ComfyUI server.",
+          "markdownDescription": "URL of the ComfyUI server. **Default:** `http://127.0.0.1:8188`. Change if ComfyUI runs on a remote machine or non-standard port. [ComfyUI install guide](https://github.com/comfyanonymous/ComfyUI#installing)"
         },
         "codecomfy.ffmpegPath": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to FFmpeg executable. Leave empty to auto-detect from PATH."
+          "description": "Absolute path to FFmpeg executable. Leave empty to auto-detect from PATH.",
+          "markdownDescription": "Absolute path to FFmpeg executable. **Required for video generation.** Leave empty to auto-detect from PATH. [Download FFmpeg](https://ffmpeg.org/download.html). Common Windows locations: `C:\\ffmpeg\\bin\\ffmpeg.exe`, `%LOCALAPPDATA%\\Programs\\ffmpeg\\bin\\ffmpeg.exe`."
         },
         "codecomfy.autoOpenGalleryOnComplete": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically open NextGallery when generation completes."
+          "description": "Automatically open NextGallery when generation completes.",
+          "markdownDescription": "Automatically open [NextGallery](https://github.com/mcp-tool-shop-org/nextgallery) when generation completes. The gallery is optional — set to `false` if you prefer to open outputs manually."
         },
         "codecomfy.defaultNegativePrompt": {
           "type": "string",
           "default": "",
-          "description": "Default negative prompt pre-filled during generation. Common values: blurry, distorted, low quality, text, watermark."
+          "description": "Default negative prompt pre-filled during generation. Common values: blurry, distorted, low quality, text, watermark.",
+          "markdownDescription": "Default negative prompt pre-filled during generation. Describes what to **avoid** in the output. Common values: `blurry, distorted, low quality, text, watermark, deformed hands`. See the [ComfyUI prompt guide](https://github.com/comfyanonymous/ComfyUI#workflow-examples) for examples."
         }
       }
     }
