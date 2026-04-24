@@ -21,5 +21,6 @@ assets/screenshot-*.png
 assets/logo.png
 assets/icon.svg
 .scoping/
+RELEASE_NOTES_v*.md
 CONTRIBUTING.md
 site/**
