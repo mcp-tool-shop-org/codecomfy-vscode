@@ -17,5 +17,7 @@ node_modules/**
 .github/**
 assets/SCREENSHOTS.md
 assets/screenshot-*.svg
+assets/logo.png
+assets/icon.svg
 CONTRIBUTING.md
 site/**
