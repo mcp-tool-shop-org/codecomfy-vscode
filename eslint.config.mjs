@@ -6,6 +6,8 @@ export default tseslint.config(
         ignores: [
             "dist/",
             "dist-test/",
+            "site/.astro/",
+            "site/dist/",
             "test/register-vscode-stub.js",
         ],
     },
