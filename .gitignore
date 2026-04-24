@@ -5,3 +5,4 @@ dist-test/
 .vscode-test/
 site/.astro/
 .scoping/
+RELEASE_NOTES_v*.md
