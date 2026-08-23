@@ -22,5 +22,8 @@ assets/logo.png
 assets/icon.svg
 .scoping/
 RELEASE_NOTES_v*.md
+.claude/**
+.polyglot-cache.json
+dist-release/**
 CONTRIBUTING.md
 site/**

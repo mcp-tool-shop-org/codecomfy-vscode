@@ -7,3 +7,4 @@ site/.astro/
 .scoping/
 RELEASE_NOTES_v*.md
 .polyglot-cache.json
+dist-release/
