@@ -30,8 +30,16 @@ import {
     INDEX_SCHEMA_VERSION,
 } from '../types';
 import { findFfmpeg, assembleVideo, cleanupPartialVideo } from '../engines/ffmpeg';
+import { snapToFrameGrid } from '../engines/workflowInjection';
 import { Logger, createNullLogger } from '../logging/logger';
 import { pruneRuns } from '../pruning/pruner';
+
+/**
+ * Frame-count grid for temporal latents. Wan and Hunyuan video latents declare
+ * `length` with step 4 (`4n + 1` legal values); LTX uses step 8. We snap to the
+ * stricter-but-universal 4 so a count is legal on the widest set of models.
+ */
+const VIDEO_FRAME_GRID = 4;
 
 export interface JobRouterOptions {
     ffmpegPath?: string;
@@ -81,8 +89,19 @@ export class JobRouter {
             const duration = processedInputs.duration_seconds ?? preset.defaults.duration_seconds ?? 4;
             processedInputs.fps = fps;
             processedInputs.duration_seconds = duration;
-            processedInputs.frame_count = Math.ceil(fps * duration);
-            this.log.info(`Video params: ${duration}s @ ${fps}fps = ${processedInputs.frame_count} frames`);
+            // Temporal latents take `length` in frames on a 4n+1 grid
+            // (Wan / Hunyuan step 4; LTX step 8). ComfyUI does NOT snap for us
+            // — `step` is a UI hint and `/prompt` validation only enforces
+            // min/max — so an off-grid value would be silently mishandled by
+            // the model. Snap up to the next legal count here.
+            const requested = Math.ceil(fps * duration);
+            processedInputs.frame_count = snapToFrameGrid(requested, VIDEO_FRAME_GRID);
+            this.log.info(
+                `Video params: ${duration}s @ ${fps}fps = ${requested} frames` +
+                (processedInputs.frame_count !== requested
+                    ? ` → snapped to ${processedInputs.frame_count} (${VIDEO_FRAME_GRID}n+1 grid)`
+                    : ''),
+            );
         }
 
         const request: JobRequest = {
@@ -123,9 +142,19 @@ export class JobRouter {
                 return this.handleFailure(runDir, result.error, onProgress, onComplete);
             }
 
-            // For video: assemble frames into MP4
+            // For video: assemble frames into MP4 — unless the server already
+            // encoded the clip for us (CreateVideo → SaveVideo), in which case
+            // the engine returns a ready `type: 'video'` artifact and FFmpeg is
+            // not needed at all.
             let finalArtifacts: Artifact[];
-            if (request.kind === 'video') {
+            const serverEncoded = result.artifacts.filter((a) => a.type === 'video');
+            if (request.kind === 'video' && serverEncoded.length > 0) {
+                this.log.info(
+                    `Run ${runId} used server-side video encoding ` +
+                    `(${serverEncoded.length} file(s)) — FFmpeg not required`,
+                );
+                finalArtifacts = serverEncoded;
+            } else if (request.kind === 'video') {
                 this.log.info(`Run ${runId} assembling video from ${result.artifacts.length} frames`);
                 const videoResult = await this.assembleVideoFromFrames(request, result.artifacts);
                 if (!videoResult.success) {
