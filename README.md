@@ -11,11 +11,13 @@
   <a href="https://mcp-tool-shop-org.github.io/codecomfy-vscode/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page" /></a>
 </p>
 
-*Sit back, type a prompt, let the couch do the work.*
+*Six profiles. Verified workflows. No canvas.*
 
-Generate images and videos with ComfyUI without leaving your editor.
-Pick a preset, type a prompt, and watch the status bar while CodeComfy
-handles the workflow submission, polling, frame download, and FFmpeg assembly.
+Drive ComfyUI from your editor — images, video, audio, 3D meshes, and
+image understanding. Pick a profile, answer the inputs it asks for, and watch
+the status bar while CodeComfy handles submission, polling, download, and
+assembly. Every shipped workflow is verified against the live ComfyUI catalog,
+and missing nodes or models are named before anything is submitted.
 
 > **Windows-first, cross-platform friendly.** Fully tested on Windows 10/11.
 > macOS and Linux are expected to work — see [Known Limitations](#known-limitations).

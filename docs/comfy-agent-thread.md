@@ -133,3 +133,29 @@ this rig the whole time.
 - Round 6 (queue / determinism / Cloud backend) is written but unsent.
 - `/upload/mask` compositing semantics, and the local `/view` → `/upload/image` round-trip, are
   plausible but unproven end-to-end.
+
+## Where this landed (v1.3.0)
+
+The verified contract above is now implemented, and the six-profile surface is
+built on it:
+
+| Finding | Implementation |
+|---|---|
+| `/history` output keys are not uniform | `src/engines/retrieval.ts` — the terminator→key map, one collection path for all kinds. Fixed the defect where every non-`images` output was discarded at validation |
+| `SaveVideo` writes under `images` | server-side encode collected by the existing path; FFmpeg optional |
+| `/object_info/{class}` is the cheap presence check | `src/engines/preflight.ts` — missing node names its pack |
+| `/models/{folder}` is the cheap model listing | preflight model check; `null` (old server) degrades to "skipped", never a false negative |
+| `/upload/image` fields + the server renames on collision | `ComfyServerEngine.uploadFile()` returns the **server's** name |
+| Link-walking beats class-name matching | `src/engines/workflowInjection.ts` — required for split-stack and `SamplerCustomAdvanced` graphs, which is most of the KB |
+| INT is coerced, not rejected | `toInt()` before every INT injection |
+
+**Workflow graphs are vendored, not authored.** `scripts/sync-kb.mjs` pulls the
+27 verified reference graphs from `comfy-headless`'s in-repo KB. `npm run
+kb:check` fails when the vendored copy drifts. The reason is the same one that
+motivated this whole thread: a wrong graph does not error, it runs green and
+returns nothing.
+
+**Still open:** the Cancel ordering bug (clear the queue, *then* interrupt —
+round 6 confirmed `/queue` delete/clear touch pending only), and the WebSocket
+progress work, which also fixes the `/history` eviction bug class
+(`MAXIMUM_HISTORY_SIZE = 10000`, in-memory, no restart survival).
