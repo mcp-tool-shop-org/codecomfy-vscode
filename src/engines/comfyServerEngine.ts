@@ -83,7 +83,14 @@ import {
     sanitizeComfyFilename,
 } from './comfyValidation';
 import { Logger, createNullLogger } from '../logging/logger';
-import { ApiWorkflow, injectRequest } from './workflowInjection';
+import { ApiWorkflow, injectRequest, substitutePlaceholders } from './workflowInjection';
+import {
+    RetrievalResult,
+    collectOutputs,
+    explainEmptyOutputs,
+    isFrameSequence,
+    defaultExtensionFor,
+} from './retrieval';
 
 /**
  * Structured availability result from `getAvailability()`. The legacy
@@ -157,13 +164,6 @@ export type OnCompleteCallback = (
 ) => void;
 
 /**
- * Container extensions that mark a `/history` output entry as a server-encoded
- * video rather than a still frame. ComfyUI reports both under the same
- * `images` key, so the extension is the discriminator.
- */
-const VIDEO_CONTAINER_EXTENSIONS = /\.(mp4|webm|mkv|mov|avi|m4v)$/i;
-
-/**
  * Re-exported for the handbook and schema generator. The injection contract is
  * now role-based (see `workflowInjection.ts`), so this list documents the node
  * types the LEGACY degenerate-graph fallback still matches by name — not the
@@ -219,6 +219,113 @@ export class ComfyServerEngine implements IGenerationEngine {
      * non-2xx HTTP responses. Router-side callers compose the user-facing
      * error from `reason` + `detail`.
      */
+    /**
+     * Does this server know how to execute `classType`?
+     *
+     * Uses the single-node form of `/object_info` rather than the full
+     * catalog, which is multi-megabyte on a server with a normal custom-node
+     * load. A non-2xx or empty body means "not registered here".
+     */
+    async hasClass(classType: string): Promise<boolean> {
+        try {
+            const response = await fetch(
+                `${this.serverUrl}/object_info/${encodeURIComponent(classType)}`,
+                { signal: AbortSignal.timeout(5000) },
+            );
+            if (!response.ok) return false;
+            const body = await response.json();
+            return !!body && typeof body === 'object' && Object.keys(body).length > 0;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * List the files in a ComfyUI model folder.
+     *
+     * `/models/{folder}` is present in ComfyUI 0.23.0 but was added at some
+     * point we cannot pin, so a failure here returns `null` ("could not
+     * check") rather than an empty list ("nothing installed") — reporting a
+     * model as missing because the server is old would be worse than skipping
+     * the check.
+     */
+    async listModels(folder: string): Promise<string[] | null> {
+        try {
+            const response = await fetch(
+                `${this.serverUrl}/models/${encodeURIComponent(folder)}`,
+                { signal: AbortSignal.timeout(5000) },
+            );
+            if (!response.ok) return null;
+            const body = await response.json();
+            if (!Array.isArray(body)) return null;
+            return body.filter((f): f is string => typeof f === 'string');
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Upload a local file into ComfyUI's input namespace and return the name
+     * the server actually stored it under.
+     *
+     * The returned name is the ONLY trustworthy handle: with `overwrite` off
+     * the server renames on collision, so the filename we sent may not be the
+     * filename on disk. Callers must inject what comes back, never what they
+     * sent.
+     *
+     * Contract verified against ComfyUI 0.23.0 (`server.py:450`): multipart
+     * field `image`, plus optional `subfolder`, `type`, and `overwrite`.
+     */
+    async uploadFile(localPath: string, subfolder = 'codecomfy'): Promise<string | null> {
+        const uploadLog = this.logger.child('upload');
+        try {
+            const bytes = fs.readFileSync(localPath);
+            const form = new FormData();
+            form.append(
+                'image',
+                new Blob([new Uint8Array(bytes)]),
+                path.basename(localPath),
+            );
+            form.append('type', 'input');
+            if (subfolder) form.append('subfolder', subfolder);
+
+            const response = await fetch(`${this.serverUrl}/upload/image`, {
+                method: 'POST',
+                body: form,
+                signal: AbortSignal.timeout(60000),
+            });
+            if (!response.ok) {
+                uploadLog.error(
+                    `Upload failed — HTTP ${response.status} from /upload/image`,
+                    `File: ${localPath}`,
+                );
+                return null;
+            }
+            const body = (await response.json()) as {
+                name?: unknown;
+                subfolder?: unknown;
+            };
+            if (typeof body.name !== 'string') {
+                uploadLog.error('Upload response did not include a "name" field.');
+                return null;
+            }
+            // A subfolder-qualified reference is what LoadImage expects when
+            // the file was not stored at the input root.
+            const stored =
+                typeof body.subfolder === 'string' && body.subfolder
+                    ? `${body.subfolder}/${body.name}`
+                    : body.name;
+            uploadLog.info(`Uploaded ${path.basename(localPath)} as "${stored}"`);
+            return stored;
+        } catch (err) {
+            uploadLog.error(
+                'Upload failed',
+                err instanceof Error ? err.message : String(err),
+            );
+            return null;
+        }
+    }
+
     async getAvailability(): Promise<AvailabilityResult> {
         try {
             const response = await fetch(`${this.serverUrl}/system_stats`, {
@@ -341,23 +448,30 @@ export class ComfyServerEngine implements IGenerationEngine {
             // ends in CreateVideo → SaveVideo the server has already muxed the
             // clip, so we download it directly and FFmpeg is never invoked.
             const downloadStart = Date.now();
+            const retrieval = collectOutputs(history);
             let artifacts: Artifact[];
-            if (request.kind === 'video') {
-                artifacts = await this.collectServerVideos(history, request);
-                if (artifacts.length === 0) {
-                    artifacts = await this.collectFrames(history, request);
-                    framesCollected = artifacts.length;
-                }
+            if (request.kind === 'video' && isFrameSequence(retrieval.refs)) {
+                // Legacy shape: many stills from one node, assembled locally.
+                artifacts = await this.collectFrames(history, request);
+                framesCollected = artifacts.length;
             } else {
-                artifacts = await this.collectImages(history, request);
+                artifacts = await this.collectFiles(retrieval, request);
             }
             phaseBreakdown.download_ms = Date.now() - downloadStart;
 
             if (artifacts.length === 0) {
+                // Name the keys we looked under and what this graph's
+                // terminators were expected to write — "no outputs" alone
+                // sends users hunting in the wrong place.
+                const classTypes = Object.values(
+                    (preset.workflow ?? {}) as Record<string, { class_type?: string }>,
+                )
+                    .map((n) => n?.class_type)
+                    .filter((c): c is string => typeof c === 'string');
                 return finish({
                     success: false,
                     artifacts: [],
-                    error: 'No outputs received from ComfyUI.',
+                    error: explainEmptyOutputs(classTypes),
                 });
             }
 
@@ -409,6 +523,32 @@ export class ComfyServerEngine implements IGenerationEngine {
 
         const workflow = JSON.parse(JSON.stringify(preset.workflow)) as ApiWorkflow;
         const buildLog = this.logger.child('buildWorkflow');
+
+        // Vendored reference graphs carry literal placeholder tokens wherever a
+        // runtime value belongs. Substitute those first — they appear on nodes
+        // (LoadImage, Florence2Run, ACE-Step tags) that have no structural
+        // relationship to the sampler, so link-walking alone would miss them.
+        const substitution = substitutePlaceholders(workflow, {
+            PROMPT_TEXT: request.inputs.prompt,
+            PROMPT_TAGS: request.inputs.prompt,
+            EDIT_INSTRUCTION: request.inputs.prompt,
+            NEGATIVE_TEXT: request.inputs.negative_prompt ?? '',
+            QUERY_TEXT: request.inputs.query,
+            'INPUT_IMAGE_REF.png': request.inputs.input_image,
+            'INPUT_AUDIO_REF.flac': request.inputs.input_audio,
+        });
+        if (substitution.unresolved.length > 0) {
+            // Submitting would send the literal token as a filename or prompt.
+            buildLog.error(
+                'Workflow still contains unfilled placeholders: ' +
+                `${substitution.unresolved.join(', ')}. This preset needs those ` +
+                'inputs before it can run.',
+            );
+            return null;
+        }
+        if (substitution.substituted > 0) {
+            buildLog.info(`Substituted ${substitution.substituted} placeholder value(s)`);
+        }
 
         const report = injectRequest(workflow, request, this.overrides);
 
@@ -583,78 +723,109 @@ export class ComfyServerEngine implements IGenerationEngine {
     // =========================================================================
 
     /**
-     * Collect a video that the SERVER already encoded (CreateVideo → SaveVideo).
+     * Download every artifact a workflow produced, whatever kind it is.
      *
-     * ComfyUI's core video save nodes report their result through the same
-     * `outputs[nodeId].images` array as a still image — `PreviewVideo.as_dict()`
-     * returns `{"images": [...], "animated": (True,)}` — so the only reliable
-     * discriminator available to us after response validation is the container
-     * extension on the filename.
+     * This is the single collection path for all six profiles. It reads the
+     * references gathered by `collectOutputs()` — which walks every `/history`
+     * output key, not just `images` — so audio (`SaveAudioAdvanced` → `audio`),
+     * meshes (`SaveGLB` → `3d`), inference text (`SaveText` → `text` + `files`)
+     * and VHS-terminated video (`gifs`) all land on disk the same way stills do.
      *
-     * Returns an empty array when the preset produced frames rather than a
-     * container, in which case the caller falls back to `collectFrames()` +
-     * FFmpeg assembly.
+     * Inline `SaveText` results are written out as `.txt` so an inference run
+     * leaves a readable artifact rather than living only in the log.
      */
-    private async collectServerVideos(
-        history: ValidatedHistoryEntry,
+    private async collectFiles(
+        retrieval: RetrievalResult,
         request: JobRequest,
     ): Promise<Artifact[]> {
         const artifacts: Artifact[] = [];
         const outputDir = path.join(request.workspace_path, CODECOMFY_DIR, OUTPUTS_DIR);
-        const collectLog = this.logger.child('collect/video');
+        const collectLog = this.logger.child('collect');
 
         let index = 0;
-        for (const nodeId of Object.keys(history.outputs)) {
-            const nodeOutput = history.outputs[nodeId];
-            if (!nodeOutput.images) continue;
+        let rejected = 0;
+        let downloadFailed = 0;
 
-            for (const item of nodeOutput.images) {
-                if (!VIDEO_CONTAINER_EXTENSIONS.test(item.filename)) continue;
-
-                index++;
-                let safeName: string;
-                try {
-                    safeName = sanitizeComfyFilename(item.filename);
-                } catch (err) {
-                    collectLog.warn(
-                        `Rejected video filename from ComfyUI: ${JSON.stringify(item.filename)}`,
-                        err instanceof Error ? err.message : String(err),
-                    );
-                    continue;
-                }
-
-                // Only create the directory once we know we have something to write.
-                fs.mkdirSync(outputDir, { recursive: true });
-
-                const ext = path.extname(safeName) || '.mp4';
-                const outputFilename =
-                    `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
-                const outputPath = path.join(outputDir, outputFilename);
-
-                const sizeBytes = await this.downloadToFile(
-                    safeName, item.subfolder, item.type, outputPath,
-                    { index, kind: 'video' },
+        for (const ref of retrieval.refs) {
+            index++;
+            let safeName: string;
+            try {
+                safeName = sanitizeComfyFilename(ref.filename);
+            } catch (err) {
+                rejected++;
+                collectLog.warn(
+                    `Rejected filename from ComfyUI: ${JSON.stringify(ref.filename)} ` +
+                    `(from outputs.${ref.key})`,
+                    err instanceof Error ? err.message : String(err),
                 );
-                if (sizeBytes === null) continue;
-
-                const relativePath = path.join(CODECOMFY_DIR, OUTPUTS_DIR, outputFilename);
-                artifacts.push({
-                    type: 'video',
-                    path: relativePath.replace(/\\/g, '/'),
-                    size_bytes: sizeBytes,
-                    meta: {
-                        fps: request.inputs.fps,
-                        duration_seconds: request.inputs.duration_seconds,
-                    },
-                    provenance: { seed: request.inputs.seed },
-                });
+                continue;
             }
+
+            fs.mkdirSync(outputDir, { recursive: true });
+
+            const ext = path.extname(safeName) || defaultExtensionFor(ref.kind);
+            const outputFilename =
+                `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
+            const outputPath = path.join(outputDir, outputFilename);
+
+            const sizeBytes = await this.downloadToFile(
+                safeName, ref.subfolder, ref.type, outputPath,
+                { index, kind: ref.kind === 'image' ? 'image' : 'video' },
+            );
+            if (sizeBytes === null) {
+                downloadFailed++;
+                continue;
+            }
+
+            const relativePath = path.join(CODECOMFY_DIR, OUTPUTS_DIR, outputFilename);
+            const artifact: Artifact = {
+                type: ref.kind,
+                path: relativePath.replace(/\\/g, '/'),
+                size_bytes: sizeBytes,
+                provenance: { seed: request.inputs.seed },
+            };
+            if (ref.kind === 'video') {
+                artifact.meta = {
+                    fps: request.inputs.fps,
+                    duration_seconds: request.inputs.duration_seconds,
+                };
+            }
+            artifacts.push(artifact);
         }
 
-        if (artifacts.length > 0) {
+        // `SaveText` reports its result inline rather than as a file; persist it
+        // so an inference run produces something the user can open.
+        for (const { nodeId, text } of retrieval.inlineText) {
+            fs.mkdirSync(outputDir, { recursive: true });
+            const outputFilename =
+                `${Date.now()}_${crypto.randomBytes(4).toString('hex')}_node${nodeId}.txt`;
+            const outputPath = path.join(outputDir, outputFilename);
+            try {
+                fs.writeFileSync(outputPath, text, 'utf8');
+            } catch (err) {
+                collectLog.warn(
+                    `Failed to write inline text from node ${nodeId}`,
+                    err instanceof Error ? err.message : String(err),
+                );
+                continue;
+            }
+            const relativePath = path.join(CODECOMFY_DIR, OUTPUTS_DIR, outputFilename);
+            artifacts.push({
+                type: 'text',
+                path: relativePath.replace(/\\/g, '/'),
+                size_bytes: Buffer.byteLength(text, 'utf8'),
+                provenance: { seed: request.inputs.seed },
+            });
+        }
+
+        if (retrieval.refs.length > 0 || retrieval.inlineText.length > 0) {
+            const kinds = [...new Set(artifacts.map((a) => a.type))].join(', ') || 'none';
             collectLog.info(
-                `Server-side encode detected — collected ${artifacts.length} video file(s). ` +
-                'FFmpeg assembly skipped.',
+                `Collected ${artifacts.length} artifact(s) [${kinds}] ` +
+                `from outputs.${retrieval.keysSeen.join(' + ')}` +
+                (rejected || downloadFailed
+                    ? ` (${rejected} rejected, ${downloadFailed} download-failed)`
+                    : ''),
             );
         }
 
@@ -662,82 +833,15 @@ export class ComfyServerEngine implements IGenerationEngine {
     }
 
     /**
-     * Collect images for single image generation.
-     * Saves to .codecomfy/outputs/
+     * Retained for the `IGenerationEngine` shape and for tests that exercise
+     * the image path directly. Delegates to `collectFiles()` so there is only
+     * one download/classify implementation to keep correct.
      */
-    private async collectImages(history: ValidatedHistoryEntry, request: JobRequest): Promise<Artifact[]> {
-        const artifacts: Artifact[] = [];
-        const outputDir = path.join(request.workspace_path, CODECOMFY_DIR, OUTPUTS_DIR);
-        fs.mkdirSync(outputDir, { recursive: true });
-        const collectLog = this.logger.child('collect/image');
-
-        let total = 0;
-        let rejected = 0;
-        let downloadFailed = 0;
-
-        for (const nodeId of Object.keys(history.outputs)) {
-            const nodeOutput = history.outputs[nodeId];
-            if (!nodeOutput.images) continue;
-
-            for (const img of nodeOutput.images) {
-                total++;
-                // Sanitise untrusted filename from ComfyUI response before any
-                // path.* / fs.* use. See sanitizeComfyFilename() for rejection rules.
-                let safeName: string;
-                try {
-                    safeName = sanitizeComfyFilename(img.filename);
-                } catch (err) {
-                    rejected++;
-                    if (err instanceof ComfyResponseError) {
-                        collectLog.warn(
-                            `Rejected filename from ComfyUI: ${JSON.stringify(img.filename)} ` +
-                            `(${err.fieldPath ?? 'invalid'})`,
-                            err.message,
-                        );
-                    } else {
-                        collectLog.warn(
-                            `Rejected filename from ComfyUI: ${JSON.stringify(img.filename)}`,
-                            err instanceof Error ? err.message : String(err),
-                        );
-                    }
-                    continue;
-                }
-                const ext = path.extname(safeName) || '.png';
-                const outputFilename = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
-                const outputPath = path.join(outputDir, outputFilename);
-
-                const sizeBytes = await this.downloadToFile(
-                    safeName, img.subfolder, img.type, outputPath,
-                    { index: total, kind: 'image' },
-                );
-                if (sizeBytes === null) {
-                    downloadFailed++;
-                    continue;
-                }
-
-                const relativePath = path.join(CODECOMFY_DIR, OUTPUTS_DIR, outputFilename);
-
-                artifacts.push({
-                    type: 'image',
-                    path: relativePath.replace(/\\/g, '/'),
-                    size_bytes: sizeBytes,
-                    provenance: { seed: request.inputs.seed },
-                });
-            }
-        }
-
-        if (total > 0) {
-            if (rejected > 0 || downloadFailed > 0) {
-                collectLog.info(
-                    `Collected ${artifacts.length} of ${total} images ` +
-                    `(${rejected} rejected, ${downloadFailed} download-failed)`,
-                );
-            } else {
-                collectLog.info(`Collected ${artifacts.length} of ${total} images`);
-            }
-        }
-
-        return artifacts;
+    private async collectImages(
+        history: ValidatedHistoryEntry,
+        request: JobRequest,
+    ): Promise<Artifact[]> {
+        return this.collectFiles(collectOutputs(history), request);
     }
 
     /**

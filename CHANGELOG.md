@@ -9,6 +9,72 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-22
+
+The six-profile release. CodeComfy now drives the same capability profiles
+`comfy-headless` exposes headlessly — **Image, Video, Audio, 3D, Inference,
+Metadata** — but interactively, from the editor.
+
+### Fixed
+
+- **Every output that was not an image was silently discarded.** The history
+  validator preserved only the `images` key, so nothing else survived
+  validation. ComfyUI does not use a uniform key: `VHS_VideoCombine` reports
+  under `gifs`, `SaveAudioAdvanced` under `audio`, `SaveGLB` under `3d`, and
+  `SaveText` under `text` + `files`. This made audio, 3D, inference, and
+  VHS-terminated video structurally unretrievable — the run would complete
+  successfully and CodeComfy would report no outputs. All keys are now read.
+- **"No outputs received from ComfyUI" was a dead end.** The message now names
+  the preset's terminators and the key each was expected to write, and calls
+  out the case where a graph has no output node at all (which runs green and
+  returns nothing by design).
+
+### Added
+
+- **`CodeComfy: Run… (all profiles)`** — profile → preset → inputs. The inputs
+  are derived from the placeholder tokens in the chosen preset's own graph, so
+  an image-to-video preset asks for a source image and a text-to-video preset
+  does not, with no per-profile special-casing.
+- **27 verified reference workflows**, vendored from `comfy-headless` v3.1.0's
+  in-repo KB by `scripts/sync-kb.mjs` (`npm run kb:sync`, `npm run kb:check`).
+  CodeComfy does not author workflow graphs — a second hand-maintained copy
+  would drift, and drift in a graph is silent. Covers image (Qwen txt2img,
+  Qwen edit, union ControlNet for Qwen and SDXL), video (Hunyuan 1.5 i2v and
+  720p, Wan 14B, LTX, Mochi, core-output), audio (ACE-Step 1.5 music/jingle/
+  draft/mp3, stem separation), 3D (Hunyuan3D-2 draft/standard/detail), and
+  inference (Florence-2 caption/detailed/more-detailed/tag/detect/segment/OCR).
+- **Preflight.** Before anything is submitted, each preset's `class_type`s are
+  checked against `GET /object_info/{class}` and its model files against
+  `GET /models/{folder}`. A missing node names the pack that provides it; a
+  missing model names the file and the folder it belongs in. Nothing is
+  submitted, so no GPU time is spent on a run that cannot succeed. A server
+  too old to list models degrades to "skipped", never to a false negative.
+- **Image upload** — `ComfyServerEngine.uploadFile()` posts to `/upload/image`
+  and returns the name the **server** stored it under, which is the only
+  trustworthy handle (with `overwrite` off the server renames on collision).
+- **Metadata profile** — `CodeComfy: Read Workflow from PNG` extracts the graph
+  ComfyUI embeds in its outputs. Pure stdlib PNG chunk parsing (`tEXt`, `zTXt`,
+  `iTXt`), bounds-checked against the buffer and capped against zip bombs,
+  because a PNG is untrusted input. Prefers the `prompt` chunk (API format,
+  re-submittable) over `workflow` (editor format, not accepted by `/prompt`).
+- **Placeholder substitution** — reference graphs carry literal tokens
+  (`PROMPT_TEXT`, `INPUT_IMAGE_REF.png`, `QUERY_TEXT`, …) wherever a runtime
+  value belongs. These are substituted by exact whole-value match, and a graph
+  with an unfilled token is refused rather than submitted with the literal
+  token as a filename.
+- **28 new tests** (476 total, up from 448), including a regression guard that
+  a `gifs`-keyed output is retrievable.
+
+### Changed
+
+- `GenerationKind` extends to `image | video | audio | 3d | inference`.
+- `Artifact.type` extends to `image | video | audio | model3d | text`.
+  Consumers that only understand image/video should treat unknown kinds as
+  opaque files rather than assuming they are images.
+- Artifact collection is now a single path for all profiles; the frame-sequence
+  branch is entered only when the outputs actually look like loose frames.
+
+
 ## [1.2.0] - 2026-08-22
 
 Platform-contract release. Every claim behind these changes was verified

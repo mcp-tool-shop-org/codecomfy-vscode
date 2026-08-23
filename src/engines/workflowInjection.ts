@@ -483,3 +483,49 @@ export function collectModelReferences(
     }
     return out;
 }
+
+/**
+ * Replace the reference graphs' placeholder tokens with runtime values.
+ *
+ * The vendored KB graphs carry literal tokens (`PROMPT_TEXT`,
+ * `INPUT_IMAGE_REF.png`, `QUERY_TEXT`, …) wherever a runtime value belongs.
+ * Link-walking handles the conditioning encoders, but tokens also appear on
+ * nodes with no structural relationship to the sampler — `LoadImage.image`,
+ * `Florence2Run.text_input`, an ACE-Step tag field — so a direct substitution
+ * pass runs first and covers all of them uniformly.
+ *
+ * Substitution is exact-match on the whole string value, never a substring
+ * replace: a prompt that happens to contain the word `PROMPT_TEXT` must not
+ * corrupt a neighbouring field.
+ *
+ * Returns the tokens that were still present but had no value supplied, so the
+ * caller can refuse to submit a graph that would run with a literal
+ * `INPUT_IMAGE_REF.png` as its filename.
+ */
+export function substitutePlaceholders(
+    workflow: ApiWorkflow,
+    values: Readonly<Record<string, string | undefined>>,
+): { substituted: number; unresolved: string[] } {
+    let substituted = 0;
+    const unresolved = new Set<string>();
+
+    for (const node of Object.values(workflow)) {
+        const inputs = node?.inputs;
+        if (!inputs) continue;
+
+        for (const [key, value] of Object.entries(inputs)) {
+            if (typeof value !== 'string') continue;
+            if (!(value in values)) continue;
+
+            const replacement = values[value];
+            if (replacement === undefined || replacement === '') {
+                unresolved.add(value);
+                continue;
+            }
+            inputs[key] = replacement;
+            substituted++;
+        }
+    }
+
+    return { substituted, unresolved: Array.from(unresolved) };
+}

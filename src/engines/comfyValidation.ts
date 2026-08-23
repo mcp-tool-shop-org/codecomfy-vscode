@@ -107,9 +107,50 @@ export interface ValidatedHistoryEntry {
     status: { status_str: string; completed: boolean };
 }
 
-export interface ValidatedNodeOutput {
-    images?: Array<{ filename: string; subfolder: string; type: string }>;
+/** A `{filename, subfolder, type}` triple as ComfyUI reports saved files. */
+export interface ValidatedFileRef {
+    filename: string;
+    subfolder: string;
+    type: string;
 }
+
+/**
+ * One node's entry in `/history` outputs.
+ *
+ * ComfyUI keys saved files by the terminator that wrote them, and the key is
+ * NOT uniform: `SaveImage` and `SaveVideo` both use `images`, `VHS_VideoCombine`
+ * uses `gifs`, `SaveAudioAdvanced` uses `audio`, `SaveGLB` uses `3d`, and
+ * `SaveText` uses `text` (inline strings) plus `files` (what it wrote).
+ *
+ * Validating only `images` — as versions through 1.2.0 did — silently discards
+ * the output of every audio, 3D, inference and VHS-terminated video preset, so
+ * every file-bearing key is preserved here and `text` is carried through as
+ * inline strings.
+ */
+export interface ValidatedNodeOutput {
+    images?: ValidatedFileRef[];
+    gifs?: ValidatedFileRef[];
+    audio?: ValidatedFileRef[];
+    /** `SaveGLB` — the key really is the digit-leading string `3d`. */
+    '3d'?: ValidatedFileRef[];
+    files?: ValidatedFileRef[];
+    /** `SaveText` reports its content inline, not as a file reference. */
+    text?: string[];
+}
+
+/**
+ * Every `/history` output key that carries file references. Order is stable so
+ * collectors iterate deterministically.
+ */
+export const FILE_OUTPUT_KEYS = [
+    'images',
+    'gifs',
+    'audio',
+    '3d',
+    'files',
+] as const;
+
+export type FileOutputKey = (typeof FILE_OUTPUT_KEYS)[number];
 
 /**
  * Validate a single history entry from `GET /history/{prompt_id}`.
@@ -173,18 +214,33 @@ export function validateHistoryEntry(body: unknown): ValidatedHistoryEntry {
 
         const validatedNode: ValidatedNodeOutput = {};
 
-        if (Array.isArray(nodeObj.images)) {
-            validatedNode.images = [];
-            for (const img of nodeObj.images) {
-                if (!isObject(img)) continue;
-                const imgObj = img as Record<string, unknown>;
-                if (typeof imgObj.filename !== 'string') continue;
+        for (const key of FILE_OUTPUT_KEYS) {
+            const raw = nodeObj[key];
+            if (!Array.isArray(raw)) continue;
 
-                validatedNode.images.push({
-                    filename: imgObj.filename,
-                    subfolder: typeof imgObj.subfolder === 'string' ? imgObj.subfolder : '',
-                    type: typeof imgObj.type === 'string' ? imgObj.type : 'output',
+            const refs: ValidatedFileRef[] = [];
+            for (const item of raw) {
+                if (!isObject(item)) continue;
+                const itemObj = item as Record<string, unknown>;
+                if (typeof itemObj.filename !== 'string') continue;
+
+                refs.push({
+                    filename: itemObj.filename,
+                    subfolder: typeof itemObj.subfolder === 'string' ? itemObj.subfolder : '',
+                    type: typeof itemObj.type === 'string' ? itemObj.type : 'output',
                 });
+            }
+            if (refs.length > 0) {
+                validatedNode[key] = refs;
+            }
+        }
+
+        // `SaveText` reports its result inline as an array of strings rather
+        // than as file references, so it needs its own branch.
+        if (Array.isArray(nodeObj.text)) {
+            const texts = nodeObj.text.filter((t): t is string => typeof t === 'string');
+            if (texts.length > 0) {
+                validatedNode.text = texts;
             }
         }
 

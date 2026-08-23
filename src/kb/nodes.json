@@ -1,0 +1,71 @@
+{
+  "_generated_by": "scripts/sync-kb.mjs — do not hand-edit",
+  "source_version": "3.1.0",
+  "history_output_keys": {
+    "SaveAudioAdvanced": [
+      "audio"
+    ],
+    "SaveGLB": [
+      "3d"
+    ],
+    "SaveImage": [
+      "images"
+    ],
+    "SaveText": [
+      "text",
+      "files"
+    ],
+    "SaveVideo": [
+      "images"
+    ],
+    "VHS_VideoCombine": [
+      "gifs"
+    ]
+  },
+  "output_node_classes": [
+    "PreviewImage",
+    "SaveAnimatedPNG",
+    "SaveAnimatedWEBP",
+    "SaveAudio",
+    "SaveAudioAdvanced",
+    "SaveAudioMP3",
+    "SaveAudioOpus",
+    "SaveGLB",
+    "SaveImage",
+    "SaveText",
+    "SaveVideo",
+    "VHS_VideoCombine"
+  ],
+  "packs": {
+    "audio-separation-nodes-comfyui": {
+      "id": "audio-separation-nodes-comfyui",
+      "install_hint": "ComfyUI Manager -> Install Custom Nodes -> 'audio-separation-nodes-comfyui'",
+      "name": "audio-separation-nodes-comfyui",
+      "url": "https://github.com/christian-byrne/audio-separation-nodes-comfyui"
+    },
+    "comfyui-florence2": {
+      "id": "comfyui-florence2",
+      "install_hint": "ComfyUI Manager -> Install Custom Nodes -> 'ComfyUI-Florence2'",
+      "name": "ComfyUI-Florence2",
+      "url": "https://github.com/kijai/ComfyUI-Florence2"
+    },
+    "comfyui-segment-anything-2": {
+      "id": "comfyui-segment-anything-2",
+      "install_hint": "ComfyUI Manager -> Install Custom Nodes -> 'ComfyUI-segment-anything-2'",
+      "name": "ComfyUI-segment-anything-2",
+      "url": "https://github.com/kijai/ComfyUI-segment-anything-2"
+    },
+    "comfyui-videohelpersuite": {
+      "id": "comfyui-videohelpersuite",
+      "install_hint": "ComfyUI Manager -> Install Custom Nodes -> 'Video Helper Suite'",
+      "name": "ComfyUI-VideoHelperSuite",
+      "url": "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
+    },
+    "comfyui-animatediff-evolved": {
+      "id": "comfyui-animatediff-evolved",
+      "install_hint": "ComfyUI Manager -> Install Custom Nodes -> 'AnimateDiff Evolved'",
+      "name": "ComfyUI-AnimateDiff-Evolved",
+      "url": "https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved"
+    }
+  }
+}

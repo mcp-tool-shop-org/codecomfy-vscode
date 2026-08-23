@@ -33,7 +33,7 @@ export interface OutputIndex {
  */
 export interface IndexedArtifact {
     id: string;
-    type: 'image' | 'video';
+    type: ArtifactType;
     /** Relative to workspace root */
     path: string;
     created_at: string;
@@ -94,7 +94,15 @@ export interface ArtifactProvenance {
 // =============================================================================
 
 export type JobStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'canceled';
-export type GenerationKind = 'image' | 'video';
+/**
+ * The six profiles CodeComfy can drive, matching the profile split in
+ * `comfy-headless` (Image, Video, 3D, Inference, Metadata, Audio).
+ *
+ * `image` and `video` predate this and keep their meaning. `metadata` is
+ * local-only — it reads provenance out of a PNG and never submits a graph —
+ * so it is not a generation kind and does not appear here.
+ */
+export type GenerationKind = 'image' | 'video' | 'audio' | '3d' | 'inference';
 
 /** What the caller provides (router assigns run_id) */
 export interface JobRequestInput {
@@ -124,6 +132,16 @@ export interface GenerationInputs {
     duration_seconds?: number;
     /** Video: computed frame count (fps * duration) */
     frame_count?: number;
+    /** Inference: what to look for (detect / segment). */
+    query?: string;
+    /**
+     * Server-side filename of an uploaded source image, as returned by
+     * `POST /upload/image`. Used by image-to-video, image-to-mesh, edit, and
+     * every inference preset.
+     */
+    input_image?: string;
+    /** Server-side filename of an uploaded source audio file. */
+    input_audio?: string;
     [key: string]: unknown;
 }
 
@@ -144,8 +162,16 @@ export interface RunArtifacts {
     artifacts: Artifact[];
 }
 
+/**
+ * What a workflow produced. Extended in 1.3.0 beyond image/video: ComfyUI
+ * workflows also emit audio (`SaveAudioAdvanced`), meshes (`SaveGLB`), and
+ * text (`SaveText`). Consumers that only understand image/video should treat
+ * unknown kinds as opaque files rather than assuming they are images.
+ */
+export type ArtifactType = 'image' | 'video' | 'audio' | 'model3d' | 'text';
+
 export interface Artifact {
-    type: 'image' | 'video';
+    type: ArtifactType;
     /** Relative to workspace root */
     path: string;
     size_bytes?: number;

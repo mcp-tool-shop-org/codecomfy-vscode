@@ -1,0 +1,3828 @@
+{
+  "_generated_by": "scripts/sync-kb.mjs — do not hand-edit",
+  "source": "mcp-tool-shop-org/comfy-headless",
+  "source_version": "3.1.0",
+  "kb_version": 1,
+  "verified_against_catalog": "2026-08-21",
+  "presets": [
+    {
+      "id": "3d_hunyuan3d_v2_detail",
+      "name": "3D Hunyuan3d V2 Detail",
+      "profile": "3d",
+      "kind": "3d",
+      "description": "Pure image-conditioned: no text prompt anywhere in the graph. MESH feeds SaveGLB's FILE_3D_* union input (union-superset edge). Fetch the GLB from /history outputs key '3d' via GET /view.",
+      "placeholders": [
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "3d"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPVisionEncode",
+          "CLIPVisionLoader",
+          "EmptyLatentHunyuan3Dv2",
+          "Hunyuan3Dv2Conditioning",
+          "ImageOnlyCheckpointLoader",
+          "KSampler",
+          "LoadImage",
+          "SaveGLB",
+          "VAEDecodeHunyuan3D",
+          "VoxelToMesh"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "2",
+            "classType": "ImageOnlyCheckpointLoader",
+            "input": "ckpt_name",
+            "file": "hunyuan3d-dit-v2_fp16.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "CLIPVisionLoader",
+            "input": "clip_name",
+            "file": "clip_vision_g.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "ImageOnlyCheckpointLoader",
+          "inputs": {
+            "ckpt_name": "hunyuan3d-dit-v2_fp16.safetensors"
+          }
+        },
+        "3": {
+          "class_type": "CLIPVisionLoader",
+          "inputs": {
+            "clip_name": "clip_vision_g.safetensors"
+          }
+        },
+        "4": {
+          "class_type": "CLIPVisionEncode",
+          "inputs": {
+            "clip_vision": [
+              "3",
+              0
+            ],
+            "crop": "center",
+            "image": [
+              "1",
+              0
+            ]
+          }
+        },
+        "5": {
+          "class_type": "Hunyuan3Dv2Conditioning",
+          "inputs": {
+            "clip_vision_output": [
+              "4",
+              0
+            ]
+          }
+        },
+        "6": {
+          "class_type": "EmptyLatentHunyuan3Dv2",
+          "inputs": {
+            "batch_size": 1,
+            "resolution": 3072
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 5.5,
+            "denoise": 1,
+            "latent_image": [
+              "6",
+              0
+            ],
+            "model": [
+              "2",
+              0
+            ],
+            "negative": [
+              "5",
+              1
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 50
+          }
+        },
+        "8": {
+          "class_type": "VAEDecodeHunyuan3D",
+          "inputs": {
+            "num_chunks": 8000,
+            "octree_resolution": 384,
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "2",
+              2
+            ]
+          }
+        },
+        "9": {
+          "class_type": "VoxelToMesh",
+          "inputs": {
+            "algorithm": "surface net",
+            "threshold": 0.6,
+            "voxel": [
+              "8",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "SaveGLB",
+          "inputs": {
+            "filename_prefix": "3d/ComfyUI",
+            "mesh": [
+              "9",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "3d_hunyuan3d_v2_draft",
+      "name": "3D Hunyuan3d V2 Draft",
+      "profile": "3d",
+      "kind": "3d",
+      "description": "Pure image-conditioned: no text prompt anywhere in the graph. MESH feeds SaveGLB's FILE_3D_* union input (union-superset edge). Fetch the GLB from /history outputs key '3d' via GET /view.",
+      "placeholders": [
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "3d"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPVisionEncode",
+          "CLIPVisionLoader",
+          "EmptyLatentHunyuan3Dv2",
+          "Hunyuan3Dv2Conditioning",
+          "ImageOnlyCheckpointLoader",
+          "KSampler",
+          "LoadImage",
+          "SaveGLB",
+          "VAEDecodeHunyuan3D",
+          "VoxelToMesh"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "2",
+            "classType": "ImageOnlyCheckpointLoader",
+            "input": "ckpt_name",
+            "file": "hunyuan3d-dit-v2_fp16.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "CLIPVisionLoader",
+            "input": "clip_name",
+            "file": "clip_vision_g.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "ImageOnlyCheckpointLoader",
+          "inputs": {
+            "ckpt_name": "hunyuan3d-dit-v2_fp16.safetensors"
+          }
+        },
+        "3": {
+          "class_type": "CLIPVisionLoader",
+          "inputs": {
+            "clip_name": "clip_vision_g.safetensors"
+          }
+        },
+        "4": {
+          "class_type": "CLIPVisionEncode",
+          "inputs": {
+            "clip_vision": [
+              "3",
+              0
+            ],
+            "crop": "center",
+            "image": [
+              "1",
+              0
+            ]
+          }
+        },
+        "5": {
+          "class_type": "Hunyuan3Dv2Conditioning",
+          "inputs": {
+            "clip_vision_output": [
+              "4",
+              0
+            ]
+          }
+        },
+        "6": {
+          "class_type": "EmptyLatentHunyuan3Dv2",
+          "inputs": {
+            "batch_size": 1,
+            "resolution": 3072
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 5.5,
+            "denoise": 1,
+            "latent_image": [
+              "6",
+              0
+            ],
+            "model": [
+              "2",
+              0
+            ],
+            "negative": [
+              "5",
+              1
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 15
+          }
+        },
+        "8": {
+          "class_type": "VAEDecodeHunyuan3D",
+          "inputs": {
+            "num_chunks": 8000,
+            "octree_resolution": 128,
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "2",
+              2
+            ]
+          }
+        },
+        "9": {
+          "class_type": "VoxelToMesh",
+          "inputs": {
+            "algorithm": "surface net",
+            "threshold": 0.6,
+            "voxel": [
+              "8",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "SaveGLB",
+          "inputs": {
+            "filename_prefix": "3d/ComfyUI",
+            "mesh": [
+              "9",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "3d_hunyuan3d_v2_standard",
+      "name": "3D Hunyuan3d V2 Standard",
+      "profile": "3d",
+      "kind": "3d",
+      "description": "Pure image-conditioned: no text prompt anywhere in the graph. MESH feeds SaveGLB's FILE_3D_* union input (union-superset edge). Fetch the GLB from /history outputs key '3d' via GET /view.",
+      "placeholders": [
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "3d"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPVisionEncode",
+          "CLIPVisionLoader",
+          "EmptyLatentHunyuan3Dv2",
+          "Hunyuan3Dv2Conditioning",
+          "ImageOnlyCheckpointLoader",
+          "KSampler",
+          "LoadImage",
+          "SaveGLB",
+          "VAEDecodeHunyuan3D",
+          "VoxelToMesh"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "2",
+            "classType": "ImageOnlyCheckpointLoader",
+            "input": "ckpt_name",
+            "file": "hunyuan3d-dit-v2_fp16.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "CLIPVisionLoader",
+            "input": "clip_name",
+            "file": "clip_vision_g.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "ImageOnlyCheckpointLoader",
+          "inputs": {
+            "ckpt_name": "hunyuan3d-dit-v2_fp16.safetensors"
+          }
+        },
+        "3": {
+          "class_type": "CLIPVisionLoader",
+          "inputs": {
+            "clip_name": "clip_vision_g.safetensors"
+          }
+        },
+        "4": {
+          "class_type": "CLIPVisionEncode",
+          "inputs": {
+            "clip_vision": [
+              "3",
+              0
+            ],
+            "crop": "center",
+            "image": [
+              "1",
+              0
+            ]
+          }
+        },
+        "5": {
+          "class_type": "Hunyuan3Dv2Conditioning",
+          "inputs": {
+            "clip_vision_output": [
+              "4",
+              0
+            ]
+          }
+        },
+        "6": {
+          "class_type": "EmptyLatentHunyuan3Dv2",
+          "inputs": {
+            "batch_size": 1,
+            "resolution": 3072
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 5.5,
+            "denoise": 1,
+            "latent_image": [
+              "6",
+              0
+            ],
+            "model": [
+              "2",
+              0
+            ],
+            "negative": [
+              "5",
+              1
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 30
+          }
+        },
+        "8": {
+          "class_type": "VAEDecodeHunyuan3D",
+          "inputs": {
+            "num_chunks": 8000,
+            "octree_resolution": 256,
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "2",
+              2
+            ]
+          }
+        },
+        "9": {
+          "class_type": "VoxelToMesh",
+          "inputs": {
+            "algorithm": "surface net",
+            "threshold": 0.6,
+            "voxel": [
+              "8",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "SaveGLB",
+          "inputs": {
+            "filename_prefix": "3d/ComfyUI",
+            "mesh": [
+              "9",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "audio_ace_step_15_draft",
+      "name": "Audio Ace Step 15 Draft",
+      "profile": "audio",
+      "kind": "audio",
+      "description": "Encoder 'duration' and latent 'seconds' are ONE parameter, driven from AudioSettings.seconds -- never set separately. SaveAudioAdvanced is the only non-deprecated audio terminator; flac emits no format.quality key at all. Fetch audio from /history outputs key 'audio' via GET /view.",
+      "placeholders": [
+        "PROMPT_TAGS"
+      ],
+      "history_output_keys": [
+        "audio"
+      ],
+      "requires": {
+        "class_types": [
+          "CheckpointLoaderSimple",
+          "EmptyAceStep1.5LatentAudio",
+          "KSampler",
+          "SaveAudioAdvanced",
+          "TextEncodeAceStepAudio1.5",
+          "VAEDecodeAudio"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 15,
+            "generate_audio_codes": false,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "PROMPT_TAGS",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "3": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 15,
+            "generate_audio_codes": false,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "4": {
+          "class_type": "EmptyAceStep1.5LatentAudio",
+          "inputs": {
+            "batch_size": 1,
+            "seconds": 15
+          }
+        },
+        "5": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 1,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "3",
+              0
+            ],
+            "positive": [
+              "2",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 8
+          }
+        },
+        "6": {
+          "class_type": "VAEDecodeAudio",
+          "inputs": {
+            "samples": [
+              "5",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "7": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "6",
+              0
+            ],
+            "filename_prefix": "audio/ComfyUI",
+            "format": "flac"
+          }
+        }
+      }
+    },
+    {
+      "id": "audio_ace_step_15_jingle",
+      "name": "Audio Ace Step 15 Jingle",
+      "profile": "audio",
+      "kind": "audio",
+      "description": "Encoder 'duration' and latent 'seconds' are ONE parameter, driven from AudioSettings.seconds -- never set separately. SaveAudioAdvanced is the only non-deprecated audio terminator; flac emits no format.quality key at all. Fetch audio from /history outputs key 'audio' via GET /view.",
+      "placeholders": [
+        "PROMPT_TAGS"
+      ],
+      "history_output_keys": [
+        "audio"
+      ],
+      "requires": {
+        "class_types": [
+          "CheckpointLoaderSimple",
+          "EmptyAceStep1.5LatentAudio",
+          "KSampler",
+          "SaveAudioAdvanced",
+          "TextEncodeAceStepAudio1.5",
+          "VAEDecodeAudio"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 10,
+            "generate_audio_codes": true,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "PROMPT_TAGS",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "3": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 10,
+            "generate_audio_codes": false,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "4": {
+          "class_type": "EmptyAceStep1.5LatentAudio",
+          "inputs": {
+            "batch_size": 1,
+            "seconds": 10
+          }
+        },
+        "5": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 1,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "3",
+              0
+            ],
+            "positive": [
+              "2",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 8
+          }
+        },
+        "6": {
+          "class_type": "VAEDecodeAudio",
+          "inputs": {
+            "samples": [
+              "5",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "7": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "6",
+              0
+            ],
+            "filename_prefix": "audio/ComfyUI",
+            "format": "flac"
+          }
+        }
+      }
+    },
+    {
+      "id": "audio_ace_step_15_music",
+      "name": "Audio Ace Step 15 Music",
+      "profile": "audio",
+      "kind": "audio",
+      "description": "Encoder 'duration' and latent 'seconds' are ONE parameter, driven from AudioSettings.seconds -- never set separately. SaveAudioAdvanced is the only non-deprecated audio terminator; flac emits no format.quality key at all. Fetch audio from /history outputs key 'audio' via GET /view.",
+      "placeholders": [
+        "PROMPT_TAGS"
+      ],
+      "history_output_keys": [
+        "audio"
+      ],
+      "requires": {
+        "class_types": [
+          "CheckpointLoaderSimple",
+          "EmptyAceStep1.5LatentAudio",
+          "KSampler",
+          "SaveAudioAdvanced",
+          "TextEncodeAceStepAudio1.5",
+          "VAEDecodeAudio"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 30,
+            "generate_audio_codes": true,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "PROMPT_TAGS",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "3": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 30,
+            "generate_audio_codes": false,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "4": {
+          "class_type": "EmptyAceStep1.5LatentAudio",
+          "inputs": {
+            "batch_size": 1,
+            "seconds": 30
+          }
+        },
+        "5": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 1,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "3",
+              0
+            ],
+            "positive": [
+              "2",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 8
+          }
+        },
+        "6": {
+          "class_type": "VAEDecodeAudio",
+          "inputs": {
+            "samples": [
+              "5",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "7": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "6",
+              0
+            ],
+            "filename_prefix": "audio/ComfyUI",
+            "format": "flac"
+          }
+        }
+      }
+    },
+    {
+      "id": "audio_ace_step_15_music_long",
+      "name": "Audio Ace Step 15 Music Long",
+      "profile": "audio",
+      "kind": "audio",
+      "description": "Encoder 'duration' and latent 'seconds' are ONE parameter, driven from AudioSettings.seconds -- never set separately. SaveAudioAdvanced is the only non-deprecated audio terminator; flac emits no format.quality key at all. Fetch audio from /history outputs key 'audio' via GET /view.",
+      "placeholders": [
+        "PROMPT_TAGS"
+      ],
+      "history_output_keys": [
+        "audio"
+      ],
+      "requires": {
+        "class_types": [
+          "CheckpointLoaderSimple",
+          "EmptyAceStep1.5LatentAudio",
+          "KSampler",
+          "SaveAudioAdvanced",
+          "TextEncodeAceStepAudio1.5",
+          "VAEDecodeAudio"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 120,
+            "generate_audio_codes": true,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "PROMPT_TAGS",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "3": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 120,
+            "generate_audio_codes": false,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "4": {
+          "class_type": "EmptyAceStep1.5LatentAudio",
+          "inputs": {
+            "batch_size": 1,
+            "seconds": 120
+          }
+        },
+        "5": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 1,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "3",
+              0
+            ],
+            "positive": [
+              "2",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 8
+          }
+        },
+        "6": {
+          "class_type": "VAEDecodeAudio",
+          "inputs": {
+            "samples": [
+              "5",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "7": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "6",
+              0
+            ],
+            "filename_prefix": "audio/ComfyUI",
+            "format": "flac"
+          }
+        }
+      }
+    },
+    {
+      "id": "audio_ace_step_15_music_mp3",
+      "name": "Audio Ace Step 15 Music Mp3",
+      "profile": "audio",
+      "kind": "audio",
+      "description": "Encoder 'duration' and latent 'seconds' are ONE parameter, driven from AudioSettings.seconds -- never set separately. SaveAudioAdvanced is the only non-deprecated audio terminator; flac emits no format.quality key at all. Fetch audio from /history outputs key 'audio' via GET /view.",
+      "placeholders": [
+        "PROMPT_TAGS"
+      ],
+      "history_output_keys": [
+        "audio"
+      ],
+      "requires": {
+        "class_types": [
+          "CheckpointLoaderSimple",
+          "EmptyAceStep1.5LatentAudio",
+          "KSampler",
+          "SaveAudioAdvanced",
+          "TextEncodeAceStepAudio1.5",
+          "VAEDecodeAudio"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "ace_step_1.5_turbo_aio.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 30,
+            "generate_audio_codes": true,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "PROMPT_TAGS",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "3": {
+          "class_type": "TextEncodeAceStepAudio1.5",
+          "inputs": {
+            "bpm": 120,
+            "cfg_scale": 2,
+            "clip": [
+              "1",
+              1
+            ],
+            "duration": 30,
+            "generate_audio_codes": false,
+            "keyscale": "C major",
+            "language": "en",
+            "lyrics": "",
+            "min_p": 0,
+            "seed": 0,
+            "tags": "",
+            "temperature": 0.85,
+            "timesignature": "4",
+            "top_k": 0,
+            "top_p": 0.9
+          }
+        },
+        "4": {
+          "class_type": "EmptyAceStep1.5LatentAudio",
+          "inputs": {
+            "batch_size": 1,
+            "seconds": 30
+          }
+        },
+        "5": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 1,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "3",
+              0
+            ],
+            "positive": [
+              "2",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 8
+          }
+        },
+        "6": {
+          "class_type": "VAEDecodeAudio",
+          "inputs": {
+            "samples": [
+              "5",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "7": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "6",
+              0
+            ],
+            "filename_prefix": "audio/ComfyUI",
+            "format": "mp3",
+            "format.quality": "320k"
+          }
+        }
+      }
+    },
+    {
+      "id": "audio_separation_stems",
+      "name": "Audio Separation Stems",
+      "profile": "audio",
+      "kind": "audio",
+      "description": "AudioSeparation is pack audio-separation-nodes-comfyui, NOT core. Outputs are wired by the pack's documented order (bass, drums, other, vocals) -- never by slot guess.",
+      "placeholders": [
+        "INPUT_AUDIO_REF.flac"
+      ],
+      "history_output_keys": [
+        "audio"
+      ],
+      "requires": {
+        "class_types": [
+          "AudioSeparation",
+          "LoadAudio",
+          "SaveAudioAdvanced"
+        ],
+        "packs": [
+          "audio-separation-nodes-comfyui"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadAudio",
+          "inputs": {
+            "audio": "INPUT_AUDIO_REF.flac"
+          }
+        },
+        "2": {
+          "class_type": "AudioSeparation",
+          "inputs": {
+            "audio": [
+              "1",
+              0
+            ],
+            "chunk_fade_shape": "linear",
+            "chunk_length": 10,
+            "chunk_overlap": 0.1
+          }
+        },
+        "3": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "2",
+              0
+            ],
+            "filename_prefix": "audio/stems_bass",
+            "format": "flac"
+          }
+        },
+        "4": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "2",
+              1
+            ],
+            "filename_prefix": "audio/stems_drums",
+            "format": "flac"
+          }
+        },
+        "5": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "2",
+              2
+            ],
+            "filename_prefix": "audio/stems_other",
+            "format": "flac"
+          }
+        },
+        "6": {
+          "class_type": "SaveAudioAdvanced",
+          "inputs": {
+            "audio": [
+              "2",
+              3
+            ],
+            "filename_prefix": "audio/stems_vocals",
+            "format": "flac"
+          }
+        }
+      }
+    },
+    {
+      "id": "image_controlnet_union_qwen",
+      "name": "Image Controlnet Union Qwen",
+      "profile": "image",
+      "kind": "image",
+      "description": "SetUnionControlNetType enum values are verbatim literals; slash-grouped entries like 'canny/lineart/anime_lineart/mlsd' are SINGLE choices. Only the core Canny preprocessor is emitted; other hint types expect a pre-made control image (aux pack not emitted).",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "images"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPLoader",
+          "CLIPTextEncode",
+          "ControlNetApplyAdvanced",
+          "ControlNetLoader",
+          "EmptySD3LatentImage",
+          "KSampler",
+          "LoadImage",
+          "ModelSamplingAuraFlow",
+          "SaveImage",
+          "SetUnionControlNetType",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "qwen_image_2512_fp8_e4m3fn.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "CLIPLoader",
+            "input": "clip_name",
+            "file": "qwen_2.5_vl_7b_fp8_scaled.safetensors"
+          },
+          {
+            "nodeId": "4",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "qwen_image_vae.safetensors"
+          },
+          {
+            "nodeId": "6",
+            "classType": "ControlNetLoader",
+            "input": "control_net_name",
+            "file": "Qwen-Image-2512-Fun-Controlnet-Union-2602.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "qwen_image_2512_fp8_e4m3fn.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "2": {
+          "class_type": "ModelSamplingAuraFlow",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "shift": 3.1
+          }
+        },
+        "3": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+            "device": "default",
+            "type": "qwen_image"
+          }
+        },
+        "4": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "qwen_image_vae.safetensors"
+          }
+        },
+        "5": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "6": {
+          "class_type": "ControlNetLoader",
+          "inputs": {
+            "control_net_name": "Qwen-Image-2512-Fun-Controlnet-Union-2602.safetensors"
+          }
+        },
+        "7": {
+          "class_type": "SetUnionControlNetType",
+          "inputs": {
+            "control_net": [
+              "6",
+              0
+            ],
+            "type": "depth"
+          }
+        },
+        "8": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "3",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "9": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "3",
+              0
+            ],
+            "text": ""
+          }
+        },
+        "10": {
+          "class_type": "ControlNetApplyAdvanced",
+          "inputs": {
+            "control_net": [
+              "7",
+              0
+            ],
+            "end_percent": 1,
+            "image": [
+              "5",
+              0
+            ],
+            "negative": [
+              "9",
+              0
+            ],
+            "positive": [
+              "8",
+              0
+            ],
+            "start_percent": 0,
+            "strength": 1,
+            "vae": [
+              "4",
+              0
+            ]
+          }
+        },
+        "11": {
+          "class_type": "EmptySD3LatentImage",
+          "inputs": {
+            "batch_size": 1,
+            "height": 1328,
+            "width": 1328
+          }
+        },
+        "13": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 2.5,
+            "denoise": 1,
+            "latent_image": [
+              "11",
+              0
+            ],
+            "model": [
+              "2",
+              0
+            ],
+            "negative": [
+              "10",
+              1
+            ],
+            "positive": [
+              "10",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 20
+          }
+        },
+        "14": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "13",
+              0
+            ],
+            "vae": [
+              "4",
+              0
+            ]
+          }
+        },
+        "15": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "filename_prefix": "comfy_headless_controlnet",
+            "images": [
+              "14",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "image_controlnet_union_sdxl",
+      "name": "Image Controlnet Union Sdxl",
+      "profile": "image",
+      "kind": "image",
+      "description": "SetUnionControlNetType enum values are verbatim literals; slash-grouped entries like 'canny/lineart/anime_lineart/mlsd' are SINGLE choices. Only the core Canny preprocessor is emitted; other hint types expect a pre-made control image (aux pack not emitted).",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "images"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPTextEncode",
+          "CheckpointLoaderSimple",
+          "ControlNetApplyAdvanced",
+          "ControlNetLoader",
+          "EmptyLatentImage",
+          "KSampler",
+          "LoadImage",
+          "SaveImage",
+          "SetUnionControlNetType",
+          "VAEDecode"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "sd_xl_base_1.0.safetensors"
+          },
+          {
+            "nodeId": "6",
+            "classType": "ControlNetLoader",
+            "input": "control_net_name",
+            "file": "controlnet-union-sdxl-1.0.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "sd_xl_base_1.0.safetensors"
+          }
+        },
+        "5": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "6": {
+          "class_type": "ControlNetLoader",
+          "inputs": {
+            "control_net_name": "controlnet-union-sdxl-1.0.safetensors"
+          }
+        },
+        "7": {
+          "class_type": "SetUnionControlNetType",
+          "inputs": {
+            "control_net": [
+              "6",
+              0
+            ],
+            "type": "depth"
+          }
+        },
+        "8": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              1
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "9": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              1
+            ],
+            "text": ""
+          }
+        },
+        "10": {
+          "class_type": "ControlNetApplyAdvanced",
+          "inputs": {
+            "control_net": [
+              "7",
+              0
+            ],
+            "end_percent": 1,
+            "image": [
+              "5",
+              0
+            ],
+            "negative": [
+              "9",
+              0
+            ],
+            "positive": [
+              "8",
+              0
+            ],
+            "start_percent": 0,
+            "strength": 1
+          }
+        },
+        "11": {
+          "class_type": "EmptyLatentImage",
+          "inputs": {
+            "batch_size": 1,
+            "height": 1024,
+            "width": 1024
+          }
+        },
+        "13": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 7,
+            "denoise": 1,
+            "latent_image": [
+              "11",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "10",
+              1
+            ],
+            "positive": [
+              "10",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "seed": 0,
+            "steps": 25
+          }
+        },
+        "14": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "13",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "15": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "filename_prefix": "comfy_headless_controlnet",
+            "images": [
+              "14",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "image_qwen_edit_2511",
+      "name": "Image Qwen Edit 2511",
+      "profile": "image",
+      "kind": "image",
+      "description": "References enter TextEncodeQwenImageEditPlus as discrete image1..image3 inputs (max 3), NOT a batched list. References do NOT pass through VAEEncode; the VAE wires into the encoder's own vae input.",
+      "placeholders": [
+        "EDIT_INSTRUCTION",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "images"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPLoader",
+          "CLIPTextEncode",
+          "EmptySD3LatentImage",
+          "KSampler",
+          "LoadImage",
+          "ModelSamplingAuraFlow",
+          "SaveImage",
+          "TextEncodeQwenImageEditPlus",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "qwen_image_edit_2511_fp8mixed.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "CLIPLoader",
+            "input": "clip_name",
+            "file": "qwen_2.5_vl_7b_fp8_scaled.safetensors"
+          },
+          {
+            "nodeId": "4",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "qwen_image_vae.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "qwen_image_edit_2511_fp8mixed.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "2": {
+          "class_type": "ModelSamplingAuraFlow",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "shift": 3.1
+          }
+        },
+        "3": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+            "device": "default",
+            "type": "qwen_image"
+          }
+        },
+        "4": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "qwen_image_vae.safetensors"
+          }
+        },
+        "5": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "6": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "8": {
+          "class_type": "TextEncodeQwenImageEditPlus",
+          "inputs": {
+            "clip": [
+              "3",
+              0
+            ],
+            "image1": [
+              "5",
+              0
+            ],
+            "image2": [
+              "6",
+              0
+            ],
+            "prompt": "EDIT_INSTRUCTION",
+            "vae": [
+              "4",
+              0
+            ]
+          }
+        },
+        "9": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "3",
+              0
+            ],
+            "text": ""
+          }
+        },
+        "10": {
+          "class_type": "EmptySD3LatentImage",
+          "inputs": {
+            "batch_size": 1,
+            "height": 1328,
+            "width": 1328
+          }
+        },
+        "11": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 2.5,
+            "denoise": 1,
+            "latent_image": [
+              "10",
+              0
+            ],
+            "model": [
+              "2",
+              0
+            ],
+            "negative": [
+              "9",
+              0
+            ],
+            "positive": [
+              "8",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 20
+          }
+        },
+        "12": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "11",
+              0
+            ],
+            "vae": [
+              "4",
+              0
+            ]
+          }
+        },
+        "13": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "filename_prefix": "comfy_headless_qwen_edit",
+            "images": [
+              "12",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "image_qwen_txt2img_2512",
+      "name": "Image Qwen Txt2img 2512",
+      "profile": "image",
+      "kind": "image",
+      "description": "Qwen loads via UNETLoader (diffusion_models), NOT CheckpointLoaderSimple. Latent is EmptySD3LatentImage (16-channel); EmptyLatentImage is garbage here. Defaults: steps 20, cfg 2.5 (not 7.0), shift 3.1, 1328x1328.",
+      "placeholders": [
+        "PROMPT_TEXT"
+      ],
+      "history_output_keys": [
+        "images"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPLoader",
+          "CLIPTextEncode",
+          "EmptySD3LatentImage",
+          "KSampler",
+          "ModelSamplingAuraFlow",
+          "SaveImage",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader"
+        ],
+        "packs": [],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "qwen_image_2512_fp8_e4m3fn.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "CLIPLoader",
+            "input": "clip_name",
+            "file": "qwen_2.5_vl_7b_fp8_scaled.safetensors"
+          },
+          {
+            "nodeId": "6",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "qwen_image_vae.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "qwen_image_2512_fp8_e4m3fn.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "2": {
+          "class_type": "ModelSamplingAuraFlow",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "shift": 3.1
+          }
+        },
+        "3": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+            "device": "default",
+            "type": "qwen_image"
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "3",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "3",
+              0
+            ],
+            "text": "ugly, blurry, low quality, distorted"
+          }
+        },
+        "6": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "qwen_image_vae.safetensors"
+          }
+        },
+        "7": {
+          "class_type": "EmptySD3LatentImage",
+          "inputs": {
+            "batch_size": 1,
+            "height": 1328,
+            "width": 1328
+          }
+        },
+        "8": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 2.5,
+            "denoise": 1,
+            "latent_image": [
+              "7",
+              0
+            ],
+            "model": [
+              "2",
+              0
+            ],
+            "negative": [
+              "5",
+              0
+            ],
+            "positive": [
+              "4",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 20
+          }
+        },
+        "9": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "8",
+              0
+            ],
+            "vae": [
+              "6",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "filename_prefix": "comfy_headless_qwen",
+            "images": [
+              "9",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_caption",
+      "name": "Inference Florence2 Caption",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "files",
+        "text"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "LoadImage",
+          "SaveText"
+        ],
+        "packs": [
+          "comfyui-florence2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "microsoft/Florence-2-large",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": false,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "caption",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "SaveText",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "format": "txt",
+            "text": [
+              "3",
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_detailed_caption",
+      "name": "Inference Florence2 Detailed Caption",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "files",
+        "text"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "LoadImage",
+          "SaveText"
+        ],
+        "packs": [
+          "comfyui-florence2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "microsoft/Florence-2-large",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": false,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "detailed_caption",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "SaveText",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "format": "txt",
+            "text": [
+              "3",
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_detect",
+      "name": "Inference Florence2 Detect",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "files",
+        "text"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "Florence2toCoordinates",
+          "LoadImage",
+          "SaveText"
+        ],
+        "packs": [
+          "comfyui-florence2",
+          "comfyui-segment-anything-2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "microsoft/Florence-2-large",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": false,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "caption_to_phrase_grounding",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "Florence2toCoordinates",
+          "inputs": {
+            "batch": false,
+            "data": [
+              "3",
+              3
+            ],
+            "index": "0"
+          }
+        },
+        "5": {
+          "class_type": "SaveText",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "format": "json",
+            "text": [
+              "4",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_more_detailed_caption",
+      "name": "Inference Florence2 More Detailed Caption",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "files",
+        "text"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "LoadImage",
+          "SaveText"
+        ],
+        "packs": [
+          "comfyui-florence2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "microsoft/Florence-2-large",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": false,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "more_detailed_caption",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "SaveText",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "format": "txt",
+            "text": [
+              "3",
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_ocr",
+      "name": "Inference Florence2 Ocr",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "files",
+        "text"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "LoadImage",
+          "SaveText"
+        ],
+        "packs": [
+          "comfyui-florence2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "microsoft/Florence-2-large",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": false,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "ocr",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "SaveText",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "format": "txt",
+            "text": [
+              "3",
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_segment",
+      "name": "Inference Florence2 Segment",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "images"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "LoadImage",
+          "MaskToImage",
+          "SaveImage"
+        ],
+        "packs": [
+          "comfyui-florence2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "microsoft/Florence-2-large",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": true,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "referring_expression_segmentation",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "MaskToImage",
+          "inputs": {
+            "mask": [
+              "3",
+              1
+            ]
+          }
+        },
+        "5": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "images": [
+              "4",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "inference_florence2_tag",
+      "name": "Inference Florence2 Tag",
+      "profile": "inference",
+      "kind": "inference",
+      "description": "Results reach /history ONLY through an OUTPUT_NODE terminator; SaveText reports inline text under 'text' plus the file under 'files'.",
+      "placeholders": [
+        "QUERY_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "files",
+        "text"
+      ],
+      "requires": {
+        "class_types": [
+          "DownloadAndLoadFlorence2Model",
+          "Florence2Run",
+          "LoadImage",
+          "SaveText"
+        ],
+        "packs": [
+          "comfyui-florence2"
+        ],
+        "models": []
+      },
+      "workflow": {
+        "1": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        },
+        "2": {
+          "class_type": "DownloadAndLoadFlorence2Model",
+          "inputs": {
+            "attention": "sdpa",
+            "model": "MiaoshouAI/Florence-2-base-PromptGen-v1.5",
+            "precision": "fp16"
+          }
+        },
+        "3": {
+          "class_type": "Florence2Run",
+          "inputs": {
+            "do_sample": true,
+            "fill_mask": false,
+            "florence2_model": [
+              "2",
+              0
+            ],
+            "image": [
+              "1",
+              0
+            ],
+            "keep_model_loaded": false,
+            "max_new_tokens": 1024,
+            "num_beams": 3,
+            "output_mask_select": "",
+            "seed": 1,
+            "task": "prompt_gen_tags",
+            "text_input": "QUERY_TEXT"
+          }
+        },
+        "4": {
+          "class_type": "SaveText",
+          "inputs": {
+            "filename_prefix": "inference/ComfyUI",
+            "format": "txt",
+            "text": [
+              "3",
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "video_hunyuan15_720p",
+      "name": "Video Hunyuan15 720P",
+      "profile": "video",
+      "kind": "video",
+      "description": "VHS_VideoCombine is the default terminator; VideoSettings(output='core') swaps in CreateVideo -> SaveVideo.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT"
+      ],
+      "history_output_keys": [
+        "gifs"
+      ],
+      "requires": {
+        "class_types": [
+          "BasicScheduler",
+          "CFGGuider",
+          "CLIPTextEncode",
+          "DualCLIPLoader",
+          "EmptyHunyuanVideo15Latent",
+          "KSamplerSelect",
+          "ModelSamplingSD3",
+          "RandomNoise",
+          "SamplerCustomAdvanced",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader",
+          "VHS_VideoCombine"
+        ],
+        "packs": [
+          "comfyui-videohelpersuite"
+        ],
+        "models": [
+          {
+            "nodeId": "2",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "hunyuanvideo15_vae_fp16.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "hunyuanvideo1.5_720p_t2v_fp16.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "DualCLIPLoader",
+          "inputs": {
+            "clip_name1": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+            "clip_name2": "byt5_small_glyphxl_fp16.safetensors",
+            "device": "default",
+            "type": "hunyuan_video_15"
+          }
+        },
+        "2": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "hunyuanvideo15_vae_fp16.safetensors"
+          }
+        },
+        "3": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "hunyuanvideo1.5_720p_t2v_fp16.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "4": {
+          "class_type": "EmptyHunyuanVideo15Latent",
+          "inputs": {
+            "batch_size": 1,
+            "height": 720,
+            "length": 121,
+            "width": 1280
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              0
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "7": {
+          "class_type": "ModelSamplingSD3",
+          "inputs": {
+            "model": [
+              "3",
+              0
+            ],
+            "shift": 9
+          }
+        },
+        "8": {
+          "class_type": "CFGGuider",
+          "inputs": {
+            "cfg": 6,
+            "model": [
+              "7",
+              0
+            ],
+            "negative": [
+              "6",
+              0
+            ],
+            "positive": [
+              "5",
+              0
+            ]
+          }
+        },
+        "9": {
+          "class_type": "BasicScheduler",
+          "inputs": {
+            "denoise": 1,
+            "model": [
+              "3",
+              0
+            ],
+            "scheduler": "simple",
+            "steps": 20
+          }
+        },
+        "10": {
+          "class_type": "RandomNoise",
+          "inputs": {
+            "noise_seed": 0
+          }
+        },
+        "11": {
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler"
+          }
+        },
+        "12": {
+          "class_type": "SamplerCustomAdvanced",
+          "inputs": {
+            "guider": [
+              "8",
+              0
+            ],
+            "latent_image": [
+              "4",
+              0
+            ],
+            "noise": [
+              "10",
+              0
+            ],
+            "sampler": [
+              "11",
+              0
+            ],
+            "sigmas": [
+              "9",
+              0
+            ]
+          }
+        },
+        "13": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "12",
+              0
+            ],
+            "vae": [
+              "2",
+              0
+            ]
+          }
+        },
+        "14": {
+          "class_type": "VHS_VideoCombine",
+          "inputs": {
+            "filename_prefix": "comfy_headless_hunyuan15",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "images": [
+              "13",
+              0
+            ],
+            "loop_count": 0,
+            "pingpong": false,
+            "save_output": true
+          }
+        }
+      }
+    },
+    {
+      "id": "video_hunyuan15_i2v",
+      "name": "Video Hunyuan15 I2v",
+      "profile": "video",
+      "kind": "video",
+      "description": "VHS_VideoCombine is the default terminator; VideoSettings(output='core') swaps in CreateVideo -> SaveVideo.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT",
+        "INPUT_IMAGE_REF.png"
+      ],
+      "history_output_keys": [
+        "gifs"
+      ],
+      "requires": {
+        "class_types": [
+          "BasicScheduler",
+          "CFGGuider",
+          "CLIPTextEncode",
+          "DualCLIPLoader",
+          "HunyuanVideo15ImageToVideo",
+          "KSamplerSelect",
+          "LoadImage",
+          "ModelSamplingSD3",
+          "RandomNoise",
+          "SamplerCustomAdvanced",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader",
+          "VHS_VideoCombine"
+        ],
+        "packs": [
+          "comfyui-videohelpersuite"
+        ],
+        "models": [
+          {
+            "nodeId": "2",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "hunyuanvideo15_vae_fp16.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "hunyuanvideo1.5_480p_i2v_fp16.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "DualCLIPLoader",
+          "inputs": {
+            "clip_name1": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+            "clip_name2": "byt5_small_glyphxl_fp16.safetensors",
+            "device": "default",
+            "type": "hunyuan_video_15"
+          }
+        },
+        "2": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "hunyuanvideo15_vae_fp16.safetensors"
+          }
+        },
+        "3": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "hunyuanvideo1.5_480p_i2v_fp16.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "4": {
+          "class_type": "HunyuanVideo15ImageToVideo",
+          "inputs": {
+            "batch_size": 1,
+            "height": 480,
+            "length": 81,
+            "negative": [
+              "6",
+              0
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "start_image": [
+              "17",
+              0
+            ],
+            "vae": [
+              "2",
+              0
+            ],
+            "width": 848
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              0
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "7": {
+          "class_type": "ModelSamplingSD3",
+          "inputs": {
+            "model": [
+              "3",
+              0
+            ],
+            "shift": 5
+          }
+        },
+        "8": {
+          "class_type": "CFGGuider",
+          "inputs": {
+            "cfg": 6,
+            "model": [
+              "7",
+              0
+            ],
+            "negative": [
+              "4",
+              1
+            ],
+            "positive": [
+              "4",
+              0
+            ]
+          }
+        },
+        "9": {
+          "class_type": "BasicScheduler",
+          "inputs": {
+            "denoise": 1,
+            "model": [
+              "3",
+              0
+            ],
+            "scheduler": "simple",
+            "steps": 20
+          }
+        },
+        "10": {
+          "class_type": "RandomNoise",
+          "inputs": {
+            "noise_seed": 0
+          }
+        },
+        "11": {
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler"
+          }
+        },
+        "12": {
+          "class_type": "SamplerCustomAdvanced",
+          "inputs": {
+            "guider": [
+              "8",
+              0
+            ],
+            "latent_image": [
+              "4",
+              2
+            ],
+            "noise": [
+              "10",
+              0
+            ],
+            "sampler": [
+              "11",
+              0
+            ],
+            "sigmas": [
+              "9",
+              0
+            ]
+          }
+        },
+        "13": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "12",
+              0
+            ],
+            "vae": [
+              "2",
+              0
+            ]
+          }
+        },
+        "14": {
+          "class_type": "VHS_VideoCombine",
+          "inputs": {
+            "filename_prefix": "comfy_headless_hunyuan15",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "images": [
+              "13",
+              0
+            ],
+            "loop_count": 0,
+            "pingpong": false,
+            "save_output": true
+          }
+        },
+        "17": {
+          "class_type": "LoadImage",
+          "inputs": {
+            "image": "INPUT_IMAGE_REF.png"
+          }
+        }
+      }
+    },
+    {
+      "id": "video_ltx_standard",
+      "name": "Video Ltx Standard",
+      "profile": "video",
+      "kind": "video",
+      "description": "LTXV keeps its LTXVScheduler -> KSamplerSelect -> SamplerCustom leg; a plain KSampler would silently drop the SIGMAS config.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT"
+      ],
+      "history_output_keys": [
+        "gifs"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPLoader",
+          "CLIPTextEncode",
+          "CheckpointLoaderSimple",
+          "EmptyLTXVLatentVideo",
+          "KSamplerSelect",
+          "LTXVConditioning",
+          "LTXVScheduler",
+          "SamplerCustom",
+          "VAEDecode",
+          "VHS_VideoCombine"
+        ],
+        "packs": [
+          "comfyui-videohelpersuite"
+        ],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "ltx-video-2b-v0.9.5.safetensors"
+          },
+          {
+            "nodeId": "2",
+            "classType": "CLIPLoader",
+            "input": "clip_name",
+            "file": "t5xxl_fp16.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "ltx-video-2b-v0.9.5.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "t5xxl_fp16.safetensors",
+            "device": "default",
+            "type": "ltxv"
+          }
+        },
+        "3": {
+          "class_type": "EmptyLTXVLatentVideo",
+          "inputs": {
+            "batch_size": 1,
+            "height": 512,
+            "length": 97,
+            "width": 768
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "LTXVConditioning",
+          "inputs": {
+            "frame_rate": 24,
+            "negative": [
+              "5",
+              0
+            ],
+            "positive": [
+              "4",
+              0
+            ]
+          }
+        },
+        "7": {
+          "class_type": "LTXVScheduler",
+          "inputs": {
+            "base_shift": 0.95,
+            "latent": [
+              "3",
+              0
+            ],
+            "max_shift": 2.05,
+            "steps": 30,
+            "stretch": true,
+            "terminal": 0.1
+          }
+        },
+        "8": {
+          "class_type": "KSamplerSelect",
+          "inputs": {
+            "sampler_name": "euler"
+          }
+        },
+        "9": {
+          "class_type": "SamplerCustom",
+          "inputs": {
+            "add_noise": true,
+            "cfg": 3,
+            "latent_image": [
+              "3",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "6",
+              1
+            ],
+            "noise_seed": 0,
+            "positive": [
+              "6",
+              0
+            ],
+            "sampler": [
+              "8",
+              0
+            ],
+            "sigmas": [
+              "7",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "9",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "11": {
+          "class_type": "VHS_VideoCombine",
+          "inputs": {
+            "filename_prefix": "comfy_headless_ltxv",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "images": [
+              "10",
+              0
+            ],
+            "save_output": true
+          }
+        }
+      }
+    },
+    {
+      "id": "video_mochi",
+      "name": "Video Mochi",
+      "profile": "video",
+      "kind": "video",
+      "description": "VHS_VideoCombine is the default terminator; VideoSettings(output='core') swaps in CreateVideo -> SaveVideo.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT"
+      ],
+      "history_output_keys": [
+        "gifs"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPLoader",
+          "CLIPTextEncode",
+          "EmptyMochiLatentVideo",
+          "KSampler",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader",
+          "VHS_VideoCombine"
+        ],
+        "packs": [
+          "comfyui-videohelpersuite"
+        ],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "mochi_preview_bf16.safetensors"
+          },
+          {
+            "nodeId": "2",
+            "classType": "CLIPLoader",
+            "input": "clip_name",
+            "file": "t5xxl_fp16.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "mochi_vae.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "mochi_preview_bf16.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "2": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "t5xxl_fp16.safetensors",
+            "device": "default",
+            "type": "mochi"
+          }
+        },
+        "3": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "mochi_vae.safetensors"
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "EmptyMochiLatentVideo",
+          "inputs": {
+            "batch_size": 1,
+            "height": 480,
+            "length": 162,
+            "width": 848
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 4.5,
+            "denoise": 1,
+            "latent_image": [
+              "6",
+              0
+            ],
+            "model": [
+              "1",
+              0
+            ],
+            "negative": [
+              "5",
+              0
+            ],
+            "positive": [
+              "4",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 64
+          }
+        },
+        "8": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "3",
+              0
+            ]
+          }
+        },
+        "9": {
+          "class_type": "VHS_VideoCombine",
+          "inputs": {
+            "filename_prefix": "comfy_headless_mochi",
+            "format": "video/h264-mp4",
+            "frame_rate": 30,
+            "images": [
+              "8",
+              0
+            ],
+            "loop_count": 0,
+            "pingpong": false,
+            "save_output": true
+          }
+        }
+      }
+    },
+    {
+      "id": "video_standard",
+      "name": "Video Standard",
+      "profile": "video",
+      "kind": "video",
+      "description": "VHS_VideoCombine is the default terminator; VideoSettings(output='core') swaps in CreateVideo -> SaveVideo.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT"
+      ],
+      "history_output_keys": [
+        "gifs"
+      ],
+      "requires": {
+        "class_types": [
+          "ADE_ApplyAnimateDiffModel",
+          "ADE_EmptyLatentImageLarge",
+          "ADE_LoadAnimateDiffModel",
+          "CLIPTextEncode",
+          "CheckpointLoaderSimple",
+          "KSampler",
+          "VAEDecode",
+          "VHS_VideoCombine"
+        ],
+        "packs": [
+          "comfyui-animatediff-evolved",
+          "comfyui-videohelpersuite"
+        ],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "dreamshaper_8.safetensors"
+          },
+          {
+            "nodeId": "2",
+            "classType": "ADE_LoadAnimateDiffModel",
+            "input": "model_name",
+            "file": "v3_sd15_mm.ckpt"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "dreamshaper_8.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "ADE_LoadAnimateDiffModel",
+          "inputs": {
+            "model_name": "v3_sd15_mm.ckpt"
+          }
+        },
+        "3": {
+          "class_type": "ADE_ApplyAnimateDiffModel",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "motion_model": [
+              "2",
+              0
+            ],
+            "scale_multival": 1
+          }
+        },
+        "4": {
+          "class_type": "ADE_EmptyLatentImageLarge",
+          "inputs": {
+            "batch_size": 16,
+            "height": 512,
+            "width": 512
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              1
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              1
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 7,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "3",
+              0
+            ],
+            "negative": [
+              "6",
+              0
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "seed": 0,
+            "steps": 20
+          }
+        },
+        "8": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "9": {
+          "class_type": "VHS_VideoCombine",
+          "inputs": {
+            "filename_prefix": "comfy_headless_video",
+            "format": "video/h264-mp4",
+            "frame_rate": 8,
+            "images": [
+              "8",
+              0
+            ],
+            "loop_count": 0,
+            "save_output": true
+          }
+        }
+      }
+    },
+    {
+      "id": "video_standard_core_output",
+      "name": "Video Standard Core Output",
+      "profile": "video",
+      "kind": "video",
+      "description": "Drops the comfyui-videohelpersuite dependency. SaveVideo output registers in /history under 'images' with an 'animated' flag, not under 'gifs'.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT"
+      ],
+      "history_output_keys": [
+        "images"
+      ],
+      "requires": {
+        "class_types": [
+          "ADE_ApplyAnimateDiffModel",
+          "ADE_EmptyLatentImageLarge",
+          "ADE_LoadAnimateDiffModel",
+          "CLIPTextEncode",
+          "CheckpointLoaderSimple",
+          "CreateVideo",
+          "KSampler",
+          "SaveVideo",
+          "VAEDecode"
+        ],
+        "packs": [
+          "comfyui-animatediff-evolved"
+        ],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "CheckpointLoaderSimple",
+            "input": "ckpt_name",
+            "file": "dreamshaper_8.safetensors"
+          },
+          {
+            "nodeId": "2",
+            "classType": "ADE_LoadAnimateDiffModel",
+            "input": "model_name",
+            "file": "v3_sd15_mm.ckpt"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "CheckpointLoaderSimple",
+          "inputs": {
+            "ckpt_name": "dreamshaper_8.safetensors"
+          }
+        },
+        "2": {
+          "class_type": "ADE_LoadAnimateDiffModel",
+          "inputs": {
+            "model_name": "v3_sd15_mm.ckpt"
+          }
+        },
+        "3": {
+          "class_type": "ADE_ApplyAnimateDiffModel",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "motion_model": [
+              "2",
+              0
+            ],
+            "scale_multival": 1
+          }
+        },
+        "4": {
+          "class_type": "ADE_EmptyLatentImageLarge",
+          "inputs": {
+            "batch_size": 16,
+            "height": 512,
+            "width": 512
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              1
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "1",
+              1
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 7,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "3",
+              0
+            ],
+            "negative": [
+              "6",
+              0
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "seed": 0,
+            "steps": 20
+          }
+        },
+        "8": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "1",
+              2
+            ]
+          }
+        },
+        "9": {
+          "class_type": "SaveVideo",
+          "inputs": {
+            "codec": "auto",
+            "filename_prefix": "comfy_headless_video",
+            "format": "auto",
+            "video": [
+              "10",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "CreateVideo",
+          "inputs": {
+            "fps": 8,
+            "images": [
+              "8",
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "video_wan_14b",
+      "name": "Video Wan 14B",
+      "profile": "video",
+      "kind": "video",
+      "description": "VHS_VideoCombine is the default terminator; VideoSettings(output='core') swaps in CreateVideo -> SaveVideo.",
+      "placeholders": [
+        "PROMPT_TEXT",
+        "NEGATIVE_TEXT"
+      ],
+      "history_output_keys": [
+        "gifs"
+      ],
+      "requires": {
+        "class_types": [
+          "CLIPLoader",
+          "CLIPTextEncode",
+          "EmptyHunyuanLatentVideo",
+          "KSampler",
+          "ModelSamplingSD3",
+          "UNETLoader",
+          "VAEDecode",
+          "VAELoader",
+          "VHS_VideoCombine"
+        ],
+        "packs": [
+          "comfyui-videohelpersuite"
+        ],
+        "models": [
+          {
+            "nodeId": "1",
+            "classType": "UNETLoader",
+            "input": "unet_name",
+            "file": "wan2.2_t2v_14B_fp8_scaled.safetensors"
+          },
+          {
+            "nodeId": "2",
+            "classType": "CLIPLoader",
+            "input": "clip_name",
+            "file": "umt5_xxl_fp8_e4m3fn_scaled.safetensors"
+          },
+          {
+            "nodeId": "3",
+            "classType": "VAELoader",
+            "input": "vae_name",
+            "file": "wan_2.1_vae.safetensors"
+          }
+        ]
+      },
+      "workflow": {
+        "1": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "wan2.2_t2v_14B_fp8_scaled.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "2": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+            "device": "default",
+            "type": "wan"
+          }
+        },
+        "3": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "wan_2.1_vae.safetensors"
+          }
+        },
+        "4": {
+          "class_type": "EmptyHunyuanLatentVideo",
+          "inputs": {
+            "batch_size": 1,
+            "height": 640,
+            "length": 81,
+            "width": 640
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "PROMPT_TEXT"
+          }
+        },
+        "6": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "NEGATIVE_TEXT"
+          }
+        },
+        "7": {
+          "class_type": "ModelSamplingSD3",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "shift": 8
+          }
+        },
+        "8": {
+          "class_type": "KSampler",
+          "inputs": {
+            "cfg": 3.5,
+            "denoise": 1,
+            "latent_image": [
+              "4",
+              0
+            ],
+            "model": [
+              "7",
+              0
+            ],
+            "negative": [
+              "6",
+              0
+            ],
+            "positive": [
+              "5",
+              0
+            ],
+            "sampler_name": "uni_pc",
+            "scheduler": "simple",
+            "seed": 0,
+            "steps": 20
+          }
+        },
+        "9": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "8",
+              0
+            ],
+            "vae": [
+              "3",
+              0
+            ]
+          }
+        },
+        "10": {
+          "class_type": "VHS_VideoCombine",
+          "inputs": {
+            "filename_prefix": "comfy_headless_wan",
+            "format": "video/h264-mp4",
+            "frame_rate": 16,
+            "images": [
+              "9",
+              0
+            ],
+            "save_output": true
+          }
+        }
+      }
+    }
+  ]
+}
