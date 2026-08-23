@@ -95,7 +95,19 @@ Run metadata lives in `.codecomfy/runs/`.
 ### Cancel
 
 Run `CodeComfy: Cancel Generation` from the Command Palette or click the
-status bar item while a generation is in progress.
+status bar item while a generation is in progress. This clears the pending
+queue **and** interrupts the running job — so cancelling does not simply start
+whatever you had queued next.
+
+### Clear the queue
+
+`CodeComfy: Clear ComfyUI Queue` drops every *pending* job and leaves the
+running one alone.
+
+This is the honest version of "pause": mainline ComfyUI has `/interrupt`
+(abort, no resume) and nothing else — there is no pause and no
+resume-at-step-N. Stopping more work from starting is the part that can
+actually be done.
 
 ## Features
 
@@ -103,6 +115,8 @@ status bar item while a generation is in progress.
   with 27 verified reference workflows.
 - **Preflight** — missing nodes and models are named before anything is
   submitted, so no GPU time is spent on a run that cannot succeed.
+- **Live progress** — real sampler steps in the status bar (`Step 12 / 20`),
+  streamed over ComfyUI's WebSocket. Falls back to polling automatically.
 - Built-in HQ image + video presets — video runs on **Wan 2.2 TI2V-5B**
   (Apache-2.0, commercial-safe) with **server-side encoding, no FFmpeg**.
 - **User-authored workflow presets** (NEW) — drop any ComfyUI workflow JSON in `.codecomfy/presets/`.

@@ -21,16 +21,28 @@
  *        Expected: 200 { system: {...}, devices: [...] }
  *        Non-2xx → reason: 'http-error'; network → 'refused' | 'timeout' | 'bad-url' | 'unknown'.
  *
- *   2. submitPrompt(workflow)
+ *   1a. ComfyEventStream.connect()  [optional — see comfyEvents.ts]
+ *        WS   {serverUrl}/ws?clientId=<uuid>   (ws:// or wss:// per scheme)
+ *        Opened BEFORE submit so no event is missed. Skipped entirely when the
+ *        runtime has no global WebSocket; everything below still works.
+ *
+ *   2. submitPrompt(workflow, clientId)
  *        POST {serverUrl}/prompt
  *        Headers: Content-Type: application/json
- *        Body: { prompt: <workflow_nodes_by_id> }
- *               (no client_id is sent; ComfyUI assigns one server-side)
+ *        Body: { prompt: <workflow_nodes_by_id>, client_id: <uuid> }
+ *               client_id routes this job's events to our socket. Omitted when
+ *               no socket is open.
  *        Timeout: 10s
  *        Expected: 200 { prompt_id: string, number: int, node_errors: {} }
  *        Validated by `validatePromptResponse()`.
  *
- *   3. pollForCompletion(promptId)
+ *   3a. waitForTerminal()          [when the socket is up]
+ *        No HTTP. Resolves on execution_success / executing{node:null} /
+ *        execution_error / execution_interrupted, then ONE
+ *        GET {serverUrl}/history/{promptId} via fetchHistoryOnce().
+ *        Falls through to 3b if the socket drops or times out.
+ *
+ *   3b. pollForCompletion(promptId)  [fallback, and the only path pre-1.4]
  *        GET  {serverUrl}/history/{promptId}
  *        Timeout per attempt: 5s
  *        Poll cadence: exponential backoff via BackoffTimer (≈500ms → 8s cap)
@@ -45,9 +57,23 @@
  *        Expected: 200 image/png | image/jpeg (streamed to disk)
  *        Filename is first passed through `sanitizeComfyFilename()`.
  *
- *   5. cancel()  [only if a prompt is in flight]
- *        POST {serverUrl}/interrupt
- *        No body; response body ignored; errors swallowed.
+ *   5. cancel()
+ *        POST {serverUrl}/queue      body { "clear": true }   <-- FIRST
+ *        POST {serverUrl}/interrupt  no body                  <-- THEN
+ *        Order is load-bearing: /interrupt aborts only the running job and the
+ *        server immediately promotes the next pending item, so the queue must
+ *        be cleared before the interrupt or the next job starts in the gap.
+ *        Both are best-effort; cancel never throws.
+ *
+ *   6. clearQueue() / getQueueDepth()  [user commands, not part of a run]
+ *        POST {serverUrl}/queue  body { "clear": true }
+ *        GET  {serverUrl}/queue  -> { queue_running: [...], queue_pending: [...] }
+ *        /queue returns the FULL graph per entry — call on demand, never on a timer.
+ *
+ *   7. hasClass() / listModels() / uploadFile()  [preflight + input upload]
+ *        GET  {serverUrl}/object_info/{class_type}
+ *        GET  {serverUrl}/models/{folder}
+ *        POST {serverUrl}/upload/image   multipart: image, type, subfolder
  *
  * Notes for fixture recorders:
  *   • ORDER MATTERS — a recorder that replays calls in the wrong order will
@@ -84,6 +110,7 @@ import {
 } from './comfyValidation';
 import { Logger, createNullLogger } from '../logging/logger';
 import { ApiWorkflow, injectRequest, substitutePlaceholders } from './workflowInjection';
+import { ComfyEventStream } from './comfyEvents';
 import {
     RetrievalResult,
     collectOutputs,
@@ -164,6 +191,24 @@ export type OnCompleteCallback = (
 ) => void;
 
 /**
+ * Live progress from the ComfyUI event socket.
+ *
+ * Only emitted when the socket is available; on a polling fallback the caller
+ * simply receives nothing and keeps its coarse per-status text.
+ */
+export interface EngineProgress {
+    phase: 'generating';
+    /** Current step within the executing node. */
+    stepCurrent: number;
+    /** Total steps that node will report. */
+    stepTotal: number;
+    /** Node id currently executing, when known. */
+    node?: string;
+}
+
+export type EngineProgressCallback = (progress: EngineProgress) => void;
+
+/**
  * Re-exported for the handbook and schema generator. The injection contract is
  * now role-based (see `workflowInjection.ts`), so this list documents the node
  * types the LEGACY degenerate-graph fallback still matches by name — not the
@@ -183,6 +228,12 @@ export class ComfyServerEngine implements IGenerationEngine {
 
     private serverUrl: string;
     private currentPromptId: string | null = null;
+    /**
+     * Identifies this engine on the ComfyUI event socket. Minted per instance:
+     * the same value goes in the `/ws?clientId=` query and the `/prompt` body,
+     * which is what routes a job's events back to us.
+     */
+    private readonly clientId: string = crypto.randomUUID();
     private canceled = false;
     private logger: Logger;
     private overrides: WorkflowOverrides;
@@ -362,6 +413,7 @@ export class ComfyServerEngine implements IGenerationEngine {
         request: JobRequest,
         preset: Preset,
         onComplete?: OnCompleteCallback,
+        onProgress?: EngineProgressCallback,
     ): Promise<GenerationResult> {
         this.canceled = false;
 
@@ -411,9 +463,27 @@ export class ComfyServerEngine implements IGenerationEngine {
             });
         }
 
+        // Open the live event stream BEFORE submitting, so no event is missed
+        // between submission and connection. A failure here is not fatal — the
+        // socket is an optimisation and polling covers everything it does.
+        const events = new ComfyEventStream(this.serverUrl, this.clientId, this.logger);
+        const streamConnected = await events.connect();
+        if (streamConnected && onProgress) {
+            events.onProgress((p) => {
+                onProgress({
+                    phase: 'generating',
+                    stepCurrent: p.value,
+                    stepTotal: p.max,
+                    node: p.node,
+                });
+            });
+        }
+
         try {
             const submitStart = Date.now();
-            const promptResponse = await this.submitPrompt(workflow);
+            // Binding the prompt to our client id is what routes this job's
+            // events to our socket.
+            const promptResponse = await this.submitPrompt(workflow, this.clientId);
             phaseBreakdown.submit_ms = Date.now() - submitStart;
             if (!promptResponse) {
                 return finish({
@@ -428,7 +498,50 @@ export class ComfyServerEngine implements IGenerationEngine {
             // Video generation can take much longer
             const timeoutMs = request.kind === 'video' ? 600000 : 300000;
             const pollStart = Date.now();
-            const history = await this.pollForCompletion(promptResponse.prompt_id, timeoutMs);
+
+            let history: ValidatedHistoryEntry | null = null;
+
+            if (streamConnected) {
+                const outcome = await events.waitForTerminal(
+                    promptResponse.prompt_id,
+                    timeoutMs,
+                );
+
+                if (outcome.reason === 'error') {
+                    phaseBreakdown.poll_ms = Date.now() - pollStart;
+                    return finish({
+                        success: false,
+                        artifacts: [],
+                        error: `ComfyUI reported an execution error. ${outcome.detail ?? ''}`.trim(),
+                    });
+                }
+                if (outcome.reason === 'interrupted' || this.canceled) {
+                    phaseBreakdown.poll_ms = Date.now() - pollStart;
+                    return finish({
+                        success: false,
+                        artifacts: [],
+                        error: 'Generation canceled.',
+                    });
+                }
+                if (outcome.reason === 'success') {
+                    // We KNOW the run finished, so read history once rather
+                    // than polling. This is also what closes the eviction hole:
+                    // the read happens immediately on completion instead of
+                    // after an unknown number of poll intervals.
+                    history = await this.fetchHistoryOnce(promptResponse.prompt_id);
+                    if (!history) {
+                        this.logger.child('poll').warn(
+                            'Run completed but /history had no entry yet — falling back to polling.',
+                        );
+                    }
+                }
+                // `unavailable` (socket dropped, or no terminal event in time)
+                // falls through to polling below.
+            }
+
+            if (!history) {
+                history = await this.pollForCompletion(promptResponse.prompt_id, timeoutMs);
+            }
             phaseBreakdown.poll_ms = Date.now() - pollStart;
 
             if (!history) {
@@ -484,17 +597,94 @@ export class ComfyServerEngine implements IGenerationEngine {
             });
         } finally {
             this.currentPromptId = null;
+            events.close();
         }
     }
 
+    /**
+     * Stop the current run — and stop the NEXT one from starting.
+     *
+     * `POST /interrupt` aborts only the job that is running; the server then
+     * immediately starts the next pending item. Through 1.3.0 CodeComfy called
+     * `/interrupt` alone, so a user who had queued work from the ComfyUI web
+     * UI would hit Cancel and watch the next job start.
+     *
+     * ORDER IS LOAD-BEARING. The queue is cleared FIRST: clearing after the
+     * interrupt leaves a window in which the server has already promoted the
+     * next pending item to running, where a queue-clear can no longer touch it
+     * (`wipe_queue` / `delete_queue_item` affect pending entries only —
+     * server.py:982-994).
+     *
+     * Both calls are best-effort: cancel must never throw, because the caller
+     * is already tearing the run down.
+     */
     async cancel(): Promise<void> {
         this.canceled = true;
+        const cancelLog = this.logger.child('cancel');
+
+        // 1. Stop anything else from starting.
+        await this.clearQueue();
+
+        // 2. Abort what is running now.
         if (this.currentPromptId) {
             try {
-                await fetch(`${this.serverUrl}/interrupt`, { method: 'POST' });
-            } catch {
-                // Ignore cancel errors
+                await fetch(`${this.serverUrl}/interrupt`, {
+                    method: 'POST',
+                    signal: AbortSignal.timeout(5000),
+                });
+            } catch (err) {
+                cancelLog.warn(
+                    'Interrupt request failed — the running job may continue on the server.',
+                    err instanceof Error ? err.message : String(err),
+                );
             }
+        }
+    }
+
+    /**
+     * Drop every PENDING item from the ComfyUI queue.
+     *
+     * Does not stop the running job — that is `/interrupt`'s job, and mainline
+     * ComfyUI has no pause primitive at all. Returns false when the request
+     * could not be made, so callers can report honestly rather than claiming a
+     * queue was cleared that was not.
+     */
+    async clearQueue(): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.serverUrl}/queue`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clear: true }),
+                signal: AbortSignal.timeout(5000),
+            });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * How many items are running and pending on the server.
+     *
+     * `/queue` returns the FULL graph for every entry, so this is expensive on
+     * a queue of large video workflows — call it on demand, never on a timer.
+     */
+    async getQueueDepth(): Promise<{ running: number; pending: number } | null> {
+        try {
+            const response = await fetch(`${this.serverUrl}/queue`, {
+                signal: AbortSignal.timeout(5000),
+            });
+            if (!response.ok) return null;
+            const body = (await response.json()) as {
+                queue_running?: unknown[];
+                queue_pending?: unknown[];
+            };
+            return {
+                running: Array.isArray(body.queue_running) ? body.queue_running.length : 0,
+                pending: Array.isArray(body.queue_pending) ? body.queue_pending.length : 0,
+            };
+        } catch {
+            return null;
         }
     }
 
@@ -579,12 +769,20 @@ export class ComfyServerEngine implements IGenerationEngine {
     // Prompt Submission and Polling
     // =========================================================================
 
-    private async submitPrompt(workflow: Record<string, unknown>): Promise<ValidatedPromptResponse | null> {
+    private async submitPrompt(
+        workflow: Record<string, unknown>,
+        clientId?: string,
+    ): Promise<ValidatedPromptResponse | null> {
         try {
+            // `client_id` binds this job's events to our socket. Harmless when
+            // no socket is open — the server just has nobody to notify.
+            const requestBody = clientId
+                ? { ...workflow, client_id: clientId }
+                : workflow;
             const response = await fetch(`${this.serverUrl}/prompt`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(workflow),
+                body: JSON.stringify(requestBody),
                 signal: AbortSignal.timeout(10000),
             });
 
@@ -608,6 +806,26 @@ export class ComfyServerEngine implements IGenerationEngine {
                 throw new Error(`${prefix}${fieldHint}: ${err.message}\nRaw: ${err.rawBody}`);
             }
             throw new Error(`Failed to submit prompt: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    }
+
+    /**
+     * Read `/history/{promptId}` exactly once.
+     *
+     * Used when the event socket has already told us the run finished, so
+     * there is nothing to wait for. Returns null if the entry is not there yet
+     * (or is malformed), and the caller falls back to polling.
+     */
+    private async fetchHistoryOnce(promptId: string): Promise<ValidatedHistoryEntry | null> {
+        try {
+            const response = await fetch(`${this.serverUrl}/history/${promptId}`, {
+                signal: AbortSignal.timeout(5000),
+            });
+            if (!response.ok) return null;
+            const body = await response.json();
+            return validateHistoryResponse(body, promptId);
+        } catch {
+            return null;
         }
     }
 

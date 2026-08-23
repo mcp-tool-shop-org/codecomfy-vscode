@@ -6,7 +6,7 @@ import { getConfig } from './config';
 import { JobRouter } from './router/jobRouter';
 import { ComfyServerEngine } from './engines/comfyServerEngine';
 import { getPresetRegistry } from './presets/registry';
-import { GenerationKind, JobRequestInput, JobRun, Preset } from './types';
+import { GenerationKind, JobRequestInput, JobRun, Preset, ProgressDetail } from './types';
 import {
     PROFILES,
     ProfileId,
@@ -68,12 +68,6 @@ function ts(): string {
  * Router/engine must populate these for full effect — see cross_domain_notes
  * on F-256918-018. When absent, the status bar falls back to coarse status.
  */
-export interface ProgressDetail {
-    frameCurrent?: number;
-    frameTotal?: number;
-    phase?: 'polling' | 'downloading' | 'assembling';
-}
-
 // ---------------------------------------------------------------------------
 // Concurrency guard — only one generation at a time, with cooldown
 // ---------------------------------------------------------------------------
@@ -230,6 +224,7 @@ export function activate(context: vscode.ExtensionContext) {
         // FT-024: Seed a new user preset file from a bundled HQ template
         vscode.commands.registerCommand('codecomfy.newPresetFromHQ', newPresetFromHQCommand),
         vscode.commands.registerCommand('codecomfy.runProfile', runProfileCommand),
+        vscode.commands.registerCommand('codecomfy.clearQueue', clearQueueCommand),
         vscode.commands.registerCommand('codecomfy.readPngWorkflow', readPngWorkflowCommand),
     );
 
@@ -1067,6 +1062,55 @@ async function readPngWorkflowCommand(): Promise<void> {
     );
 }
 
+/**
+ * Drop everything PENDING from the ComfyUI queue.
+ *
+ * This is the honest version of the "pause" people ask for: mainline ComfyUI
+ * has `/interrupt` (abort, no resume) and nothing else — there is no pause and
+ * no resume-at-step-N. What a queue-clear *can* do is stop more work from
+ * starting, which is usually what was actually wanted.
+ *
+ * The currently-running job is left alone; `Cancel Generation` stops that.
+ */
+async function clearQueueCommand(): Promise<void> {
+    const config = getConfig();
+    const engine = new ComfyServerEngine(config.comfyuiUrl);
+
+    const depth = await engine.getQueueDepth();
+    if (depth === null) {
+        vscode.window.showErrorMessage(
+            `Could not read the ComfyUI queue at ${config.comfyuiUrl}. Is the server running?`,
+        );
+        return;
+    }
+    if (depth.pending === 0) {
+        vscode.window.showInformationMessage(
+            depth.running > 0
+                ? 'Nothing pending — 1 job is running. Use "Cancel Generation" to stop it.'
+                : 'The ComfyUI queue is empty.',
+        );
+        return;
+    }
+
+    const confirm = await vscode.window.showWarningMessage(
+        `Clear ${depth.pending} pending job(s) from the ComfyUI queue?`,
+        { modal: true, detail: depth.running > 0
+            ? 'The job currently running is NOT affected — use "Cancel Generation" for that.'
+            : undefined },
+        'Clear queue',
+    );
+    if (confirm !== 'Clear queue') return;
+
+    const ok = await engine.clearQueue();
+    if (ok) {
+        vscode.window.showInformationMessage(
+            `Cleared ${depth.pending} pending job(s).`,
+        );
+    } else {
+        vscode.window.showErrorMessage('The queue-clear request failed — nothing was changed.');
+    }
+}
+
 async function cancelGenerationCommand(): Promise<void> {
     if (!currentRouter) {
         vscode.window.showInformationMessage('No generation in progress.');
@@ -1119,6 +1163,11 @@ async function runGeneration(
                     statusBarItem.text = `$(loading~spin) CodeComfy: Downloading frame ${detail.frameCurrent ?? '?'} / ${detail.frameTotal}`;
                 } else if (detail?.phase === 'assembling') {
                     statusBarItem.text = '$(loading~spin) CodeComfy: Assembling video (FFmpeg)';
+                } else if (detail?.phase === 'generating' && detail.stepTotal) {
+                    // Live sampler progress from the ComfyUI event socket.
+                    const pct = Math.round(((detail.stepCurrent ?? 0) / detail.stepTotal) * 100);
+                    statusBarItem.text =
+                        `$(loading~spin) CodeComfy: Step ${detail.stepCurrent ?? 0} / ${detail.stepTotal} (${pct}%)`;
                 } else if (detail?.frameTotal) {
                     statusBarItem.text = `$(loading~spin) CodeComfy: Generating... (frame ${detail.frameCurrent ?? 0} / ${detail.frameTotal})`;
                 } else {

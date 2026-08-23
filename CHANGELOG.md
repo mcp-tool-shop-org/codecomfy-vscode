@@ -9,6 +9,79 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-22
+
+Live progress and an honest Cancel. Both close items that were verified against
+ComfyUI 0.23.0 source in the 1.3.0 cycle but deliberately left unimplemented
+rather than bolted on.
+
+### Fixed
+
+- **Cancel started the next queued job.** `POST /interrupt` aborts only the job
+  that is running; the server then immediately promotes the next pending item.
+  A user who had queued work from the ComfyUI web UI would hit Cancel and watch
+  the next job start. Cancel now clears the queue **first**, then interrupts —
+  the order matters, because clearing afterwards leaves a window in which the
+  next job has already been promoted to running, where `wipe_queue` can no
+  longer reach it (`server.py:982-994`).
+- **A succeeded run could be reported as a failure.** `/history` is an
+  in-memory ring evicted by count (`MAXIMUM_HISTORY_SIZE = 10000`) that does
+  not survive a server restart. Polling an id that had been evicted — or that
+  vanished when the server bounced — timed out and was reported as a failed
+  generation. With the event socket up, completion is known the moment it
+  happens and history is read once, immediately, closing the window.
+
+### Added
+
+- **Live sampler progress in the status bar.** The status bar now shows
+  `Step 12 / 20 (60%)` instead of a single static string for the whole run.
+  CodeComfy opens ComfyUI's WebSocket (`/ws?clientId=…`) before submitting and
+  binds the job to it with `client_id` in the `/prompt` body. The
+  `ProgressDetail` hook that had been scaffolded and starved since v1.1.0 is
+  finally populated.
+- **`CodeComfy: Clear ComfyUI Queue`** — drops every *pending* item, leaving
+  the running job alone. This is the honest version of the "pause" people ask
+  for: mainline ComfyUI has `/interrupt` and nothing else — no pause, no
+  resume-at-step-N. It confirms the count first and does nothing if the queue
+  is already empty.
+- **`ComfyServerEngine.getQueueDepth()`** — running/pending counts. `/queue`
+  returns the full graph for every entry, so it is called on demand, never on
+  a timer.
+- **Pre-submission event buffering.** The socket is live from before the prompt
+  is submitted, so a short or fully-cached job can emit its terminal event
+  before the client knows which prompt id to correlate against. Those events
+  are buffered and replayed rather than dropped — otherwise a cached run would
+  wait out the full timeout before the polling fallback noticed it had already
+  finished.
+
+### Changed
+
+- **The socket is strictly an optimisation.** Nothing in the artifact path
+  exists only on it: `/history` remains the source of truth and polling remains
+  a complete fallback. A dropped socket resolves as `unavailable` — which means
+  "ask /history", never "the run failed" — and the run continues on the polling
+  path exactly as before.
+- **No new runtime dependency.** The socket uses the platform `WebSocket`,
+  feature-detected at runtime. VS Code builds on older Node simply keep the
+  polling behaviour they have always had, and CodeComfy still ships with zero
+  runtime dependencies.
+- `IGenerationEngine.generate()` gains an optional fourth `onProgress`
+  parameter. Additive — the two-argument call is unchanged.
+- `ProgressDetail` moved from `extension.ts` into `src/types` so the engine and
+  router can populate it, and gained `stepCurrent` / `stepTotal` / a
+  `generating` phase.
+- The engine's HTTP contract docstring now documents the socket, the
+  client-id binding, the two-call cancel ordering, and the preflight/upload
+  routes added in 1.3.0.
+
+### Tests
+
+29 new tests (505 total, up from 476), including regression guards that the
+queue is cleared before the interrupt, that `display_node` is treated as a
+field rather than an event type, and that events arriving before the prompt id
+is known are replayed rather than dropped.
+
+
 ## [1.3.0] - 2026-08-22
 
 The six-profile release. CodeComfy now drives the same capability profiles
