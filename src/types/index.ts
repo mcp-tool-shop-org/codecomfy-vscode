@@ -233,11 +233,42 @@ export interface GenerationResult {
     error?: string;
 }
 
+/**
+ * Fine-grained progress for the status bar, threaded engine → router → UI.
+ *
+ * Populated only when the ComfyUI event socket is available; on a polling
+ * fallback the UI keeps its coarse per-status text.
+ */
+export interface ProgressDetail {
+    /** Sampler step within the executing node. */
+    stepCurrent?: number;
+    stepTotal?: number;
+    /** Frames downloaded so far (video frame-assembly path). */
+    frameCurrent?: number;
+    frameTotal?: number;
+    phase?: 'generating' | 'polling' | 'downloading' | 'assembling';
+}
+
 export interface IGenerationEngine {
     readonly id: string;
     readonly name: string;
     isAvailable(): Promise<boolean>;
-    generate(request: JobRequest, preset: Preset): Promise<GenerationResult>;
+    /**
+     * `onComplete` and `onProgress` are additive optional parameters — the
+     * two-argument call remains valid, which keeps this a non-breaking
+     * extension of the engine contract.
+     */
+    generate(
+        request: JobRequest,
+        preset: Preset,
+        onComplete?: (result: GenerationResult, metadata: unknown) => void,
+        onProgress?: (progress: {
+            phase: 'generating';
+            stepCurrent: number;
+            stepTotal: number;
+            node?: string;
+        }) => void,
+    ): Promise<GenerationResult>;
     cancel(): Promise<void>;
 }
 

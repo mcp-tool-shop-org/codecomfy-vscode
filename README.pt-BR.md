@@ -90,19 +90,26 @@ Os metadados de execução estão localizados em `.codecomfy/runs/`.
 
 ### Cancelar
 
-Execute `CodeComfy: Cancel Generation` a partir da Paleta de comandos ou clique no item da barra de status enquanto uma geração estiver em andamento.
+Execute `CodeComfy: Cancel Generation` a partir da Paleta de Comandos ou clique no item da barra de estado enquanto uma geração estiver em andamento. Isso limpa a fila pendente **e** interrompe o trabalho em execução — portanto, cancelar não apenas inicia o próximo trabalho que você tinha na fila.
+
+### Limpar a fila
+
+`CodeComfy: Clear ComfyUI Queue` cancela todos os trabalhos *pendentes* e deixa o trabalho em execução intacto.
+
+Esta é a versão mais direta de "pausar": a versão principal do ComfyUI tem `/interrupt` (cancelar, sem retomar) e nada mais — não há pausa nem retomada no passo N. Impedir que mais trabalhos comecem é o que realmente pode ser feito.
 
 ## Recursos
 
 - **Seis perfis** — imagem, vídeo, áudio, 3D, inferência e metadados PNG, com 27 fluxos de trabalho de referência verificados.
-- **Pré-verificação** — os nós e modelos ausentes são identificados antes que qualquer coisa seja enviada, para que nenhum tempo da GPU seja gasto em uma execução que não pode ter sucesso.
-- Configurações integradas de imagem e vídeo de alta qualidade — vídeos executados no **Wan 2.2 TI2V-5B** (Apache-2.0, seguro para uso comercial) com **codificação do lado do servidor, sem FFmpeg**.
-- **Configurações de fluxo de trabalho criadas pelo usuário** (NOVO) — coloque qualquer arquivo JSON de fluxo de trabalho do ComfyUI em `.codecomfy/presets/`.
+- **Pré-verificação** — os nós e modelos ausentes são identificados antes que qualquer coisa seja enviada, para que nenhum tempo da GPU seja gasto em uma execução que não pode ser concluída.
+- **Progresso em tempo real** — etapas reais do sampler na barra de status (`Step 12 / 20`), transmitidas pelo WebSocket do ComfyUI. Retorna automaticamente ao modo de consulta.
+- Predefinições integradas de imagem e vídeo de alta qualidade — vídeos executados no **Wan 2.2 TI2V-5B** (Apache-2.0, seguro para uso comercial) com **codificação do lado do servidor, sem FFmpeg**.
+- **Predefinições de fluxo de trabalho criadas pelo usuário** (NOVO) — coloque qualquer arquivo JSON de fluxo de trabalho do ComfyUI em `.codecomfy/presets/`.
 - **Histórico de execução na barra de atividades** (NOVO) — navegue e execute novamente as gerações anteriores.
 - Progresso em tempo real na barra de status.
-- **Notificações de conclusão** (NOVO, opção de desativar) — saiba quando um vídeo lento estiver concluído.
-- Canal de saída estruturado para diagnóstico.
-- Compatível com várias plataformas (prioridade para Windows, macOS + Linux esperado).
+- **Notificações de conclusão** (NOVO, opção para desativar) — saiba quando um vídeo lento for concluído.
+- Canal de saída estruturado para diagnósticos.
+- Multiplataforma (inicialmente para Windows, macOS + Linux previsto).
 
 ## Os seis perfis
 

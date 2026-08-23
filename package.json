@@ -2,7 +2,7 @@
   "name": "codecomfy-vscode",
   "displayName": "CodeComfy — ComfyUI Generation",
   "description": "Drive ComfyUI from VS Code — image, video, audio, 3D, and image understanding. 27 verified workflows, with missing nodes and models named before anything runs.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "mcp-tool-shop",
   "author": {
     "name": "mcp-tool-shop",
@@ -97,6 +97,11 @@
       {
         "command": "codecomfy.readPngWorkflow",
         "title": "Read Workflow from PNG",
+        "category": "CodeComfy"
+      },
+      {
+        "command": "codecomfy.clearQueue",
+        "title": "Clear ComfyUI Queue",
         "category": "CodeComfy"
       }
     ],

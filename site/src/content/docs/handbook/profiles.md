@@ -164,3 +164,21 @@ npm run kb:sync
 ```
 
 `npm run kb:check` fails if the vendored copy has drifted from upstream.
+
+## Progress, cancelling, and the queue
+
+**Live progress.** CodeComfy opens ComfyUI's WebSocket before submitting, so
+the status bar shows real sampler steps (`Step 12 / 20 (60%)`) rather than a
+single static message. If your VS Code build has no WebSocket, or the socket
+drops mid-run, CodeComfy falls back to polling automatically — outputs are
+unaffected either way, because the socket is only ever an optimisation.
+
+**Cancel** (`CodeComfy: Cancel Generation`) clears the pending queue *and*
+interrupts the running job. The order matters: `/interrupt` on its own aborts
+only what is running, and the server immediately promotes the next pending
+item — which is why cancelling used to look like it started the next job.
+
+**Clear queue** (`CodeComfy: Clear ComfyUI Queue`) drops pending work and
+leaves the running job alone. This is the honest version of "pause": mainline
+ComfyUI has no pause primitive and no resume-at-step-N, so stopping more work
+from starting is the part that can genuinely be done.

@@ -33,6 +33,7 @@ export const config: SiteConfig = {
         { title: 'Six Profiles', desc: 'Image, Video, Audio, 3D, Inference, and Metadata — from one command. Pick a profile, pick a preset, answer only the inputs that preset actually needs.' },
         { title: 'Verified Workflows', desc: 'The 27 reference graphs are vendored from comfy-headless, where every node type is checked against the live ComfyUI catalog. We do not hand-author graphs — a wrong graph runs green and returns nothing.' },
         { title: 'Preflight', desc: 'Nodes checked against /object_info, models against /models. A missing node names its pack, a missing model names its folder — and nothing is submitted, so no GPU time is wasted.' },
+        { title: 'Live Progress', desc: 'Real sampler steps in the status bar over ComfyUI’s WebSocket — not a static “generating…” for the whole run. Falls back to polling automatically; outputs are never affected.' },
         { title: 'FFmpeg Optional', desc: 'Presets ending in CreateVideo → SaveVideo are encoded by the server itself. FFmpeg is only needed for frame-assembly presets.' },
         { title: 'Workspace Workflow', desc: 'Outputs save to .codecomfy/ in your workspace — images, video, audio, meshes, and captions alike. Run metadata and index live there for reproducibility.' },
         { title: 'PNG Provenance', desc: 'Read the workflow ComfyUI embedded in any output PNG, entirely offline. The fastest way to recover exactly what produced an image somebody sent you.' },

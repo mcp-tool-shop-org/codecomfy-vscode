@@ -28,6 +28,7 @@ import {
     RUNS_DIR,
     INDEX_FILENAME,
     INDEX_SCHEMA_VERSION,
+    ProgressDetail,
 } from '../types';
 import { findFfmpeg, assembleVideo, cleanupPartialVideo } from '../engines/ffmpeg';
 import { snapToFrameGrid } from '../engines/workflowInjection';
@@ -74,7 +75,7 @@ export class JobRouter {
     async run(
         input: JobRequestInput,
         preset: Preset,
-        onProgress?: (run: JobRun) => void,
+        onProgress?: (run: JobRun, detail?: ProgressDetail) => void,
         onComplete?: (result: GenerationResult, run: JobRun) => void
     ): Promise<GenerationResult> {
         this.cancelRequested = false;
@@ -135,7 +136,23 @@ export class JobRouter {
         try {
             // Run ComfyUI generation
             this.log.info(`Run ${runId} dispatching to engine "${this.engine.id}"`);
-            const result = await this.engine.generate(request, preset);
+            // Forward the engine's live sampler progress to the UI. The
+            // engine only emits this when the ComfyUI event socket is up; on a
+            // polling fallback nothing arrives and the caller keeps its coarse
+            // status text.
+            const result = await this.engine.generate(
+                request,
+                preset,
+                undefined,
+                (progress) => {
+                    if (!this.currentRun) return;
+                    onProgress?.(this.currentRun, {
+                        phase: 'generating',
+                        stepCurrent: progress.stepCurrent,
+                        stepTotal: progress.stepTotal,
+                    });
+                },
+            );
 
             if (!result.success) {
                 this.log.warn(`Run ${runId} engine returned failure`, result.error);

@@ -90,19 +90,26 @@ I metadati relativi all'esecuzione si trovano in `.codecomfy/runs/`.
 
 ### Annulla
 
-Esegui `CodeComfy: Cancel Generation` dalla tavolozza dei comandi o fai clic sull'elemento della barra di stato mentre è in corso una generazione.
+Esegui `CodeComfy: Cancel Generation` dalla barra dei comandi oppure fai clic sull’elemento della barra di stato mentre è in corso una generazione. In questo modo si svuota la coda in sospeso **e** si interrompe il processo in esecuzione, quindi l’annullamento non avvia semplicemente il successivo elemento presente nella coda.
+
+### Svuota la coda
+
+`CodeComfy: Clear ComfyUI Queue` elimina tutti i processi *in sospeso* e lascia invariato quello in corso.
+
+Questa è la versione più semplice di “pausa”: nella versione principale di ComfyUI è presente `/interrupt` (annulla, senza possibilità di ripresa) e nient’altro: non c’è una funzione di pausa né di ripresa dal passaggio N. L’unica cosa che si può fare è impedire l’avvio di ulteriori processi.
 
 ## Funzionalità
 
 - **Sei profili**: immagine, video, audio, 3D, inferenza e metadati PNG, con 27 flussi di lavoro di riferimento verificati.
-- **Preflight**: i nodi e i modelli mancanti vengono identificati prima dell'invio, in modo da non sprecare tempo della GPU per un'esecuzione che non può avere successo.
-- Impostazioni predefinite integrate per immagini e video di alta qualità: i video vengono eseguiti su **Wan 2.2 TI2V-5B** (licenza Apache-2.0, sicuro per uso commerciale) con **codifica lato server, senza FFmpeg**.
-- **Impostazioni predefinite dei flussi di lavoro create dagli utenti** (NUOVO): inserisci qualsiasi file JSON del flusso di lavoro ComfyUI in `.codecomfy/presets/`.
-- **Cronologia delle esecuzioni nella barra delle attività** (NUOVO): sfoglia e riesegui le generazioni precedenti.
-- Avanzamento in tempo reale nella barra di stato.
-- **Notifiche di completamento** (NUOVO, possibilità di disattivare): ricevi una notifica quando un video lungo è terminato.
+- **Preflight**: i nodi e i modelli mancanti vengono identificati prima dell’invio, in modo da non sprecare tempo di elaborazione sulla GPU per un processo che non può avere successo.
+- **Progresso in tempo reale**: visualizzazione dei passaggi del campionatore nella barra di stato (`Step 12 / 20`), trasmessi tramite WebSocket di ComfyUI. In caso di problemi, si passa automaticamente a una modalità di controllo periodico.
+- Preset integrati per immagini e video ad alta qualità: i video vengono eseguiti su **Wan 2.2 TI2V-5B** (licenza Apache-2.0, sicuro per uso commerciale) con **codifica lato server, senza FFmpeg**.
+- **Preset di flusso di lavoro creati dagli utenti** (NOVITÀ): inserisci qualsiasi file JSON del flusso di lavoro di ComfyUI in `.codecomfy/presets/`.
+- **Cronologia delle esecuzioni nella barra delle attività** (NOVITÀ): sfoglia e riesegui le generazioni precedenti.
+- Progresso in tempo reale nella barra di stato.
+- **Notifiche di completamento** (NOVITÀ, possibilità di disattivazione): ricevi una notifica quando un video lento è terminato.
 - Canale di output strutturato per la diagnostica.
-- Compatibilità multipiattaforma (progettato principalmente per Windows, ma compatibile con macOS e Linux).
+- Compatibile con diverse piattaforme (inizialmente Windows, previsto supporto per macOS e Linux).
 
 ## I sei profili
 
