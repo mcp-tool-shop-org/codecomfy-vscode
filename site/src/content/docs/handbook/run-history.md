@@ -2,7 +2,7 @@
 title: Run History
 description: Browse and re-run past generations from the CodeComfy activity bar view.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 CodeComfy adds a **Run History** tree view to the VS Code activity bar so you can browse, inspect, and re-run past generations without leaving the editor.

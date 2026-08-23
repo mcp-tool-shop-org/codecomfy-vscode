@@ -2,7 +2,7 @@
 title: Configuration
 description: Detailed guide to every CodeComfy setting, path validation, and URL handling.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 This page provides a detailed reference for every CodeComfy configuration option, including how the extension validates settings and what happens when a value is invalid.

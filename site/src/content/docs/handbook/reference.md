@@ -2,7 +2,7 @@
 title: Reference
 description: Generation limits, architecture, troubleshooting, platform support, and security scope.
 sidebar:
-  order: 4
+  order: 7
 ---
 
 This page covers the technical details behind CodeComfy — what the limits are, how the pipeline works, what to do when things go wrong, and what the extension does (and does not) touch on your system.

@@ -2,7 +2,7 @@
 title: User-Authored Presets
 description: Drop any ComfyUI workflow JSON into .codecomfy/presets/ and surface it as a CodeComfy preset.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 CodeComfy ships with two built-in presets (`hq-image` and `hq-video`), but you are not stuck with them. Any ComfyUI workflow JSON you drop into `.codecomfy/presets/` in your workspace becomes a first-class preset that appears in the generation commands.

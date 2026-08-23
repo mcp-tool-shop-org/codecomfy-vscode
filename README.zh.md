@@ -6,17 +6,16 @@
   <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/codecomfy-vscode/readme.png" alt="CodeComfy VSCode" width="400" />
 </p>
 
-[![CI](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml) [![Landing Page](https://img.shields.io/badge/Landing_Page-live-blue)](https://mcp-tool-shop-org.github.io/codecomfy-vscode/)
+<p align="center">
+  <a href="https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml"><img src="https://github.com/mcp-tool-shop-org/codecomfy-vscode/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://mcp-tool-shop-org.github.io/codecomfy-vscode/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page" /></a>
+</p>
 
-* 坐下来，输入提示，让 CodeComfy 完成工作。
+*六种配置。经过验证的工作流程。无需画布。*
 
-无需离开编辑器，即可使用 ComfyUI 生成图像和视频。
-选择一个预设，输入提示，并在状态栏查看进度，CodeComfy
-负责工作流程提交、轮询、帧下载以及 FFmpeg 编解码。
+从您的编辑器驱动 ComfyUI ——图像、视频、音频、3D 网格和图像理解。选择一个配置，回答它提出的问题，并观察状态栏，CodeComfy 会处理提交、轮询、下载和组装。每个已发布的流程都会对照实时 ComfyUI 目录进行验证，并且在提交任何内容之前，会列出缺少的节点或模型。
 
-> **主要面向 Windows，但支持跨平台。** 已在 Windows 10/11 上进行全面测试。
-> 预计 macOS 和 Linux 也能正常运行，请参阅 [已知限制](#known-limitations)。
-> 欢迎贡献代码。
+> **首先支持 Windows，同时对跨平台友好。** 已在 Windows 10/11 上进行了全面测试。预计 macOS 和 Linux 也能正常工作——请参阅[已知限制](#known-limitations)。欢迎提交 PR（拉取请求）。
 
 ---
 
@@ -24,30 +23,30 @@
 
 | 依赖项 | 必需 | 说明 |
 |------------|----------|-------|
-| **ComfyUI** | 是 | CodeComfy 通过其 HTTP API 进行通信，可以运行在本地 (`http://127.0.0.1:8188`) 或远程机器上。 |
-| **FFmpeg**  | 用于视频 | 必须在系统 PATH 中 *或* 通过 `codecomfy.ffmpegPath` 进行配置。 [下载 FFmpeg](https://ffmpeg.org/download.html)。 |
-| **NextGallery** | 可选 | 配套的画廊查看器。生成本身不需要。 |
+| **VS Code** | 是 | `^1.85.0` 或更高版本。该扩展程序使用了 1.85 版本中发布的 `InputBox` 和结构化取消 API；已在 1.85.0 到当前稳定版本上进行了测试。 |
+| **ComfyUI** | 是 | 在本地运行（`http://127.0.0.1:8188`）或在远程机器上运行。CodeComfy 与其 HTTP API 进行通信。 |
+| **FFmpeg**  | 可选 | 仅适用于旧版帧组装预设。已发布的视频预设由 ComfyUI 本身进行编码（`CreateVideo` → `SaveVideo`），因此不需要 FFmpeg。[下载 FFmpeg](https://ffmpeg.org/download.html)。 |
+| **NextGallery** | 可选 | 配套的图库查看器。本身不需要用于生成。 |
 
 ## 安装
 
-### 从 VS Code Marketplace 安装（推荐）
+### 从 VS Code 市场（推荐）
 
-1. 打开**扩展**侧边栏（`Ctrl+Shift+X`）。
-2. 搜索 **CodeComfy**，或访问
-   [Marketplace 页面](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode)。
-3. 点击**安装**，并在提示时重新加载窗口。
+1. 打开“扩展”侧边栏（`Ctrl+Shift+X`）。
+2. 搜索“CodeComfy”，或访问[市场列表](https://marketplace.visualstudio.com/items?itemName=mcp-tool-shop.codecomfy-vscode)。
+3. 点击“安装”，并在提示时重新加载窗口。
 
-### 从 `.vsix` 文件安装（替代方案）
+### 从 `.vsix` 文件（备选）
 
-适用于开发构建或离线安装：
+用于开发版本或离线安装：
 
-1. 从 [发布版本](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases) 下载最新的 `.vsix` 文件。
-2. 在 VS Code 中：**扩展**侧边栏 → `···` 菜单 → **从 VSIX 安装…**
-3. 提示时重新加载窗口。
+1. 从[发布](https://github.com/mcp-tool-shop-org/codecomfy-vscode/releases)下载最新的 `.vsix`。
+2. 在 VS Code 中： “扩展”侧边栏 → `···` 菜单 →“从 VSIX 安装…”
+3. 并在提示时重新加载窗口。
 
 ### 设置
 
-打开 **设置 → 扩展 → CodeComfy**，或将其添加到 `settings.json` 中：
+打开“设置 → 扩展 → CodeComfy”，或添加到 `settings.json`：
 
 ```json
 {
@@ -59,115 +58,157 @@
 }
 ```
 
-| 设置项 | 描述 | 默认值 |
+| 设置 | 描述 | 默认值 |
 |---------|-------------|---------|
 | `codecomfy.comfyuiUrl` | ComfyUI 服务器 URL | `http://127.0.0.1:8188` |
-| `codecomfy.ffmpegPath` | FFmpeg 可执行文件的绝对路径（留空则使用 PATH 查找） | `""` |
-| `codecomfy.autoOpenGalleryOnComplete` | 生成完成后是否自动打开 NextGallery | `true` |
+| `codecomfy.ffmpegPath` | FFmpeg 可执行文件的绝对路径（如果为空，则在 PATH 环境变量中查找） | `""` |
+| `codecomfy.autoOpenGalleryOnComplete` | 生成完成后打开 NextGallery | `true` |
 | `codecomfy.nextGalleryPath` | NextGallery.exe 的绝对路径 | 自动检测 |
-| `codecomfy.defaultNegativePrompt` | 生成过程中默认填充的负面提示 | `""` |
+| `codecomfy.defaultNegativePrompt` | 生成过程中预填充的默认负面提示词 | `""` |
 
 ## 快速入门
 
-1. **启动 ComfyUI** — 确保其正在运行且可访问。
-2. **选择一个命令** — 打开命令面板 (`Ctrl+Shift+P`) 并选择：
-- `CodeComfy: 生成图像 (HQ)` — 单个图像
-- `CodeComfy: 生成视频 (HQ)` — 短视频 (2–8 秒)
-3. **输入提示**，可选地输入 **负面提示**（要避免的内容），以及一个 **种子**，然后查看状态栏。
+1. **启动 ComfyUI**——确保它正在运行且可以访问。
+2. **选择一个命令**——打开“命令面板”（`Ctrl+Shift+P`），然后选择：
+- `CodeComfy: Generate Image (HQ)` —— 单个图像
+- `CodeComfy: Generate Video (HQ)` —— 短视频（2–8 秒）
+3. **输入提示词**，可选地输入**负面提示词**（要避免的内容）和**种子**，然后观察状态栏。
 
-<!-- 屏幕截图：替换为真实的 PNG 文件 — 参见 assets/SCREENSHOTS.md -->
+<!-- Screenshots: replace with real PNGs — see assets/SCREENSHOTS.md -->
 
-**状态栏** 显示实时进度（排队 → 生成 → 完成）。
+**状态栏**显示实时进度（已排队 → 正在生成 → 完成）。
 
-结构化的日志显示在 **CodeComfy** 输出通道中
-(`Ctrl+Shift+U`，然后选择 "CodeComfy")。
+结构化日志会出现在“CodeComfy”输出通道中（`Ctrl+Shift+U`，然后选择“CodeComfy”）。
 
-输出文件保存在工作区根目录下的 `.codecomfy/outputs/` 文件夹中。
-运行元数据保存在 `.codecomfy/runs/` 文件夹中。
+输出保存在工作区根目录的 `.codecomfy/outputs/` 中。运行元数据存储在 `.codecomfy/runs/` 中。
 
 ### 取消
 
-从命令面板中运行 `CodeComfy: 取消生成`，或在生成过程中单击状态栏上的项目。
+从命令面板运行 `CodeComfy: Cancel Generation`，或在生成过程中单击状态栏项目。
+
+## 特性
+
+- **六种配置**——图像、视频、音频、3D、推理和 PNG 元数据，包含 27 个经过验证的参考流程。
+- **预检**——在提交任何内容之前，会检查缺少的节点和模型，因此不会浪费 GPU 时间来运行无法成功的任务。
+- 内置高质量图像 + 视频预设 —— 视频使用 **Wan 2.2 TI2V-5B**（Apache-2.0，商业安全）进行运行，并采用**服务器端编码，无需 FFmpeg**。
+- **用户自定义流程预设**（新功能）——将任何 ComfyUI 流程 JSON 文件放入 `.codecomfy/presets/` 中。
+- **活动栏运行历史记录**（新功能）——浏览和重新运行过去的生成结果。
+- 状态栏中的实时进度。
+- **完成通知**（新功能，可选择禁用）——了解耗时的视频何时完成。
+- 用于诊断的结构化输出通道。
+- 跨平台（首先支持 Windows，预计 macOS + Linux 也将支持）。
+
+## 这六种配置
+
+`CodeComfy: Run… (all profiles)` 遵循 **配置 → 预设 → 输入** 的流程。输入是从所选预设的图表中派生的，因此图像到视频的预设会要求提供源图像，而文本到视频的预设则不需要。
+
+| 配置 | 它做什么 | 预设 |
+|---------|--------------|---------|
+| **Image** | 文本转图像、图像编辑、联合 ControlNet | Qwen txt2img、Qwen 编辑、ControlNet（Qwen / SDXL） |
+| **Video** | 基于真实时间模型的文本和图像到视频 | Hunyuan 1.5 i2v + 720p、Wan 14B、LTX、Mochi |
+| **Audio** | 文本转音乐和人声分离 | ACE-Step 1.5（音乐/小曲/草稿/mp3）、分离 |
+| **3D** | 图像到网格，导出为 GLB | Hunyuan3D-2（草稿/标准/详细） |
+| **Inference** | 字幕、标签、检测、分割、OCR | Florence-2（7 个任务） |
+| **Metadata** | 读取嵌入在 PNG 中的流程 | 仅本地，不需要服务器 |
+
+**在可以成功之前不会提交任何内容。** 每个预设都会针对您的服务器进行预检：其节点会使用 `/object_info/{class}` 进行检查，模型会使用 `/models/{folder}` 进行检查。缺少节点时，会显示提供该节点的包的名称；缺少模型时，会显示文件名和它所属的文件夹——并且不会浪费 GPU 时间来查找。
+
+### 工作流程来自哪里
+
+CodeComfy 不会自行创建工作流图。这 27 个参考工作流是从 [comfy-headless](https://github.com/mcp-tool-shop-org/comfy-headless) 的代码库知识库中提取的，其中每个 `class_type` 都经过验证，以确保与当前的 ComfyUI 目录一致。维护者会使用 `npm run kb:sync` 来更新它们；如果提取的副本发生偏差，`npm run kb:check` 命令将失败。
+
+对该知识库进行第二次手动维护的副本可能会发生偏差，并且工作流图中发生的偏差是不会发出任何提示的——图会正常运行，但不会返回任何结果。
+
+## 视频模型
+
+`CodeComfy: Generate Video (HQ)` 运行 **Wan 2.2 TI2V-5B** 模型，该模型完全基于 ComfyUI 自带的 `video_wan2_2_5B_ti2v` 模板。Wan 2.2 使用 **Apache-2.0** 许可——生成的输出可以用于商业用途。
+
+它需要在您的 ComfyUI 服务器上安装三个文件：
+
+| 文件 | 放置位置 | 下载链接 |
+|------|-----------|----------|
+| `wan2.2_ti2v_5B_fp16.safetensors` | `models/diffusion_models/` | [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors) |
+| `umt5_xxl_fp8_e4m3fn_scaled.safetensors` | `models/text_encoders/` | [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors) |
+| `wan2.2_vae.safetensors` | `models/vae/` | [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/vae/wan2.2_vae.safetensors) |
+
+> **关于 1.2.0 版本之前的版本说明。** 在 v1.0.0 到 v1.1.0 版本中提供的 `hq-video` 预设**不是视频工作流**——它是一个文本到图像的图，该图从一个提示词生成 N 个独立的帧，然后使用 FFmpeg 将它们组合在一起。其中没有涉及任何运动模型，因此输出结果会闪烁而不是移动。这是我们的缺陷，而不是 ComfyUI 的限制，v1.2.0 版本已对其进行了替换。如果您保存了旧视频预设的 `.codecomfy/presets/` 副本，现在它将记录一条警告信息，解释该问题。
 
 ## 生成限制
 
-视频生成会强制执行安全限制，以防止意外耗尽资源：
+为了防止意外耗尽资源，视频生成会强制执行安全限制：
 
 | 参数 | 最小值 | 最大值 |
 |-----------|-----|-----|
 | 时长 | 1 秒 | 15 秒 |
-| FPS | 1   | 60   |
-| 总帧数 (时长 × FPS) | — | 450 |
+| FPS（每秒帧数） | 1   | 60   |
+| 总帧数（时长 × 每秒帧数） | — | 450 |
 
-如果达到限制，请缩短时长或选择具有较低帧率的预设。
+如果达到限制，请减少时长或选择具有较低帧速率的预设。
+
+在提交之前，时间模型中的帧数将向上取整到下一个合法的 `4n + 1` 值（49、53、57……）。ComfyUI 可以接受非网格计数，但该模型无法处理这些值，因此 CodeComfy 会进行调整，而不是直接使用该值。
 
 ## 故障排除
 
-### `[网络]` — 无法连接到 ComfyUI 服务器
+### `[Network]` — 无法连接到 ComfyUI 服务器
 
-- ComfyUI 正在运行吗？请在浏览器中访问 `http://127.0.0.1:8188/system_stats` 进行检查。
-- 如果 ComfyUI 运行在不同的端口或主机上，请更新 `codecomfy.comfyuiUrl`。
-- 防火墙或代理是否阻止了连接？尝试使用 `curl http://127.0.0.1:8188/system_stats` 命令。
+- ComfyUI 是否正在运行？请在浏览器中检查 `http://127.0.0.1:8188/system_stats`。
+- 如果 ComfyUI 使用不同的端口或主机，请更新 `codecomfy.comfyuiUrl`。
+- 防火墙或代理是否阻止了连接？请尝试 `curl http://127.0.0.1:8188/system_stats`。
 
-### `[服务器]` — ComfyUI 返回错误
+### `[Server]` — ComfyUI 返回错误
 
-- 请检查 ComfyUI 的终端/控制台，查看堆栈跟踪信息。
+- 检查 ComfyUI 终端/控制台中的堆栈跟踪信息。
 - 常见原因：缺少模型检查点或自定义节点。
-- 确保您的 ComfyUI 具有预设工作流程所需的节点。
+- 确保您的 ComfyUI 具有预设工作流所需的节点。
 
-### `[API]` — 响应格式错误
+### `[API]` — 响应形状错误
 
-- 您的 ComfyUI 版本可能太旧或太新，不兼容捆绑的预设。
-- 反向代理或 CDN 可能会修改 JSON 响应。
-- 尝试直接访问 `/prompt` 和 `/history` 接口，以检查响应格式。
+- 您的 ComfyUI 版本可能太旧或太新，无法与捆绑的预设兼容。
+- 反向代理或 CDN 可能会破坏 JSON 响应。
+- 尝试直接访问 `/prompt` 和 `/history` 以检查响应形状。
 
 ### `[IO]` — 文件权限或磁盘问题
 
-- 确保您的工作区文件夹具有写入权限。
-- 检查可用磁盘空间——视频帧的下载可能非常大。
-- 在 Windows 上，避免将工作区放在网络驱动器上，以获得最佳性能。
+- 确保您的工作区文件夹可写。
+- 检查可用磁盘空间——视频的帧下载量可能很大。
+- 在 Windows 上，为了获得最佳性能，请避免在网络驱动器上使用工作区。
 
 ### 未找到 FFmpeg
 
-- 安装 FFmpeg，并确保 `ffmpeg.exe` 位于您的系统 PATH 环境变量中。
-- 或者，将 `codecomfy.ffmpegPath` 设置为 **完整的绝对路径**（例如：`C:\ffmpeg\bin\ffmpeg.exe`）。
-- 相对路径和不带扩展名的名称（除了 PATH 环境变量中找到的 `ffmpeg`）将被拒绝，以确保安全性。
+- 安装 FFmpeg 并确保 `ffmpeg.exe` 在您的系统 PATH 中。
+- 或者将 `codecomfy.ffmpegPath` 设置为**完整的绝对路径**（例如，`C:\ffmpeg\bin\ffmpeg.exe`）。
+- 出于安全考虑，相对路径和裸名称（不包括通过 PATH 解析的 `ffmpeg`）将被拒绝。
 
-### "生成任务已在运行中"
+### “生成已在运行”
 
-- 每次只能运行一个生成任务。
-- 取消当前任务 (`CodeComfy: 取消生成`) 或等待其完成。
-- 连续任务之间存在 2 秒的冷却时间。
+一次只能运行一个生成任务。
+取消当前任务（`CodeComfy: Cancel Generation`），或等待其完成。
+连续作业之间有 2 秒的冷却时间。
 
 ### 种子/提示验证
 
-- 种子必须是 0 到 2,147,483,647 之间的整数。
-- 提示必须不为空，且长度最多为 8,000 个字符。
+- 种子必须是介于 0 和 2,147,483,647 之间的整数。
+- 提示不能为空，并且最多为 8,000 个字符。
 
-## 安全与数据范围
+## 安全性和数据范围
 
-- **网络：** 仅连接到用户配置的 ComfyUI URL（默认 `127.0.0.1:8188`）——不进行任何其他出站请求。
-- **文件：** 输出保存到工作区中的 `.codecomfy/outputs/` 和 `.codecomfy/runs/` 文件夹中——不会修改工作区之外的任何文件。
-- **FFmpeg：** 从所有进程中删除了 `shell: true`；路径必须是绝对路径、已存在的路径，并且可执行。
-- **不收集或发送任何遥测数据**——请参阅 [SECURITY.md](SECURITY.md) 了解完整策略。
+- **网络：**仅连接到用户配置的 ComfyUI URL（默认 `127.0.0.1:8188`）——没有其他外部请求
+- **文件：**输出保存到工作区中的 `.codecomfy/outputs/` 和 `.codecomfy/runs/` ——不会触及工作区之外的文件
+- **FFmpeg：**所有进程中都删除了 `shell: true`；路径必须是绝对的、存在的和可执行的
+- 不会收集或发送任何遥测数据——有关完整策略，请参阅 [SECURITY.md](SECURITY.md)
 
 ## 已知限制
 
 | 区域 | 状态 |
 |------|--------|
 | **Windows** | 已完全测试（Windows 10/11）。主要平台。 |
-| **macOS** | 预期适用于图像和视频生成。NextGallery 可能尚未可用。 |
-| **Linux** | 预期适用于图像和视频生成。NextGallery 可能尚未可用。 |
-| **Remote / WSL** | ComfyUI URL 必须能够从运行 VS Code 的主机访问。 |
+| **macOS** | 预计可以用于图像 + 视频生成。NextGallery 可能尚未可用。 |
+| **Linux** | 预计可以用于图像 + 视频生成。NextGallery 可能尚未可用。 |
+| **Remote / WSL** | ComfyUI URL 必须可从运行 VS Code 的主机访问。 |
 
-核心功能（提示 → ComfyUI → 下载 → FFmpeg 组装）
-是跨平台的。Windows 上的唯一特定功能是 NextGallery
-自动检测，如果其他平台无法检测到，则会提示用户在
-设置中指定路径。
+核心功能（提示 → ComfyUI → 下载 → FFmpeg 组装）与平台无关。唯一的 Windows 特定功能是 NextGallery 自动检测，如果无法检测到，它会优雅地回退到“在设置中设置路径”的提示上。
 
-如果遇到与特定平台相关的问题，请
-[提交问题](https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues)
-，并提供您的操作系统、VS Code 版本和 ComfyUI 版本。
+如果您遇到特定于平台的问题，请[提交问题](https://github.com/mcp-tool-shop-org/codecomfy-vscode/issues)，并提供您的操作系统、VS Code 版本和 ComfyUI 版本。
 
 ## 工作原理
 
@@ -192,8 +233,8 @@ FFmpeg        ─── (video only) assemble frames → MP4
 
 ## 许可证
 
-MIT — 详情请参阅 [LICENSE](LICENSE)。
+MIT——有关详细信息，请参阅 [LICENSE](LICENSE)。
 
 ---
 
-由 [MCP Tool Shop](https://mcp-tool-shop.github.io/) 构建。
+由 [MCP Tool Shop](https://mcp-tool-shop.github.io/) 构建

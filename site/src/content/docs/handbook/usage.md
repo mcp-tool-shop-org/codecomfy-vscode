@@ -2,7 +2,7 @@
 title: Usage Guide
 description: Daily workflow patterns, prompt strategies, output management, and run history for CodeComfy.
 sidebar:
-  order: 2
+  order: 3
 ---
 
 This page covers the day-to-day workflows you will use once CodeComfy is installed and connected to your ComfyUI server.
