@@ -83,6 +83,7 @@ import {
     sanitizeComfyFilename,
 } from './comfyValidation';
 import { Logger, createNullLogger } from '../logging/logger';
+import { ApiWorkflow, injectRequest } from './workflowInjection';
 
 /**
  * Structured availability result from `getAvailability()`. The legacy
@@ -156,108 +157,25 @@ export type OnCompleteCallback = (
 ) => void;
 
 /**
- * Context passed to each injector. `id` is the node's key in the workflow
- * JSON object; `title` is the user-authored `_meta.title` if present.
+ * Container extensions that mark a `/history` output entry as a server-encoded
+ * video rather than a still frame. ComfyUI reports both under the same
+ * `images` key, so the extension is the discriminator.
  */
-interface InjectionContext {
-    id: string;
-    title?: string;
-}
+const VIDEO_CONTAINER_EXTENSIONS = /\.(mp4|webm|mkv|mov|avi|m4v)$/i;
 
 /**
- * Declarative map of `class_type → injector` used by `buildWorkflow()`.
- * (FT-018) Refactored out of an inline if/else chain so:
- *   • ci-docs can enumerate supported node types by importing `INJECTABLE_CLASS_TYPES`;
- *   • new node types can be added with one new entry instead of another branch;
- *   • the workflow warning in `buildWorkflow()` has a single source of truth
- *     for "which class_types are auto-injectable".
- *
- * Injectors mutate `inputs` in place and should be defensive: they run only
- * when the node actually has an `inputs` object, and they must tolerate
- * missing fields on the `request.inputs` side.
+ * Re-exported for the handbook and schema generator. The injection contract is
+ * now role-based (see `workflowInjection.ts`), so this list documents the node
+ * types the LEGACY degenerate-graph fallback still matches by name — not the
+ * limit of what can be injected into.
  */
-type NodeInjector = (
-    inputs: Record<string, unknown>,
-    request: JobRequest,
-    ctx: InjectionContext,
-    overrides: WorkflowOverrides,
-) => void;
+export const INJECTABLE_CLASS_TYPES: readonly string[] = Object.freeze([
+    'CLIPTextEncode',
+    'KSampler',
+    'EmptyLatentImage',
+    'CheckpointLoaderSimple',
+]);
 
-const INJECTABLE_NODES: Record<string, NodeInjector> = {
-    CLIPTextEncode: (inputs, request, ctx) => {
-        if (inputs.text === undefined) return;
-        const isNegative =
-            ctx.title?.toLowerCase().includes('negative') || ctx.id.includes('neg');
-        inputs.text = isNegative
-            ? (request.inputs.negative_prompt || '')
-            : request.inputs.prompt;
-    },
-    KSampler: (inputs, request) => {
-        if (request.inputs.seed !== undefined) {
-            inputs.seed = request.inputs.seed;
-        }
-        if (request.inputs.steps !== undefined) {
-            inputs.steps = request.inputs.steps;
-        }
-        if (request.inputs.cfg_scale !== undefined) {
-            inputs.cfg = request.inputs.cfg_scale;
-        }
-    },
-    EmptyLatentImage: (inputs, request) => {
-        if (request.inputs.width !== undefined) {
-            inputs.width = request.inputs.width;
-        }
-        if (request.inputs.height !== undefined) {
-            inputs.height = request.inputs.height;
-        }
-        // For video: batch_size = frame_count
-        if (request.kind === 'video' && request.inputs.frame_count !== undefined) {
-            inputs.batch_size = request.inputs.frame_count;
-        }
-    },
-    CheckpointLoaderSimple: (inputs, _request, _ctx, overrides) => {
-        if (overrides.checkpoint) {
-            inputs.ckpt_name = overrides.checkpoint;
-        }
-    },
-};
-
-/**
- * Ordered list of `class_type` strings that `buildWorkflow()` will auto-inject.
- * Exported so `ci-docs` (or any schema generator) can list the supported
- * node types in the handbook without depending on engine internals.
- *
- * NOTE: `CLIPTextEncode` and `KSampler` are matched by `includes()` in
- * `buildWorkflow()` (to catch variants like `CLIPTextEncodeSDXL` or
- * `KSamplerAdvanced`). The entries below are the canonical keys only.
- */
-export const INJECTABLE_CLASS_TYPES: readonly string[] = Object.freeze(
-    Object.keys(INJECTABLE_NODES),
-);
-
-/**
- * Find the injector whose key matches a node's class_type. `CLIPTextEncode`
- * and `KSampler` use substring match to support SDXL/Advanced variants;
- * others require exact equality.
- */
-function resolveInjector(classType: string | undefined): {
-    key: string;
-    fn: NodeInjector;
-} | null {
-    if (!classType) return null;
-    // Substring-matched keys come first because the original inline code
-    // used `classType?.includes(...)` for these.
-    if (classType.includes('CLIPTextEncode')) {
-        return { key: 'CLIPTextEncode', fn: INJECTABLE_NODES.CLIPTextEncode };
-    }
-    if (classType.includes('KSampler')) {
-        return { key: 'KSampler', fn: INJECTABLE_NODES.KSampler };
-    }
-    if (INJECTABLE_NODES[classType]) {
-        return { key: classType, fn: INJECTABLE_NODES[classType] };
-    }
-    return null;
-}
 
 export class ComfyServerEngine implements IGenerationEngine {
     readonly id = 'comfy-server';
@@ -413,15 +331,27 @@ export class ComfyServerEngine implements IGenerationEngine {
                 return finish({ success: false, artifacts: [], error: 'Generation timed out or failed.' });
             }
 
-            // Collect outputs based on kind
+            // Collect outputs based on kind.
+            //
+            // For video we first look for a server-encoded container. ComfyUI's
+            // core `SaveVideo` node writes its result into `/history` outputs
+            // under the `images` key (verified: `PreviewVideo.as_dict()` returns
+            // `{"images": [...], "animated": (True,)}`), carrying the same
+            // {filename, subfolder, type} triple as a still. When the preset
+            // ends in CreateVideo → SaveVideo the server has already muxed the
+            // clip, so we download it directly and FFmpeg is never invoked.
             const downloadStart = Date.now();
-            const artifacts = request.kind === 'video'
-                ? await this.collectFrames(history, request)
-                : await this.collectImages(history, request);
-            phaseBreakdown.download_ms = Date.now() - downloadStart;
+            let artifacts: Artifact[];
             if (request.kind === 'video') {
-                framesCollected = artifacts.length;
+                artifacts = await this.collectServerVideos(history, request);
+                if (artifacts.length === 0) {
+                    artifacts = await this.collectFrames(history, request);
+                    framesCollected = artifacts.length;
+                }
+            } else {
+                artifacts = await this.collectImages(history, request);
             }
+            phaseBreakdown.download_ms = Date.now() - downloadStart;
 
             if (artifacts.length === 0) {
                 return finish({
@@ -461,78 +391,44 @@ export class ComfyServerEngine implements IGenerationEngine {
     /**
      * Build the workflow JSON object posted to ComfyUI's `/prompt` endpoint.
      *
-     * Rather than an inline if/else chain, per-node injection rules live in
-     * the exported `INJECTABLE_NODES` map (FT-018). Every node in the
-     * preset is walked; matching class_types get their `inputs` mutated
-     * in place, non-matching nodes are left alone.
+     * Injection is role-based: the graph is analysed by following links from
+     * the sampler rather than by matching `class_type` names, so split-stack
+     * models (Flux, Qwen-Image, SD3.5, Wan) and custom-sampling graphs are
+     * handled correctly. See `workflowInjection.ts` for the verified anchors.
      *
-     * Observability (FT-013 + FT-014):
-     *   • `unhandled` → counts each non-injectable class_type; a single
-     *     aggregated WARN is emitted so user-authored workflows with
-     *     custom samplers / LoRA loaders / AnimateDiff nodes don't have
-     *     their prompt/seed silently dropped.
-     *   • If ZERO nodes matched, emit a prominent WARN — the run still
-     *     proceeds (ComfyUI may well handle a hardcoded workflow) but
-     *     the user has a diagnostic line in the output channel to
-     *     explain why their prompt didn't take effect.
+     * Warnings produced by the injector are surfaced to the output channel
+     * verbatim — they name the specific thing that did NOT take effect
+     * (an unresolvable prompt, an ignored negative on a guidance-distilled
+     * graph, a checkpoint override with no CheckpointLoaderSimple to apply
+     * to, or a video preset with no temporal latent).
      */
     private buildWorkflow(preset: Preset, request: JobRequest): Record<string, unknown> | null {
         if (!preset.workflow) {
             return null;
         }
 
-        const workflow = JSON.parse(JSON.stringify(preset.workflow));
+        const workflow = JSON.parse(JSON.stringify(preset.workflow)) as ApiWorkflow;
         const buildLog = this.logger.child('buildWorkflow');
-        const unhandled = new Map<string, number>();
-        let injectionCount = 0;
 
-        for (const nodeId of Object.keys(workflow)) {
-            const node = workflow[nodeId] as Record<string, unknown>;
-            const inputs = node.inputs as Record<string, unknown> | undefined;
-            if (!inputs) continue;
+        const report = injectRequest(workflow, request, this.overrides);
 
-            const classType = node.class_type as string | undefined;
-            const resolved = resolveInjector(classType);
-
-            if (!resolved) {
-                if (classType) {
-                    unhandled.set(classType, (unhandled.get(classType) ?? 0) + 1);
-                }
-                continue;
-            }
-
-            const meta = node._meta as Record<string, unknown> | undefined;
-            const title = meta && typeof meta.title === 'string' ? meta.title : undefined;
-
-            resolved.fn(inputs, request, { id: nodeId, title }, this.overrides);
-            injectionCount++;
+        for (const warning of report.warnings) {
+            buildLog.warn(warning);
         }
 
-        // FT-013: aggregated warning for unhandled node types. We only warn
-        // when the user's workflow contains nodes we don't know how to
-        // inject into — shipped HQ presets are well-understood, so this
-        // path is quiet for the default case.
-        if (unhandled.size > 0) {
-            const summary = Array.from(unhandled.entries())
-                .map(([cls, n]) => `${n} ${cls}`)
-                .join(', ');
+        if (report.injected === 0) {
             buildLog.warn(
-                `Workflow contains non-injectable node types — ${summary}. ` +
-                `If these nodes need prompt/seed/dimensions, edit the workflow JSON directly. ` +
-                `Auto-injected types: ${INJECTABLE_CLASS_TYPES.join(', ')}.`,
+                'No values were injected into this workflow. Your prompt and seed were ' +
+                'not applied — the generation will use whatever is hardcoded in the ' +
+                'workflow JSON. Check that the preset is API-format (ComfyUI → ' +
+                'Workflow → Export (API)), not the plain editor export.',
             );
-        }
-
-        // FT-014: no-injection signal. Fail-softer — let the run proceed
-        // (ComfyUI will either succeed with the hardcoded values or produce
-        // its own error), but make sure the user has a log line explaining
-        // why their prompt/seed didn't take effect if things go sideways.
-        if (injectionCount === 0) {
-            buildLog.warn(
-                'No injection rules matched this workflow. ' +
-                'Your prompt and seed were not applied — the generation may use ' +
-                'whatever values are hardcoded in the workflow JSON. ' +
-                `Auto-injected types: ${INJECTABLE_CLASS_TYPES.join(', ')}.`,
+        } else {
+            buildLog.info(
+                `Injected ${report.injected} value(s); ` +
+                `samplers=${report.analysis.samplerIds.length}, ` +
+                `negative=${report.analysis.supportsNegative ? 'supported' : 'none'}, ` +
+                `latent=${report.analysis.latentHasLength ? 'temporal' : 'image'}`,
             );
         }
 
@@ -685,6 +581,85 @@ export class ComfyServerEngine implements IGenerationEngine {
     // =========================================================================
     // Output Collection
     // =========================================================================
+
+    /**
+     * Collect a video that the SERVER already encoded (CreateVideo → SaveVideo).
+     *
+     * ComfyUI's core video save nodes report their result through the same
+     * `outputs[nodeId].images` array as a still image — `PreviewVideo.as_dict()`
+     * returns `{"images": [...], "animated": (True,)}` — so the only reliable
+     * discriminator available to us after response validation is the container
+     * extension on the filename.
+     *
+     * Returns an empty array when the preset produced frames rather than a
+     * container, in which case the caller falls back to `collectFrames()` +
+     * FFmpeg assembly.
+     */
+    private async collectServerVideos(
+        history: ValidatedHistoryEntry,
+        request: JobRequest,
+    ): Promise<Artifact[]> {
+        const artifacts: Artifact[] = [];
+        const outputDir = path.join(request.workspace_path, CODECOMFY_DIR, OUTPUTS_DIR);
+        const collectLog = this.logger.child('collect/video');
+
+        let index = 0;
+        for (const nodeId of Object.keys(history.outputs)) {
+            const nodeOutput = history.outputs[nodeId];
+            if (!nodeOutput.images) continue;
+
+            for (const item of nodeOutput.images) {
+                if (!VIDEO_CONTAINER_EXTENSIONS.test(item.filename)) continue;
+
+                index++;
+                let safeName: string;
+                try {
+                    safeName = sanitizeComfyFilename(item.filename);
+                } catch (err) {
+                    collectLog.warn(
+                        `Rejected video filename from ComfyUI: ${JSON.stringify(item.filename)}`,
+                        err instanceof Error ? err.message : String(err),
+                    );
+                    continue;
+                }
+
+                // Only create the directory once we know we have something to write.
+                fs.mkdirSync(outputDir, { recursive: true });
+
+                const ext = path.extname(safeName) || '.mp4';
+                const outputFilename =
+                    `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
+                const outputPath = path.join(outputDir, outputFilename);
+
+                const sizeBytes = await this.downloadToFile(
+                    safeName, item.subfolder, item.type, outputPath,
+                    { index, kind: 'video' },
+                );
+                if (sizeBytes === null) continue;
+
+                const relativePath = path.join(CODECOMFY_DIR, OUTPUTS_DIR, outputFilename);
+                artifacts.push({
+                    type: 'video',
+                    path: relativePath.replace(/\\/g, '/'),
+                    size_bytes: sizeBytes,
+                    meta: {
+                        fps: request.inputs.fps,
+                        duration_seconds: request.inputs.duration_seconds,
+                    },
+                    provenance: { seed: request.inputs.seed },
+                });
+            }
+        }
+
+        if (artifacts.length > 0) {
+            collectLog.info(
+                `Server-side encode detected — collected ${artifacts.length} video file(s). ` +
+                'FFmpeg assembly skipped.',
+            );
+        }
+
+        return artifacts;
+    }
 
     /**
      * Collect images for single image generation.
@@ -948,7 +923,7 @@ export class ComfyServerEngine implements IGenerationEngine {
  * "Frame 47/96 download"; for images, just "Image 3 download".
  */
 interface DownloadContext {
-    kind: 'frame' | 'image';
+    kind: 'frame' | 'image' | 'video';
     index: number;
     total?: number;
 }
@@ -960,7 +935,8 @@ function describeDownload(ctx: DownloadContext | undefined, filename: string): s
     if (ctx.kind === 'frame' && typeof ctx.total === 'number') {
         return `Frame ${ctx.index}/${ctx.total} (${filename}) download`;
     }
-    return `${ctx.kind === 'frame' ? 'Frame' : 'Image'} ${ctx.index} (${filename}) download`;
+    const label = ctx.kind === 'frame' ? 'Frame' : ctx.kind === 'video' ? 'Video' : 'Image';
+    return `${label} ${ctx.index} (${filename}) download`;
 }
 
 /**

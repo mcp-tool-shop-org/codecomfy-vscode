@@ -3,7 +3,12 @@
   "title": "CodeComfy Preset",
   "description": "User-authored ComfyUI workflow preset for codecomfy-vscode.",
   "type": "object",
-  "required": ["id", "name", "kind", "defaults"],
+  "required": [
+    "id",
+    "name",
+    "kind",
+    "defaults"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -22,7 +27,10 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["image", "video"],
+      "enum": [
+        "image",
+        "video"
+      ],
       "description": "Generation kind. Determines which command surfaces the preset."
     },
     "defaults": {
@@ -35,12 +43,60 @@
       "description": "ComfyUI workflow JSON (node-id -> node object mapping). Each node has class_type + inputs.",
       "additionalProperties": {
         "type": "object",
-        "required": ["class_type"],
+        "required": [
+          "class_type"
+        ],
         "properties": {
-          "class_type": { "type": "string", "minLength": 1 },
-          "inputs": { "type": "object" }
+          "class_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "inputs": {
+            "type": "object"
+          }
         }
       }
+    },
+    "requires": {
+      "type": "object",
+      "description": "Model files this preset needs on the ComfyUI server. Declarative only — the workflow still carries the real filenames. Used to report a missing model by name, with a download link, before submitting.",
+      "properties": {
+        "note": {
+          "type": "string",
+          "description": "Provenance or licensing note shown in docs and QuickPick detail."
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "input",
+              "file",
+              "folder"
+            ],
+            "properties": {
+              "input": {
+                "type": "string",
+                "description": "Workflow input holding this filename, e.g. unet_name."
+              },
+              "file": {
+                "type": "string",
+                "description": "Exact filename as it appears in the loader dropdown."
+              },
+              "folder": {
+                "type": "string",
+                "description": "ComfyUI models/ subfolder, e.g. diffusion_models."
+              },
+              "url": {
+                "type": "string",
+                "description": "Direct download URL."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

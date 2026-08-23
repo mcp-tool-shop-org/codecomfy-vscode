@@ -9,6 +9,79 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-22
+
+Platform-contract release. Every claim behind these changes was verified
+against **ComfyUI 0.23.0 source** rather than inferred — see
+`docs/comfy-agent-thread.md` for the file/line references behind each one.
+
+### Fixed
+
+- **`Generate Video (HQ)` did not produce video (shipped defect).** Through
+  v1.1.0 the `hq-video` preset was an SDXL text-to-image graph with
+  `EmptyLatentImage.batch_size` set to the frame count, decoded to N PNGs and
+  assembled by FFmpeg. There was **no temporal model anywhere in that graph**,
+  so every frame was generated independently from the same prompt: the output
+  flickered rather than moving. The command has been shipping in that state
+  since v1.0.0 and the defect was ours, not a ComfyUI limitation.
+
+  `hq-video` is now **Wan 2.2 TI2V-5B**, derived verbatim from ComfyUI's own
+  `video_wan2_2_5B_ti2v` template — a real temporal model whose latent takes
+  `length` in frames. Wan 2.2 is Apache-2.0, so output is commercial-safe.
+  **It requires three model files** that are named, with download URLs and
+  target folders, in the preset's new `requires` block and in the README.
+
+- **`codecomfy.defaultCheckpoint` was a silent no-op on most modern models.**
+  The override only ever matched `CheckpointLoaderSimple`, which does not
+  appear in any split-stack graph (Flux, Qwen-Image, SD3.5, Wan, ACE). The
+  setting reported success while changing nothing. It now warns explicitly
+  when a workflow has no checkpoint node to apply to.
+
+- **Positive and negative prompts could be swapped.** Which `CLIPTextEncode`
+  received the negative prompt was decided by looking for the word "negative"
+  in `_meta.title`, or `neg` in the node id. `_meta` is frontend metadata that
+  `/prompt` ignores and that hand-written or programmatically generated graphs
+  may omit entirely, in which case both encoders received the positive prompt.
+
+- **Fractional values could be silently truncated by the server.** ComfyUI
+  coerces INT inputs with `int(val)` rather than rejecting them
+  (`execution.py:970`), so a computed `steps: 30.7` became `30` with no error.
+  All INT-typed injections are now explicitly rounded before submission.
+
+- **Off-grid frame counts.** Temporal latents declare `length` with step 4
+  (Wan/Hunyuan) or 8 (LTX), but `step` is a UI hint — `/prompt` validation
+  enforces only min/max, so ComfyUI neither rejects nor snaps an off-grid
+  value. Frame counts are now snapped up to the next legal `4n + 1` value
+  before submission.
+
+### Added
+
+- **Server-side video encoding — FFmpeg is now optional.** Presets ending in
+  `CreateVideo → SaveVideo` (both core ComfyUI nodes) are muxed by the server.
+  ComfyUI reports the result under the `images` key of `/history` outputs with
+  the same `{filename, subfolder, type}` triple as a still, so the existing
+  download path collects it unchanged. When a server-encoded container is
+  detected, FFmpeg is never invoked. Frame-assembly presets still work exactly
+  as before.
+- **Role-based workflow injection** (`src/engines/workflowInjection.ts`).
+  Runtime values are placed by following links from the sampler rather than by
+  matching `class_type` names, so split-stack and custom-sampling graphs are
+  handled correctly. `SamplerCustomAdvanced` is resolved through its guider;
+  `CFGGuider` receives `cfg`; a `BasicGuider` graph is correctly identified as
+  having no negative-conditioning path at all.
+- **`requires` block on presets** (`schemas/codecomfy-preset.schema.json`) —
+  declares the model files a preset needs, with folder and download URL, so a
+  missing model can be named rather than surfacing as an opaque node error.
+- **21 new tests** covering the injection module (448 total, up from 427).
+
+### Changed
+
+- The negative-prompt value is no longer merged into the positive prompt on
+  guidance-distilled graphs; it is dropped, with a warning naming why.
+- `hq-video` defaults are now 1280×704 @ 24fps, 2s (49 frames), steps 20,
+  cfg 5, `uni_pc`/`simple` — the official template's recipe.
+
+
 ## [1.1.0] - 2026-04-24
 
 This release is the output of a 10-phase dogfood swarm: full health pass

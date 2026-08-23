@@ -170,6 +170,31 @@ export interface Preset {
     defaults: Partial<GenerationInputs>;
     /** ComfyUI workflow JSON template */
     workflow?: Record<string, unknown>;
+    /**
+     * Model files this preset needs on the ComfyUI server, so a missing model
+     * can be reported by name (with a download link) instead of surfacing as
+     * an opaque ComfyUI node error after submission.
+     *
+     * Purely declarative — the workflow still carries the real filenames.
+     */
+    requires?: PresetRequirements;
+}
+
+export interface PresetRequiredModel {
+    /** The workflow input holding this filename, e.g. `unet_name`. */
+    input: string;
+    /** Exact filename as it must appear in the loader's dropdown. */
+    file: string;
+    /** ComfyUI models/ subfolder the file belongs in, e.g. `diffusion_models`. */
+    folder: string;
+    /** Direct download URL, shown in the "model missing" message. */
+    url?: string;
+}
+
+export interface PresetRequirements {
+    /** Free-text provenance/licensing note shown in docs and QuickPick detail. */
+    note?: string;
+    models?: PresetRequiredModel[];
 }
 
 // =============================================================================

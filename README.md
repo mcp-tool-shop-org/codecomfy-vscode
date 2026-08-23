@@ -29,7 +29,7 @@ handles the workflow submission, polling, frame download, and FFmpeg assembly.
 |------------|----------|-------|
 | **VS Code** | Yes | `^1.85.0` or newer. The extension uses the `InputBox` and structured cancellation APIs that shipped with 1.85; tested on 1.85.0 through current stable. |
 | **ComfyUI** | Yes | Running locally (`http://127.0.0.1:8188`) or on a remote machine. CodeComfy talks to its HTTP API. |
-| **FFmpeg**  | For video | Must be on your system PATH *or* configured via `codecomfy.ffmpegPath`. [Download FFmpeg](https://ffmpeg.org/download.html). |
+| **FFmpeg**  | Optional | Only needed for legacy frame-assembly presets. The shipped video preset is encoded by ComfyUI itself (`CreateVideo` → `SaveVideo`), so FFmpeg is **not** required. [Download FFmpeg](https://ffmpeg.org/download.html). |
 | **NextGallery** | Optional | Companion gallery viewer. Not required for generation itself. |
 
 ## Installation
@@ -97,13 +97,36 @@ status bar item while a generation is in progress.
 
 ## Features
 
-- Built-in HQ image + video presets.
+- Built-in HQ image + video presets — video runs on **Wan 2.2 TI2V-5B**
+  (Apache-2.0, commercial-safe) with **server-side encoding, no FFmpeg**.
 - **User-authored workflow presets** (NEW) — drop any ComfyUI workflow JSON in `.codecomfy/presets/`.
 - **Activity-bar run history** (NEW) — browse and re-run past generations.
 - Real-time progress in the status bar.
 - **Completion notifications** (NEW, opt-out) — know when a slow video is done.
 - Structured output channel for diagnostics.
 - Cross-platform (Windows-first, macOS + Linux expected).
+
+## Video models
+
+`CodeComfy: Generate Video (HQ)` runs **Wan 2.2 TI2V-5B**, derived verbatim
+from ComfyUI's own `video_wan2_2_5B_ti2v` template. Wan 2.2 is **Apache-2.0** —
+generated output is commercial-safe.
+
+It needs three files on your ComfyUI server:
+
+| File | Put it in | Download |
+|------|-----------|----------|
+| `wan2.2_ti2v_5B_fp16.safetensors` | `models/diffusion_models/` | [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors) |
+| `umt5_xxl_fp8_e4m3fn_scaled.safetensors` | `models/text_encoders/` | [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors) |
+| `wan2.2_vae.safetensors` | `models/vae/` | [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/vae/wan2.2_vae.safetensors) |
+
+> **Note on versions before 1.2.0.** The `hq-video` preset shipped in v1.0.0
+> through v1.1.0 was **not a video workflow** — it was a text-to-image graph
+> that generated N independent frames from one prompt and assembled them with
+> FFmpeg. There was no motion model involved, so the output flickered instead
+> of moving. That was our defect, not a ComfyUI limitation, and v1.2.0 replaces
+> it. If you have a saved `.codecomfy/presets/` copy of the old video preset,
+> it will now log a warning explaining the problem.
 
 ## Generation Limits
 
@@ -116,6 +139,11 @@ Video generation enforces safety limits to prevent accidental resource exhaustio
 | Total frames (duration × fps) | — | 450 |
 
 If you hit a limit, reduce the duration or choose a preset with a lower frame rate.
+
+Frame counts for temporal models are snapped up to the next legal `4n + 1`
+value (49, 53, 57, …) before submission — ComfyUI accepts off-grid counts
+without complaint but the model does not handle them, so CodeComfy snaps
+rather than letting the value through.
 
 ## Troubleshooting
 

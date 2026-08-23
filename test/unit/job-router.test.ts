@@ -284,10 +284,14 @@ describe('JobRouter', () => {
 
             assert.ok(generateSpy.calledOnce, 'engine.generate should be called once');
             const [request] = generateSpy.firstCall.args as any[];
+            // 30fps x 5s = 150 frames, snapped UP to the next legal `4n + 1`
+            // value (153). Temporal latents (Wan/Hunyuan `length`, step 4)
+            // only accept on-grid counts, and ComfyUI does not snap for us —
+            // `step` is a UI hint and /prompt validation checks only min/max.
             assert.strictEqual(
                 request.inputs.frame_count,
-                Math.ceil(30 * 5),
-                'frame_count should be ceil(fps * duration)',
+                153,
+                'frame_count should be snapped up to the 4n+1 frame grid',
             );
             assert.strictEqual(request.inputs.fps, 30);
             assert.strictEqual(request.inputs.duration_seconds, 5);
@@ -322,7 +326,8 @@ describe('JobRouter', () => {
             const [request] = generateSpy.firstCall.args as any[];
             assert.strictEqual(request.inputs.fps, 12);
             assert.strictEqual(request.inputs.duration_seconds, 6);
-            assert.strictEqual(request.inputs.frame_count, 72);
+            // 12fps x 6s = 72 frames -> snapped up to 73 (4n + 1 grid).
+            assert.strictEqual(request.inputs.frame_count, 73);
         });
     });
 
