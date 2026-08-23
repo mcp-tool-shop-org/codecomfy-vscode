@@ -6,7 +6,17 @@ import { getConfig } from './config';
 import { JobRouter } from './router/jobRouter';
 import { ComfyServerEngine } from './engines/comfyServerEngine';
 import { getPresetRegistry } from './presets/registry';
-import { JobRequestInput, JobRun, Preset } from './types';
+import { GenerationKind, JobRequestInput, JobRun, Preset } from './types';
+import {
+    PROFILES,
+    ProfileId,
+    KbPreset,
+    kbPresetsForProfile,
+    requiredInputs,
+    toEnginePreset,
+} from './profiles/registry';
+import { preflightPreset } from './engines/preflight';
+import { readPngWorkflow } from './profiles/metadata';
 import { parseSeed, validatePrompt } from './validation/inputs';
 import { validateVideoLimits } from './validation/video';
 import { createChannelLogger } from './logging/logger';
@@ -219,6 +229,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('codecomfy.rerunJob', rerunJobCommand),
         // FT-024: Seed a new user preset file from a bundled HQ template
         vscode.commands.registerCommand('codecomfy.newPresetFromHQ', newPresetFromHQCommand),
+        vscode.commands.registerCommand('codecomfy.runProfile', runProfileCommand),
+        vscode.commands.registerCommand('codecomfy.readPngWorkflow', readPngWorkflowCommand),
     );
 
     // FT-022: Run-history TreeView. Registering unconditionally — the
@@ -865,6 +877,196 @@ async function newPresetFromHQCommand(): Promise<void> {
     );
 }
 
+/**
+ * The six-profile entry point.
+ *
+ * Rather than one command per capability, this walks profile → preset →
+ * inputs. The inputs are derived from the placeholder tokens in the chosen
+ * preset's own graph, so an image-to-video preset asks for a source image and
+ * a text-to-video preset does not, without either being special-cased here.
+ */
+async function runProfileCommand(): Promise<void> {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        vscode.window.showWarningMessage('Open a folder or workspace first.');
+        return;
+    }
+    if (!canStartGeneration()) return;
+
+    const workspacePath = workspaceFolders[0].uri.fsPath;
+    const config = getConfig();
+    const logger = createChannelLogger('JobRouter', outputChannel);
+
+    // --- 1. Profile ---
+    const profilePick = await vscode.window.showQuickPick(
+        PROFILES.map((p) => ({
+            label: `$(${p.icon}) ${p.label}`,
+            description: p.description,
+            id: p.id,
+        })),
+        { title: 'CodeComfy — choose a profile', matchOnDescription: true },
+    );
+    if (!profilePick) return;
+    const profileId = profilePick.id as ProfileId;
+
+    // Metadata submits no graph — it reads provenance from a local PNG.
+    if (profileId === 'metadata') {
+        await readPngWorkflowCommand();
+        return;
+    }
+
+    // --- 2. Preset ---
+    const presets = kbPresetsForProfile(profileId);
+    if (presets.length === 0) {
+        vscode.window.showWarningMessage(`No presets available for ${profileId}.`);
+        return;
+    }
+    const presetPick = await vscode.window.showQuickPick(
+        presets.map((p) => ({
+            label: p.name,
+            description: p.requires.packs.length
+                ? `needs: ${p.requires.packs.join(', ')}`
+                : 'core nodes only',
+            detail: p.description,
+            preset: p,
+        })),
+        { title: `CodeComfy — ${profileId} preset`, matchOnDetail: true },
+    );
+    if (!presetPick) return;
+    const preset: KbPreset = presetPick.preset;
+
+    writeCommandHeader(`Run ${preset.name}`, config);
+    outputChannel.show(true);
+
+    const engine = new ComfyServerEngine(config.comfyuiUrl, logger, {
+        checkpoint: config.defaultCheckpoint,
+    });
+
+    // --- 3. Reachability, then preflight ---
+    const health = await ensureComfyReachable(engine, config.comfyuiUrl);
+    if (!health.ok) {
+        vscode.window.showErrorMessage(health.message ?? 'ComfyUI is not reachable.');
+        return;
+    }
+
+    const preflight = await vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: `Checking ${preset.name}...`,
+        },
+        () => preflightPreset(preset, {
+            hasClass: (c) => engine.hasClass(c),
+            listModels: (f) => engine.listModels(f),
+        }),
+    );
+    for (const skip of preflight.skipped) {
+        logger.warn(`Preflight skipped ${skip}`);
+    }
+    if (!preflight.ok) {
+        logger.error(preflight.message);
+        const choice = await vscode.window.showErrorMessage(
+            `${preset.name} is missing requirements on this server.`,
+            'Show details',
+        );
+        if (choice === 'Show details') outputChannel.show(true);
+        return;
+    }
+
+    // --- 4. Inputs, derived from the graph's own placeholders ---
+    const inputs: Record<string, unknown> = {};
+    for (const descriptor of requiredInputs(preset)) {
+        if (descriptor.isFile) {
+            const picked = await vscode.window.showOpenDialog({
+                title: descriptor.label,
+                canSelectMany: false,
+                openLabel: 'Use this file',
+                defaultUri: workspaceFolders[0].uri,
+            });
+            if (!picked || picked.length === 0) return;
+
+            const uploaded = await vscode.window.withProgress(
+                {
+                    location: vscode.ProgressLocation.Notification,
+                    title: 'Uploading to ComfyUI...',
+                },
+                () => engine.uploadFile(picked[0].fsPath),
+            );
+            if (!uploaded) {
+                vscode.window.showErrorMessage(
+                    'Upload to ComfyUI failed — see the CodeComfy output channel.',
+                );
+                return;
+            }
+            inputs[descriptor.field] = uploaded;
+            continue;
+        }
+
+        const value = await vscode.window.showInputBox({
+            title: `${preset.name} — ${descriptor.label}`,
+            prompt: descriptor.optional
+                ? `${descriptor.placeholder} (press Enter to skip)`
+                : descriptor.placeholder,
+            placeHolder: descriptor.placeholder,
+            validateInput: (v) =>
+                !descriptor.optional && !v.trim() ? `${descriptor.label} is required` : null,
+        });
+        if (value === undefined) return;
+        inputs[descriptor.field] = value.trim();
+    }
+
+    // A prompt is the engine's required field even for presets whose graph
+    // never names one (stem separation, plain captioning).
+    if (typeof inputs.prompt !== 'string') inputs.prompt = '';
+
+    // --- 5. Run ---
+    const router = new JobRouter(workspacePath, engine, {
+        ffmpegPath: config.ffmpegPath,
+        logger,
+    });
+    const enginePreset = toEnginePreset(preset) as unknown as Preset;
+    await runGeneration(
+        router,
+        {
+            kind: preset.kind,
+            preset_id: preset.id,
+            inputs: inputs as JobRequestInput['inputs'],
+        },
+        enginePreset,
+        config,
+        preset.kind,
+    );
+}
+
+/**
+ * Metadata profile — read the workflow ComfyUI embedded in a PNG.
+ *
+ * Local-only: nothing is submitted and the server is never contacted.
+ */
+async function readPngWorkflowCommand(): Promise<void> {
+    const picked = await vscode.window.showOpenDialog({
+        title: 'Read workflow from PNG',
+        canSelectMany: false,
+        openLabel: 'Read metadata',
+        filters: { Images: ['png'] },
+    });
+    if (!picked || picked.length === 0) return;
+
+    const result = readPngWorkflow(picked[0].fsPath);
+    if (!result.ok) {
+        vscode.window.showWarningMessage(result.error);
+        return;
+    }
+
+    const doc = await vscode.workspace.openTextDocument({
+        language: 'json',
+        content: JSON.stringify(result.value, null, 2),
+    });
+    await vscode.window.showTextDocument(doc, { preview: false });
+    vscode.window.showInformationMessage(
+        `Read ${result.chunkKeys.join(' + ')} from ${path.basename(picked[0].fsPath)}.`,
+    );
+}
+
 async function cancelGenerationCommand(): Promise<void> {
     if (!currentRouter) {
         vscode.window.showInformationMessage('No generation in progress.');
@@ -893,7 +1095,7 @@ async function runGeneration(
     requestInput: JobRequestInput,
     preset: Preset,
     config: ReturnType<typeof getConfig>,
-    type: 'image' | 'video'
+    type: GenerationKind
 ): Promise<void> {
     /**
      * Frame-level status-bar granularity (UX F-256918-018).

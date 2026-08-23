@@ -97,6 +97,10 @@ status bar item while a generation is in progress.
 
 ## Features
 
+- **Six profiles** — image, video, audio, 3D, inference, and PNG metadata,
+  with 27 verified reference workflows.
+- **Preflight** — missing nodes and models are named before anything is
+  submitted, so no GPU time is spent on a run that cannot succeed.
 - Built-in HQ image + video presets — video runs on **Wan 2.2 TI2V-5B**
   (Apache-2.0, commercial-safe) with **server-side encoding, no FFmpeg**.
 - **User-authored workflow presets** (NEW) — drop any ComfyUI workflow JSON in `.codecomfy/presets/`.
@@ -105,6 +109,38 @@ status bar item while a generation is in progress.
 - **Completion notifications** (NEW, opt-out) — know when a slow video is done.
 - Structured output channel for diagnostics.
 - Cross-platform (Windows-first, macOS + Linux expected).
+
+## The six profiles
+
+`CodeComfy: Run… (all profiles)` walks **profile → preset → inputs**. The inputs
+are derived from the chosen preset's own graph, so an image-to-video preset asks
+for a source image and a text-to-video preset does not.
+
+| Profile | What it does | Presets |
+|---------|--------------|---------|
+| **Image** | Text-to-image, image edit, union ControlNet | Qwen txt2img, Qwen edit, ControlNet (Qwen / SDXL) |
+| **Video** | Text- and image-to-video on real temporal models | Hunyuan 1.5 i2v + 720p, Wan 14B, LTX, Mochi |
+| **Audio** | Text-to-music and stem separation | ACE-Step 1.5 (music / jingle / draft / mp3), separation |
+| **3D** | Image-to-mesh, exported as GLB | Hunyuan3D-2 (draft / standard / detail) |
+| **Inference** | Caption, tag, detect, segment, OCR | Florence-2 (7 tasks) |
+| **Metadata** | Read the workflow embedded in a PNG | local-only, no server needed |
+
+**Nothing is submitted before it can succeed.** Every preset is preflighted
+against your server: its nodes are checked with `/object_info/{class}` and its
+models with `/models/{folder}`. A missing node names the pack that provides it,
+a missing model names the file and the folder it belongs in — and no GPU time
+is spent finding out.
+
+### Where the workflows come from
+
+CodeComfy does not author workflow graphs. The 27 reference workflows are
+vendored from [comfy-headless](https://github.com/mcp-tool-shop-org/comfy-headless)'s
+in-repo knowledge base, where every `class_type` is verified against the live
+ComfyUI catalog. Maintainers refresh them with `npm run kb:sync`; `npm run
+kb:check` fails if the vendored copy has drifted.
+
+A second hand-maintained copy of that knowledge would drift, and drift in a
+workflow graph is silent — the graph runs green and returns nothing.
 
 ## Video models
 
