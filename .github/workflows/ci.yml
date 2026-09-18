@@ -11,6 +11,9 @@ on:
       - 'tsconfig*.json'
       - 'eslint.config.mjs'
       - '.github/workflows/**'
+      - 'site/package.json'
+      - 'site/package-lock.json'
+      - 'site/astro.config.mjs'
   pull_request:
     branches: [main]
     paths:
@@ -21,6 +24,9 @@ on:
       - 'tsconfig*.json'
       - 'eslint.config.mjs'
       - '.github/workflows/**'
+      - 'site/package.json'
+      - 'site/package-lock.json'
+      - 'site/astro.config.mjs'
   workflow_dispatch:
 
 concurrency:
