@@ -1,0 +1,336 @@
+{
+  "authored": [
+    ".github/",
+    "assets/",
+    "docs/",
+    "root",
+    "schemas/",
+    "site/"
+  ],
+  "breaks": [
+    {
+      "doors": 3,
+      "importedBy": [],
+      "importedByTests": [
+        "test"
+      ],
+      "kind": "part",
+      "name": "src",
+      "partLabel": "src"
+    },
+    {
+      "doors": 3,
+      "importedBy": [],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "site",
+      "partLabel": "the site"
+    },
+    {
+      "doors": 2,
+      "importedBy": [],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "root",
+      "partLabel": "the repository root"
+    },
+    {
+      "doors": 2,
+      "importedBy": [],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "scripts",
+      "partLabel": "scripts"
+    },
+    {
+      "doors": 2,
+      "importedBy": [],
+      "importedByTests": [],
+      "kind": "part",
+      "name": "test",
+      "partLabel": "test"
+    }
+  ],
+  "changes": {
+    "first": true
+  },
+  "changesTogether": [
+    {
+      "a": "src/engines/comfyServerEngine.ts",
+      "b": "src/extension.ts",
+      "either": 8,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 6
+    },
+    {
+      "a": "src/engines/comfyServerEngine.ts",
+      "b": "src/types/index.ts",
+      "either": 8,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 5
+    },
+    {
+      "a": "src/extension.ts",
+      "b": "src/types/index.ts",
+      "either": 7,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 4
+    }
+  ],
+  "changesTogetherNote": [
+    "Confidence is low: fewer than 20 source files reach 10 revisions in the window.",
+    "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
+  ],
+  "changesTogetherWithTests": 0,
+  "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571",
+  "defaultBranch": "main",
+  "derived": "9 parts, mostly TypeScript (50 files). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. People install the codecomfy-vscode extension.",
+  "doors": [
+    {
+      "checks": [
+        "eslint.config.mjs",
+        "scripts/",
+        "site/",
+        "src/",
+        "test/"
+      ],
+      "checksCount": 5,
+      "file": ".github/workflows/ci.yml",
+      "id": ".github/workflows/ci.yml",
+      "landings": [],
+      "name": "CI",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "root",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "scripts",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 4
+        },
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 26
+        },
+        {
+          "boundary": "test",
+          "depth": 0,
+          "files": 27
+        }
+      ],
+      "runs": [
+        "test/register-vscode-stub.js"
+      ],
+      "runsCount": 1,
+      "sends": [],
+      "stages": [],
+      "triggers": [
+        "on a pull request touching 11 paths",
+        "on a push to main touching 11 paths",
+        "or by hand"
+      ]
+    },
+    {
+      "checks": [
+        "eslint.config.mjs",
+        "scripts/",
+        "site/",
+        "src/",
+        "test/"
+      ],
+      "checksCount": 5,
+      "file": ".github/workflows/publish.yml",
+      "id": ".github/workflows/publish.yml",
+      "landings": [],
+      "name": "Build and Release",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "root",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "scripts",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 4
+        },
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 26
+        },
+        {
+          "boundary": "test",
+          "depth": 0,
+          "files": 27
+        }
+      ],
+      "runs": [
+        "test/register-vscode-stub.js"
+      ],
+      "runsCount": 1,
+      "sends": [
+        "creates a GitHub release on a tag push",
+        "publishes to the VS Code Marketplace when run by hand"
+      ],
+      "stages": [],
+      "triggers": [
+        "when a tag matching `v*` is pushed",
+        "or by hand"
+      ]
+    },
+    {
+      "checks": [],
+      "checksCount": 0,
+      "file": ".github/workflows/pages.yml",
+      "id": ".github/workflows/pages.yml",
+      "landings": [],
+      "name": "Deploy site to GitHub Pages",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "runs": [
+        "site/astro.config.mjs",
+        "site/src/"
+      ],
+      "runsCount": 2,
+      "sends": [
+        "deploys the site"
+      ],
+      "stages": [],
+      "triggers": [
+        "on a push to main touching 2 paths",
+        "or by hand"
+      ]
+    },
+    {
+      "checks": [],
+      "checksCount": 0,
+      "extension": true,
+      "file": "package.json",
+      "id": "package.json#codecomfy-vscode",
+      "kind": "package",
+      "landings": [],
+      "name": "codecomfy-vscode",
+      "publishedTo": "the VS Code Marketplace",
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 26
+        }
+      ],
+      "runs": [
+        "src/extension.ts"
+      ],
+      "runsCount": 1,
+      "sends": [],
+      "stages": [],
+      "triggers": []
+    }
+  ],
+  "duplicates": [],
+  "duplicatesLead": null,
+  "duplicatesNote": [],
+  "edges": [
+    {
+      "from": "test",
+      "fromTests": true,
+      "to": "src"
+    }
+  ],
+  "generated": [],
+  "generatedAt": "2026-09-24T09:03:59.912Z",
+  "limits": [
+    "1 import site could not be resolved.",
+    "1 file uses syntax the parser cannot read (test/unit/ffmpeg-utils.test.ts), so what it imports is not known.",
+    "4 writes and 8 reads use paths built at run time and are not named here.",
+    "16 writes and 39 reads go to the directory the command is run in, the home directory or a path its caller passes, not to this repository.",
+    "3 commands are built at run time and not followed.",
+    "Statistics confidence is low: fewer than 20 source files reach 10 revisions in the window."
+  ],
+  "mainDoor": ".github/workflows/ci.yml",
+  "partLabels": {
+    ".github": ".github",
+    "assets": "assets",
+    "docs": "docs",
+    "root": "the repository root",
+    "schemas": "schemas",
+    "scripts": "scripts",
+    "site": "the site",
+    "src": "src",
+    "test": "test"
+  },
+  "parts": 9,
+  "readers": [],
+  "repo": "mcp-tool-shop-org/codecomfy-vscode",
+  "sequences": [],
+  "startDoor": ".github/workflows/ci.yml",
+  "startHere": [],
+  "startNote": "CI runs no code this map can follow; it only checks code, so there is no path of files to read in order.",
+  "summary": null,
+  "summaryFrom": null,
+  "testFiles": 30,
+  "testedBy": {
+    "scripts": 0,
+    "src": 21
+  },
+  "unnamedWrites": 4,
+  "unread": [],
+  "unreadFiles": 1,
+  "unreadNote": [],
+  "untested": [
+    {
+      "part": "scripts",
+      "partLabel": "scripts",
+      "testedBy": 0
+    }
+  ],
+  "untestedNote": [],
+  "written": 0
+}

@@ -1,0 +1,2220 @@
+{
+  "boundaries": [
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "59e675c6272ba696c89325529b14fc12f3b1de8437b4f6489bc6d78e0563d509",
+          "path": ".github/workflows/ci.yml"
+        },
+        {
+          "hash": "4eb81eeb113bdba84a09846e4b80ab63d20507cb41935566c110e37f99afe899",
+          "path": ".github/workflows/pages.yml"
+        },
+        {
+          "hash": "21c307b0bc285807e555bfe8442b7b1fb4babb8ceeb43ee66484a9a5db4c98ca",
+          "path": ".github/workflows/publish.yml"
+        }
+      ],
+      "globs": [
+        ".github/**"
+      ],
+      "importConfidence": "full",
+      "name": ".github",
+      "origin": "authored",
+      "role": "config",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "b2b8920b275138c4a455052721646701cadf330866b2024594426d2bbbefe300",
+          "path": "assets/SCREENSHOTS.md"
+        },
+        {
+          "hash": "de37c1c255d7538f15ff5c8a64ebe39a95869c6857acb78cbb4124221b8cad35",
+          "path": "assets/icon.png"
+        },
+        {
+          "hash": "2dac145caf3e3ce22db56a6f9c69c8977eb2acad04bc9988f81fea0c58451c09",
+          "path": "assets/icon.svg"
+        },
+        {
+          "hash": "1020a37478cb18527708e3cbd2941787504885571aa4be1ff78f79b8f170aa9f",
+          "path": "assets/logo.png"
+        },
+        {
+          "hash": "399d32e3274191652a1949712834f30b398a54654b4dcb963c8d29ec7f6abdb0",
+          "path": "assets/screenshot-command-palette.svg"
+        },
+        {
+          "hash": "28f3a747feb19863ec2ee16b23f7bd59fe75dd811c9c8d0d69d3e4e6c153372f",
+          "path": "assets/screenshot-output.svg"
+        },
+        {
+          "hash": "de95f6e5cbc56ba46dfe30dac1082e564cbf3c4e1ccd7f249d37d49375619a34",
+          "path": "assets/screenshot-statusbar.svg"
+        },
+        {
+          "hash": "806d58c844d9b74f1102d8d771c26c41089e13e896a3d999e2ccc0a1ed0a015a",
+          "path": "assets/screenshot-treeview.png"
+        }
+      ],
+      "globs": [
+        "assets/**"
+      ],
+      "importConfidence": "full",
+      "name": "assets",
+      "origin": "authored",
+      "role": "data",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [
+        "docs/index.md"
+      ],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "32b8f276c2865c7992341393e315e20a2b5afd97b53af77afa80e400033bcf23",
+          "path": "docs/comfy-agent-thread.md"
+        },
+        {
+          "hash": "59b31eb891579227fa157f36a8792870033a8f31e24ba5b5c367a5d59b41e76a",
+          "path": "docs/index.md"
+        },
+        {
+          "hash": "764a083d78c8a3f7ea1b9287e6f3de31dcfa1605bcada774e1b77397a2b1564d",
+          "path": "docs/integration-testing.md"
+        }
+      ],
+      "globs": [
+        "docs/**"
+      ],
+      "importConfidence": "full",
+      "name": "docs",
+      "origin": "authored",
+      "role": "docs",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "3a67fcde57892130e66e2b184fb90a47684c0c4a985ba9b7dd517b3abd79d450",
+          "path": ".gitignore"
+        },
+        {
+          "hash": "41d8d91afeb47692a2c9dcc80172823716faffcdc75b23edd7035676d3346653",
+          "path": ".vscodeignore"
+        },
+        {
+          "hash": "3b6c81b06b38e8900e2d505d8a2d604e814be449cb6860a92250d0531e560182",
+          "path": "CHANGELOG.md"
+        },
+        {
+          "hash": "207dd9c6bd8170f9655ca1621350f28286d22f043f28f9335af495ad63b6b7e0",
+          "path": "CLAUDE.md"
+        },
+        {
+          "hash": "014f8aa03d7441a6dcc0701f9dcbbdbc3b0c117a3578612cb80ce4f7a389447f",
+          "path": "CONTRIBUTING.md"
+        },
+        {
+          "hash": "b2c65730665c91bb28c45ca336452b81069f23f932393907e89240e183eb4e0f",
+          "path": "LICENSE"
+        },
+        {
+          "hash": "fdf0405bd07ca3359f082af541d12bd7eab66e8fb4f69ab3c695204af036aa08",
+          "path": "README.es.md"
+        },
+        {
+          "hash": "fdef8d6a0ed07f16319cb4d1042ca04e0608389a7e94e28769ed5bc4ac463a82",
+          "path": "README.fr.md"
+        },
+        {
+          "hash": "422bcc2cf7fd86208c8adadcb0464ef41baba1c92069ccb6f09e13bb0508e3ac",
+          "path": "README.hi.md"
+        },
+        {
+          "hash": "2af0127eda5e4953a08199d0157046f745a8554da1ceb45600dc133035352a29",
+          "path": "README.it.md"
+        },
+        {
+          "hash": "3d8fd01f5140c483a0a4ec6db5ceb3bc3672a1f5f731eab00cc763478366fbbc",
+          "path": "README.ja.md"
+        },
+        {
+          "hash": "19b558c727b09291427bc51070d951b038d4f6af993210afcf76f8feefd80974",
+          "path": "README.md"
+        },
+        {
+          "hash": "554aafe1718cf80ccc8ebc376dd11f9ac98913b31a4f64e584e9242d4cf6d227",
+          "path": "README.pt-BR.md"
+        },
+        {
+          "hash": "3794eaae131ad3e610b6ced08228e0b8c31d4e51af5e87164e4a2b789926e950",
+          "path": "README.zh.md"
+        },
+        {
+          "hash": "644281eeb769e6eebd5c04da4dd97af538d26ba9443d897b44b686d30ccf6fd2",
+          "path": "SCORECARD.md"
+        },
+        {
+          "hash": "ab934fbac1966b26c308afe9ca5d5857570b49d655aa130ce237e38503268abb",
+          "path": "SECURITY.md"
+        },
+        {
+          "hash": "faf62a854780e6eff6379f59d4fc12f37fb84345f95ff7e2a228ea9200364c99",
+          "path": "SHIP_GATE.md"
+        },
+        {
+          "hash": "0db78f5ab73eb42919be2a79e805ed12c5e44e38a0eb43667538e76e5fda5f90",
+          "path": "eslint.config.mjs"
+        },
+        {
+          "hash": "7ce9b072cf4ffa721978b3dc947808f36ad2a7179fe9634a44097d2edee80bd1",
+          "path": "package-lock.json"
+        },
+        {
+          "hash": "9f908f609a076fe4c6f06371c5b71fee6e877842db02c63e132d0fc73e1592ac",
+          "path": "package.json"
+        },
+        {
+          "hash": "ea018a34e3293ef871abc111d97d2e72ec2f220a998ce01886df125d95288892",
+          "path": "tsconfig.json"
+        },
+        {
+          "hash": "d1e31e4864a672d965b237889b9939d0c01a95e527d7a80bb3ee5c2649b2ffda",
+          "path": "tsconfig.test.json"
+        }
+      ],
+      "globs": [
+        "*"
+      ],
+      "importConfidence": "full",
+      "name": "root",
+      "origin": "authored",
+      "role": "config",
+      "testedBy": 1,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "32381c83ca1306c97fa08904cd15b8fd59536911977bcbe4063846f1473fc5d8",
+          "path": "schemas/codecomfy-preset.schema.json"
+        }
+      ],
+      "globs": [
+        "schemas/**"
+      ],
+      "importConfidence": "full",
+      "name": "schemas",
+      "origin": "authored",
+      "role": "data",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 2,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 2,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "7602713bba305712f4d079df205177e1a694c9273a5012cbb53570ae57c2a32f",
+          "path": "scripts/sync-kb.mjs"
+        }
+      ],
+      "globs": [
+        "scripts/**"
+      ],
+      "importConfidence": "full",
+      "name": "scripts",
+      "origin": "authored",
+      "outsideReads": 4,
+      "role": "code",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "38dd6f4cec2ee36d9e053e1ba4b69ca6f8c24d365b5ec7f0ef79a79926552115",
+          "path": "site/astro.config.mjs"
+        },
+        {
+          "hash": "b5578baf42cab82e5e7b451b6992cb929aeb6ff8d02d8e11ab690e6f67fea144",
+          "path": "site/package-lock.json"
+        },
+        {
+          "hash": "cff923d88f356795747a843362ca300b43d09c5715e6356f904b4d5fa06a7fae",
+          "path": "site/package.json"
+        },
+        {
+          "hash": "806d58c844d9b74f1102d8d771c26c41089e13e896a3d999e2ccc0a1ed0a015a",
+          "path": "site/src/assets/screenshot-treeview.png"
+        },
+        {
+          "hash": "6e1b55a028cc33de13853eccf2ef2eb6b8e869085dbe2dc18510ae72396e8cde",
+          "path": "site/src/content.config.ts"
+        },
+        {
+          "hash": "79e7096d206ce915fe805db620bc511b607868cbdc41157de3f8485efa332144",
+          "path": "site/src/content/docs/handbook/beginners.md"
+        },
+        {
+          "hash": "e818cbe59358fa966f7654396df5f3bd18c6d90eb3e04ef087cc08d7967aa1cf",
+          "path": "site/src/content/docs/handbook/configuration.md"
+        },
+        {
+          "hash": "63d1cea7716e9cae82b728b0bba50bd117fab73c2afc5e10e41c51e975b08678",
+          "path": "site/src/content/docs/handbook/getting-started.md"
+        },
+        {
+          "hash": "9e3fbafb1cebb0903cc48c09daed03cebe28f216fc42e6ba6fab9d00ce280d7a",
+          "path": "site/src/content/docs/handbook/index.md"
+        },
+        {
+          "hash": "4fe8b1da96f2b16c81eb152c793bdfd643d1ee580751d887e7b319c16322f862",
+          "path": "site/src/content/docs/handbook/presets.md"
+        },
+        {
+          "hash": "b7f39a674f442703b2071d157c98c2f730d39284dd81c5b964dd073421677f0b",
+          "path": "site/src/content/docs/handbook/profiles.md"
+        },
+        {
+          "hash": "78d74c29fc1d0b57eb55462b6816f7a179ce8ca79f9b5023a50700d7bbe7a317",
+          "path": "site/src/content/docs/handbook/reference.md"
+        },
+        {
+          "hash": "57f774bc0ed71ac83a175654a80e5d9e450878b88a3c23b92967dad177a3ef43",
+          "path": "site/src/content/docs/handbook/run-history.md"
+        },
+        {
+          "hash": "d5098f7f57137962c68c90b380d607761cd1d3a8f454e14fab4b6b657793c4c3",
+          "path": "site/src/content/docs/handbook/usage.md"
+        },
+        {
+          "hash": "a699ad78a6d27d6864ccfe4c3a4a01993aca28ecb4a3d20893f37db9f9b1a522",
+          "path": "site/src/pages/index.astro"
+        },
+        {
+          "hash": "7d368c510282c594ba69f4278154989e1f920b9d7f1d905dcfc9b7c6718bd8cd",
+          "path": "site/src/site-config.ts"
+        },
+        {
+          "hash": "5995279a40a9a63426a93feec129006b261cc7200426a398914d0317722ef19b",
+          "path": "site/src/styles/global.css"
+        },
+        {
+          "hash": "04bf00704f1a83aa9de96fe004f5b4bc1c81efdd6241b746e359639c78fccf36",
+          "path": "site/src/styles/starlight-custom.css"
+        },
+        {
+          "hash": "943169cf59874242f1eabf1cad3bf2ddd80c6629ef8318b7906d1987136bb2e5",
+          "path": "site/tailwind.config.js"
+        },
+        {
+          "hash": "61fc24492db9aef7ec38eb91cfeebaef96155014bb5f22648fd8ed2327c6cae2",
+          "path": "site/tsconfig.json"
+        }
+      ],
+      "globs": [
+        "site/**"
+      ],
+      "importConfidence": "full",
+      "name": "site",
+      "origin": "authored",
+      "role": "site",
+      "testedBy": 0,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 6,
+      "dynamicSpawns": 3,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 2,
+      "entryPoints": [
+        "src/extension.ts"
+      ],
+      "externals": 0,
+      "files": [
+        {
+          "entry": "getConfig",
+          "entryRule": 4,
+          "exports": [
+            "getConfig"
+          ],
+          "hash": "3435b90fc8337301d577d7a50bfabe2161586ee3a52d1687ec6eff67ef172fa1",
+          "importsFiles": [
+            "src/types/index.ts",
+            "src/validation/paths.ts",
+            "src/validation/url.ts"
+          ],
+          "path": "src/config.ts",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 29,
+                  "name": "validateExecutablePath",
+                  "target": {
+                    "file": "src/validation/paths.ts"
+                  }
+                },
+                {
+                  "line": 44,
+                  "name": "validateComfyUrl",
+                  "target": {
+                    "file": "src/validation/url.ts"
+                  }
+                },
+                {
+                  "line": 44,
+                  "name": "comfyuiUrl",
+                  "passed": true,
+                  "target": {
+                    "file": "src/types/index.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "getConfig"
+            }
+          ]
+        },
+        {
+          "exports": [
+            "interpretMessage",
+            "isEventStreamSupported",
+            "toWebSocketUrl"
+          ],
+          "hash": "093c1e12e19a657defadf2d4f248f7a2639420e904131c623e61b0da85856606",
+          "importsFiles": [
+            "src/logging/logger.ts"
+          ],
+          "path": "src/engines/comfyEvents.ts"
+        },
+        {
+          "exports": [
+            "categorizeError",
+            "composeAvailabilityMessage"
+          ],
+          "hash": "00ccca59af07c362abef413fbee269619b9584798b5d91ab3d751915af65b982",
+          "importsFiles": [
+            "src/engines/comfyEvents.ts",
+            "src/engines/comfyValidation.ts",
+            "src/engines/retrieval.ts",
+            "src/engines/workflowInjection.ts",
+            "src/logging/logger.ts",
+            "src/polling/backoff.ts",
+            "src/types/index.ts"
+          ],
+          "path": "src/engines/comfyServerEngine.ts"
+        },
+        {
+          "exports": [
+            "sanitizeComfyFilename",
+            "validateHistoryEntry",
+            "validateHistoryResponse",
+            "validatePromptResponse"
+          ],
+          "hash": "1182254cf16de2d722ee5c4e867aad44623c3fe8684c1c4455133f7547987be6",
+          "path": "src/engines/comfyValidation.ts"
+        },
+        {
+          "exports": [
+            "assembleVideo",
+            "cleanupPartialVideo",
+            "findFfmpeg",
+            "parseFfmpegVersionLine"
+          ],
+          "hash": "038059e5c806150521be0c38e989f757f58aac342ee1737573246ccebf1c31cf",
+          "importsFiles": [
+            "src/logging/logger.ts"
+          ],
+          "path": "src/engines/ffmpeg.ts"
+        },
+        {
+          "entry": "preflightPreset",
+          "entryRule": 4,
+          "exports": [
+            "preflightPreset"
+          ],
+          "hash": "d070b64ce56dd12ad499bb81c1153be31654fb3939a35e4d1056c63b24d04478",
+          "importsFiles": [
+            "src/profiles/registry.ts"
+          ],
+          "path": "src/engines/preflight.ts",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 96,
+                  "name": "hasClass",
+                  "target": null
+                },
+                {
+                  "line": 101,
+                  "name": "packInfo",
+                  "target": {
+                    "file": "src/profiles/registry.ts"
+                  }
+                },
+                {
+                  "line": 123,
+                  "name": "listModels",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "preflightPreset"
+            }
+          ]
+        },
+        {
+          "exports": [
+            "classifyArtifact",
+            "collectOutputs",
+            "defaultExtensionFor",
+            "explainEmptyOutputs",
+            "isFrameSequence"
+          ],
+          "hash": "e87f32ef327b57da5633e30553193ccf40b0c3a3d099a43299cb33d3d7bd01cd",
+          "importsFiles": [
+            "src/engines/comfyValidation.ts"
+          ],
+          "path": "src/engines/retrieval.ts"
+        },
+        {
+          "exports": [
+            "analyzeGraph",
+            "collectModelReferences",
+            "followLink",
+            "injectRequest",
+            "isNodeLink",
+            "snapToFrameGrid",
+            "substitutePlaceholders",
+            "toInt"
+          ],
+          "hash": "db1c9dbf20c398e1d6f8fbc5f425753c4508acf20960e78073a6b43dfb5f4ddb",
+          "importsFiles": [
+            "src/types/index.ts"
+          ],
+          "path": "src/engines/workflowInjection.ts"
+        },
+        {
+          "entry": "activate",
+          "entryRule": 3,
+          "exports": [
+            "activate",
+            "deactivate"
+          ],
+          "hash": "7176091b343f2f3b800872c99142e4766bc273d3c190e844423889e4244f782d",
+          "importsFiles": [
+            "src/config.ts",
+            "src/engines/comfyServerEngine.ts",
+            "src/engines/preflight.ts",
+            "src/logging/logger.ts",
+            "src/presets/registry.ts",
+            "src/profiles/metadata.ts",
+            "src/profiles/registry.ts",
+            "src/router/jobRouter.ts",
+            "src/runHistoryProvider.ts",
+            "src/types/index.ts",
+            "src/validation/inputs.ts",
+            "src/validation/video.ts"
+          ],
+          "path": "src/extension.ts",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 115,
+                  "name": "isAvailable",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "ensureComfyReachable"
+            },
+            {
+              "calls": [
+                {
+                  "line": 196,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 204,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "activate"
+            },
+            {
+              "calls": [
+                {
+                  "line": 293,
+                  "name": "getConfig",
+                  "target": {
+                    "file": "src/config.ts"
+                  }
+                },
+                {
+                  "line": 115,
+                  "name": "isAvailable",
+                  "target": null,
+                  "via": "ensureComfyReachable"
+                },
+                {
+                  "line": 319,
+                  "name": "validatePrompt",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  }
+                },
+                {
+                  "line": 345,
+                  "name": "parseSeed",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  }
+                },
+                {
+                  "line": 352,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                },
+                {
+                  "line": 359,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 1195,
+                  "name": "run",
+                  "target": null,
+                  "via": "runGeneration"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "generateImageHQCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 398,
+                  "name": "getConfig",
+                  "target": {
+                    "file": "src/config.ts"
+                  }
+                },
+                {
+                  "line": 115,
+                  "name": "isAvailable",
+                  "target": null,
+                  "via": "ensureComfyReachable"
+                },
+                {
+                  "line": 420,
+                  "name": "validatePrompt",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  }
+                },
+                {
+                  "line": 446,
+                  "name": "parseSeed",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  }
+                },
+                {
+                  "line": 463,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                },
+                {
+                  "line": 471,
+                  "name": "validateVideoLimits",
+                  "target": {
+                    "file": "src/validation/video.ts"
+                  }
+                },
+                {
+                  "line": 478,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 1195,
+                  "name": "run",
+                  "target": null,
+                  "via": "runGeneration"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "generateVideoHQCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 536,
+                  "name": "getConfig",
+                  "target": {
+                    "file": "src/config.ts"
+                  }
+                },
+                {
+                  "line": 538,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                },
+                {
+                  "line": 115,
+                  "name": "isAvailable",
+                  "target": null,
+                  "via": "ensureComfyReachable"
+                },
+                {
+                  "line": 641,
+                  "name": "validatePrompt",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  },
+                  "via": "promptGenerationInputs"
+                },
+                {
+                  "line": 662,
+                  "name": "parseSeed",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  },
+                  "via": "promptGenerationInputs"
+                },
+                {
+                  "line": 680,
+                  "name": "validateVideoLimits",
+                  "target": {
+                    "file": "src/validation/video.ts"
+                  },
+                  "via": "promptGenerationInputs"
+                },
+                {
+                  "line": 588,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 1195,
+                  "name": "run",
+                  "target": null,
+                  "via": "runGeneration"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "customWorkflowCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 641,
+                  "name": "validatePrompt",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  }
+                },
+                {
+                  "line": 662,
+                  "name": "parseSeed",
+                  "target": {
+                    "file": "src/validation/inputs.ts"
+                  }
+                },
+                {
+                  "line": 680,
+                  "name": "validateVideoLimits",
+                  "target": {
+                    "file": "src/validation/video.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "promptGenerationInputs"
+            },
+            {
+              "calls": [
+                {
+                  "line": 740,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                },
+                {
+                  "line": 749,
+                  "name": "getConfig",
+                  "target": {
+                    "file": "src/config.ts"
+                  }
+                },
+                {
+                  "line": 115,
+                  "name": "isAvailable",
+                  "target": null,
+                  "via": "ensureComfyReachable"
+                },
+                {
+                  "line": 761,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 1195,
+                  "name": "run",
+                  "target": null,
+                  "via": "runGeneration"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "rerunJobCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 825,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                },
+                {
+                  "line": 863,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 864,
+                  "name": "getPresetRegistry",
+                  "target": {
+                    "file": "src/presets/registry.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "newPresetFromHQCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 892,
+                  "name": "getConfig",
+                  "target": {
+                    "file": "src/config.ts"
+                  }
+                },
+                {
+                  "line": 893,
+                  "name": "createChannelLogger",
+                  "target": {
+                    "file": "src/logging/logger.ts"
+                  }
+                },
+                {
+                  "line": 897,
+                  "name": "map",
+                  "target": {
+                    "file": "src/profiles/registry.ts"
+                  }
+                },
+                {
+                  "branch": "profileId === 'metadata'",
+                  "line": 1049,
+                  "name": "readPngWorkflow",
+                  "target": {
+                    "file": "src/profiles/metadata.ts"
+                  },
+                  "via": "readPngWorkflowCommand"
+                },
+                {
+                  "line": 914,
+                  "name": "kbPresetsForProfile",
+                  "target": {
+                    "file": "src/profiles/registry.ts"
+                  }
+                },
+                {
+                  "line": 115,
+                  "name": "isAvailable",
+                  "target": null,
+                  "via": "ensureComfyReachable"
+                },
+                {
+                  "line": 952,
+                  "name": "preflightPreset",
+                  "target": {
+                    "file": "src/engines/preflight.ts"
+                  }
+                },
+                {
+                  "line": 972,
+                  "name": "requiredInputs",
+                  "target": {
+                    "file": "src/profiles/registry.ts"
+                  }
+                },
+                {
+                  "line": 987,
+                  "name": "uploadFile",
+                  "receiver": "ComfyServerEngine",
+                  "target": {
+                    "file": "src/engines/comfyServerEngine.ts"
+                  }
+                },
+                {
+                  "line": 1021,
+                  "name": "toEnginePreset",
+                  "target": {
+                    "file": "src/profiles/registry.ts"
+                  }
+                },
+                {
+                  "line": 1195,
+                  "name": "run",
+                  "target": null,
+                  "via": "runGeneration"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "runProfileCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 1049,
+                  "name": "readPngWorkflow",
+                  "target": {
+                    "file": "src/profiles/metadata.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "readPngWorkflowCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 1076,
+                  "name": "getConfig",
+                  "target": {
+                    "file": "src/config.ts"
+                  }
+                },
+                {
+                  "line": 1079,
+                  "name": "getQueueDepth",
+                  "receiver": "ComfyServerEngine",
+                  "target": {
+                    "file": "src/engines/comfyServerEngine.ts"
+                  }
+                },
+                {
+                  "line": 1104,
+                  "name": "clearQueue",
+                  "receiver": "ComfyServerEngine",
+                  "target": {
+                    "file": "src/engines/comfyServerEngine.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "clearQueueCommand"
+            },
+            {
+              "calls": [
+                {
+                  "line": 1195,
+                  "name": "run",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "runGeneration"
+            }
+          ]
+        },
+        {
+          "hash": "bacab4c026215bea8f82644a316adf4126826e6b6eb1833442ccc66d3c0185da",
+          "path": "src/kb/nodes.json"
+        },
+        {
+          "hash": "71e33d1b6c43d4678bb4b345339e89ea40e94dc2428d07095d9da4b0acfc0704",
+          "path": "src/kb/presets.json"
+        },
+        {
+          "exports": [
+            "createChannelLogger",
+            "createNullLogger"
+          ],
+          "hash": "f9d9d026367d5b190837380804bff493fa486968071d9582c03323c8756c97cb",
+          "path": "src/logging/logger.ts"
+        },
+        {
+          "exports": [
+            "nextDelay"
+          ],
+          "hash": "12f46a4e485bcd363c00d66b60d77a03af02b74463a92637706649f0288c6046",
+          "path": "src/polling/backoff.ts"
+        },
+        {
+          "hash": "58e3904de94261280eb6accaaefb35c68770c75e92cdb3ad67bd4e5114f06d95",
+          "path": "src/presets/hq-image.json"
+        },
+        {
+          "hash": "384759a2bb69e1c9f3d04615b5d3d03e0623787ea289c05de5d2ffd51384bbc4",
+          "path": "src/presets/hq-video.json"
+        },
+        {
+          "exports": [
+            "getPresetRegistry"
+          ],
+          "hash": "0219cdf3cc18686dcdabc0951e136eea79ff6da5a56ea2be25e9ef65d2dcc8bc",
+          "importsFiles": [
+            "src/logging/logger.ts",
+            "src/presets/hq-image.json",
+            "src/presets/hq-video.json",
+            "src/types/index.ts"
+          ],
+          "path": "src/presets/registry.ts"
+        },
+        {
+          "entry": "readPngTextChunks",
+          "entryRule": 4,
+          "exports": [
+            "extractApiGraph",
+            "readPngTextChunks",
+            "readPngWorkflow"
+          ],
+          "hash": "ff38d1619402c541c81b9a72a125db0741aca531ac6e6508c2fd0c8168df6c00",
+          "path": "src/profiles/metadata.ts",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 86,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "branch": "type === 'tEXt'",
+                  "line": 90,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "branch": "type === 'zTXt'",
+                  "line": 95,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "line": 109,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "readPngTextChunks"
+            },
+            {
+              "calls": [
+                {
+                  "line": 86,
+                  "name": "subarray",
+                  "target": null
+                },
+                {
+                  "branch": "type === 'tEXt'",
+                  "line": 90,
+                  "name": "subarray",
+                  "target": null
+                },
+                {
+                  "branch": "type === 'zTXt'",
+                  "line": 95,
+                  "name": "subarray",
+                  "target": null
+                },
+                {
+                  "line": 109,
+                  "name": "subarray",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "parseTextChunk"
+            },
+            {
+              "calls": [
+                {
+                  "line": 86,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "branch": "type === 'tEXt'",
+                  "line": 90,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "branch": "type === 'zTXt'",
+                  "line": 95,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "line": 109,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "readPngWorkflow"
+            },
+            {
+              "calls": [
+                {
+                  "line": 86,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "branch": "type === 'tEXt'",
+                  "line": 90,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "branch": "type === 'zTXt'",
+                  "line": 95,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                },
+                {
+                  "line": 109,
+                  "name": "subarray",
+                  "target": null,
+                  "via": "parseTextChunk"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "extractApiGraph"
+            }
+          ]
+        },
+        {
+          "exports": [
+            "allKbPresets",
+            "findKbPreset",
+            "getProfile",
+            "kbPresetsForProfile",
+            "kbProvenance",
+            "packInfo",
+            "requiredInputs",
+            "toEnginePreset"
+          ],
+          "hash": "02f3dd9bae6936bf770602c36b2b37fd11aca7389403c989ac1c399b22e013bd",
+          "importsFiles": [
+            "src/kb/nodes.json",
+            "src/kb/presets.json",
+            "src/types/index.ts"
+          ],
+          "path": "src/profiles/registry.ts"
+        },
+        {
+          "exports": [
+            "createEmptyIndex",
+            "pruneRuns"
+          ],
+          "hash": "d78c7bd2787636b21db4bb2147772cbfa8055464a423394cf8fc8af0ac5a46bb",
+          "importsFiles": [
+            "src/logging/logger.ts",
+            "src/types/index.ts"
+          ],
+          "path": "src/pruning/pruner.ts"
+        },
+        {
+          "hash": "5c8883133054cbeaa3ed3c365a357882929f4f6cef57354be250b87f43394240",
+          "importsFiles": [
+            "src/engines/ffmpeg.ts",
+            "src/engines/workflowInjection.ts",
+            "src/logging/logger.ts",
+            "src/pruning/pruner.ts",
+            "src/types/index.ts"
+          ],
+          "path": "src/router/jobRouter.ts"
+        },
+        {
+          "hash": "4f3b1dedf2234f3417df6a3e92960ebe826c2d06c00a9b082f96a1f55c489e25",
+          "importsFiles": [
+            "src/types/index.ts"
+          ],
+          "path": "src/runHistoryProvider.ts"
+        },
+        {
+          "hash": "4e87ed8aa70bc827e3bc3e7839a1816038bcd6cffd3479dafe672e98667e2894",
+          "path": "src/types/index.ts"
+        },
+        {
+          "exports": [
+            "parseSeed",
+            "validatePrompt"
+          ],
+          "hash": "7d2fac2d1e6ed993afce92a096554f3df9f4b268e78dd65d0c47a42d399b4019",
+          "path": "src/validation/inputs.ts"
+        },
+        {
+          "exports": [
+            "existsFile",
+            "isAbsolutePath",
+            "looksExecutable",
+            "validateExecutablePath"
+          ],
+          "hash": "958d1b12ebb36e7bf1451e43697d6e3b65d6b2e188f2a7989645ad198c8e74ff",
+          "path": "src/validation/paths.ts"
+        },
+        {
+          "exports": [
+            "validateComfyUrl"
+          ],
+          "hash": "19b07f2214f16781da23000c159b9ba06e82c390ae6ac794001b2b53c09b81e4",
+          "path": "src/validation/url.ts"
+        },
+        {
+          "exports": [
+            "validateVideoLimits"
+          ],
+          "hash": "2d04a07bcbf49bde0495b325719a4e447fbb803b4258254d812ea9dc1d2842a0",
+          "path": "src/validation/video.ts"
+        }
+      ],
+      "globs": [
+        "src/**"
+      ],
+      "importConfidence": "full",
+      "name": "src",
+      "origin": "authored",
+      "outsideReads": 35,
+      "outsideWrites": 16,
+      "role": "code",
+      "testedBy": 21,
+      "unresolvedSites": 0
+    },
+    {
+      "dynamicReads": 0,
+      "dynamicSpawns": 0,
+      "dynamicSpawnsInTests": 0,
+      "dynamicWrites": 0,
+      "entryPoints": [],
+      "externals": 0,
+      "files": [
+        {
+          "hash": "5b0345fb2bbae32d8c698689f5afa518494620cd86938a9edfba5da3ff801eec",
+          "path": "test/fixtures/comfy/README.md"
+        },
+        {
+          "hash": "2dab59e29ef13ad631720cd662f7243ab63fdd2b014fcece9645659dfa801288",
+          "path": "test/fixtures/comfy/hq-image/index.json"
+        },
+        {
+          "exports": [
+            "cleanupTempPaths",
+            "fakeResponse",
+            "makeTempDir",
+            "makeTempFile",
+            "patchModule",
+            "patchModuleMany",
+            "playbackFetch",
+            "registerCleanup",
+            "stubFetch"
+          ],
+          "hash": "c9479316dfabc6ed8988015b8e9de61216389be3c712dc20fc92e31236e297cc",
+          "path": "test/helpers.ts"
+        },
+        {
+          "hash": "36bd5cfd8f73509e2961a8f590075afb433dcbb0a910f5036b79ace84ce8f1ae",
+          "path": "test/register-vscode-stub.js"
+        },
+        {
+          "exports": [
+            "_makeExtensionContext"
+          ],
+          "hash": "4e960a7801004899bbf3b6dfe4c9a91726cc48170578e728c73f1f46035e3498",
+          "path": "test/stubs/vscode.ts"
+        },
+        {
+          "hash": "f386ed57d4f93f9cca96b205c9e037074e197891ae57e34f53f2b84503dff160",
+          "importsFiles": [
+            "src/polling/backoff.ts"
+          ],
+          "path": "test/unit/backoff.test.ts"
+        },
+        {
+          "hash": "18b513a45de65c19cf829ce4e60764cca68dd450e0cb50369b9f0ee3bbe7d1e0",
+          "importsFiles": [
+            "src/engines/comfyEvents.ts",
+            "src/engines/comfyServerEngine.ts"
+          ],
+          "path": "test/unit/comfy-events.test.ts"
+        },
+        {
+          "hash": "bc4ccbe4dd426949cee6470c82f5aa88d2cd463cb4032014a1771f768ba20152",
+          "importsFiles": [
+            "src/engines/comfyServerEngine.ts",
+            "src/engines/comfyValidation.ts",
+            "src/logging/logger.ts",
+            "src/router/jobRouter.ts",
+            "src/types/index.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/comfy-server-engine.test.ts"
+        },
+        {
+          "hash": "68c2cc48343a68659e447b076be3fdd0d9af52416b4234e517534d2b1bd5646e",
+          "importsFiles": [
+            "src/engines/comfyValidation.ts"
+          ],
+          "path": "test/unit/comfy-validation.test.ts"
+        },
+        {
+          "hash": "24d231170459e27f094e72e63fc6acf7338a7499324b28355c251f1afa04ef10",
+          "importsFiles": [
+            "src/config.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/config.test.ts"
+        },
+        {
+          "hash": "a2287f7caf7394a8577e9908aaf889d2d7bb9d83c7e245cec8a8f7398d997c7e",
+          "importsFiles": [
+            "src/engines/comfyServerEngine.ts"
+          ],
+          "path": "test/unit/error-categorization.test.ts"
+        },
+        {
+          "hash": "57b64ef8919a8f7ed46f4d1f77ecc0d46bc0285523c661dedf6307564093a805",
+          "importsFiles": [
+            "src/extension.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/extension.test.ts"
+        },
+        {
+          "hash": "f025eac28e5a80583e2fc5f41d0ae6d4715951d42c45e03cea28ef79cc4f66eb",
+          "parseError": true,
+          "path": "test/unit/ffmpeg-utils.test.ts"
+        },
+        {
+          "hash": "391881bc2004daf0f2c364665e5f2f75c1ab0e09c09596b07b2942ae394ec2b1",
+          "importsFiles": [
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/helpers.test.ts"
+        },
+        {
+          "hash": "d2a0b7005df5792bdc8514e45d25454f7360a2632a88dc74ca2bdc28bf2087ff",
+          "importsFiles": [
+            "src/engines/comfyServerEngine.ts",
+            "src/logging/logger.ts",
+            "src/router/jobRouter.ts",
+            "src/types/index.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/job-router.test.ts"
+        },
+        {
+          "hash": "e1e565a8c708cdca3780a315815451d144bbe2aa2e05fc6bc0aec2d3f41fcff8",
+          "importsFiles": [
+            "src/logging/logger.ts"
+          ],
+          "path": "test/unit/logger.test.ts"
+        },
+        {
+          "hash": "7221e938f1817c0f5094062b0e4b11298e27c5a30b0499b9bedf69e9bd426bd6",
+          "importsFiles": [
+            "src/extension.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/new-preset-command.test.ts"
+        },
+        {
+          "hash": "aefd4a3413047fa17791b154adf3ba5d31c6f310d30cc1780960b24de2b26ff0",
+          "importsFiles": [
+            "src/logging/logger.ts",
+            "src/presets/registry.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/presets-registry.test.ts"
+        },
+        {
+          "hash": "52a0f95ce57ff2f49ad548285df2bc5999470363b41a5aa5a5d4aef675dab71d",
+          "importsFiles": [
+            "src/engines/comfyValidation.ts",
+            "src/engines/preflight.ts",
+            "src/engines/retrieval.ts",
+            "src/profiles/metadata.ts",
+            "src/profiles/registry.ts"
+          ],
+          "path": "test/unit/profiles.test.ts"
+        },
+        {
+          "hash": "d470075b9e6396cef232c15f91183ac4548f51e55d8e31aadbd5c44ebfb65c9e",
+          "importsFiles": [
+            "src/pruning/pruner.ts",
+            "src/types/index.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/pruner.test.ts"
+        },
+        {
+          "hash": "98b4d27647631e27c6bc347d51cfa77f2f852d00891ffdac6706a7663527a2a2",
+          "importsFiles": [
+            "src/engines/comfyValidation.ts"
+          ],
+          "path": "test/unit/sanitize-comfy-filename.test.ts"
+        },
+        {
+          "hash": "bb70ea31b1eb0e47df359c2773f7744ad9f7dc51a4cd9611d34b4e7f9dd0df48",
+          "path": "test/unit/smoke.test.ts"
+        },
+        {
+          "hash": "0732db4b1e8d2181edb0b30b3688651a44d617cd398f69cc80122343973d08ce",
+          "importsFiles": [
+            "src/runHistoryProvider.ts",
+            "src/types/index.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/tree.test.ts"
+        },
+        {
+          "hash": "1b98b221455cf6c805fc01b106c749ec1c5833b5ed66cc0b218b52d5064c35d5",
+          "importsFiles": [
+            "src/types/index.ts"
+          ],
+          "path": "test/unit/types.test.ts"
+        },
+        {
+          "hash": "a49ef208be460f7ef6bf94a01d816bc1d7e93d3ba623f56b1bee4eecaa6dfe8a",
+          "importsFiles": [
+            "src/validation/inputs.ts"
+          ],
+          "path": "test/unit/validation-inputs.test.ts"
+        },
+        {
+          "hash": "57c0e333f0c89b26955a3156c661a45965e2db817568a6c18b1f9ca1d34c0c9a",
+          "importsFiles": [
+            "src/validation/paths.ts",
+            "test/helpers.ts"
+          ],
+          "path": "test/unit/validation-paths.test.ts"
+        },
+        {
+          "hash": "6d6bda01a7820e0417e89abb62f8b1d3766c97aead7ee10f8c5f9304fc385fee",
+          "importsFiles": [
+            "src/validation/url.ts"
+          ],
+          "path": "test/unit/validation-url.test.ts"
+        },
+        {
+          "hash": "0b47c0e255df51cd8ac4d61ae3eb540079c70183db1fde5b6085e00c58354856",
+          "importsFiles": [
+            "src/validation/video.ts"
+          ],
+          "path": "test/unit/validation-video.test.ts"
+        },
+        {
+          "hash": "4dbed747fc0ed0134e5b07f110721196b6be809b621264294cad34d522a425a8",
+          "importsFiles": [
+            "src/engines/workflowInjection.ts",
+            "src/types/index.ts"
+          ],
+          "path": "test/unit/workflow-injection.test.ts"
+        }
+      ],
+      "globs": [
+        "test/**"
+      ],
+      "importConfidence": "full",
+      "name": "test",
+      "origin": "authored",
+      "role": "test",
+      "testedBy": 0,
+      "unresolvedSites": 1
+    }
+  ],
+  "doors": [
+    {
+      "checksCount": 5,
+      "commands": [
+        {
+          "job": "quality-gates",
+          "step": "Atlas check",
+          "text": "npx --yes @dogfood-lab/atlas@1.17.0 check"
+        },
+        {
+          "job": "quality-gates",
+          "step": "Install dependencies",
+          "text": "npm ci --audit=false"
+        },
+        {
+          "job": "quality-gates",
+          "step": "Lint",
+          "text": "npm run lint"
+        },
+        {
+          "job": "quality-gates",
+          "step": "Run tests",
+          "text": "npm test"
+        },
+        {
+          "job": "quality-gates",
+          "step": "Compile (production)",
+          "text": "npm run compile"
+        },
+        {
+          "job": "dep-audit",
+          "step": "Audit production dependencies (fail on HIGH+)",
+          "text": "npm audit --omit=dev --audit-level=high"
+        }
+      ],
+      "elsewhere": [],
+      "file": ".github/workflows/ci.yml",
+      "landings": [],
+      "mentions": [
+        {
+          "job": "quality-gates",
+          "path": "tsconfig.test.json"
+        }
+      ],
+      "name": "CI",
+      "permissions": [],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "root",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "scripts",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 4
+        },
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 26
+        },
+        {
+          "boundary": "test",
+          "depth": 0,
+          "files": 27
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "job": "quality-gates",
+          "matched": true,
+          "path": "eslint.config.mjs",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "quality-gates",
+          "matched": true,
+          "path": "scripts/",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "quality-gates",
+          "matched": true,
+          "path": "site/",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "quality-gates",
+          "matched": true,
+          "path": "src/",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "quality-gates",
+          "matched": true,
+          "path": "test/",
+          "runKind": "checks",
+          "via": "tsc tsconfig.test.json"
+        },
+        {
+          "job": "quality-gates",
+          "path": "test/register-vscode-stub.js",
+          "runKind": "executes"
+        }
+      ],
+      "runsCount": 6,
+      "secrets": [],
+      "sends": {
+        "deploysPages": false,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [
+        {
+          "branches": [
+            "main"
+          ],
+          "event": "pull_request",
+          "paths": [
+            ".github/workflows/**",
+            "atlas/**",
+            "eslint.config.mjs",
+            "package-lock.json",
+            "package.json",
+            "site/astro.config.mjs",
+            "site/package-lock.json",
+            "site/package.json",
+            "src/**",
+            "test/**",
+            "tsconfig*.json"
+          ]
+        },
+        {
+          "branches": [
+            "main"
+          ],
+          "event": "push",
+          "paths": [
+            ".github/workflows/**",
+            "atlas/**",
+            "eslint.config.mjs",
+            "package-lock.json",
+            "package.json",
+            "site/astro.config.mjs",
+            "site/package-lock.json",
+            "site/package.json",
+            "src/**",
+            "test/**",
+            "tsconfig*.json"
+          ]
+        },
+        {
+          "event": "workflow_dispatch"
+        }
+      ],
+      "uses": [
+        "actions/checkout",
+        "actions/setup-node"
+      ],
+      "usesWorkflowToken": false
+    },
+    {
+      "checksCount": 0,
+      "commands": [
+        {
+          "job": "build",
+          "step": "Install site dependencies",
+          "text": "npm ci"
+        },
+        {
+          "job": "build",
+          "step": "Build site",
+          "text": "npm run build"
+        }
+      ],
+      "elsewhere": [],
+      "file": ".github/workflows/pages.yml",
+      "landings": [],
+      "mentions": [],
+      "name": "Deploy site to GitHub Pages",
+      "permissions": [
+        "contents:read",
+        "id-token:write",
+        "pages:write"
+      ],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 3
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "job": "build",
+          "matched": true,
+          "path": "site/astro.config.mjs",
+          "runKind": "executes",
+          "via": "astro build"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "site/src/",
+          "runKind": "executes",
+          "via": "astro build"
+        }
+      ],
+      "runsCount": 2,
+      "secrets": [],
+      "sends": {
+        "deploysPages": true,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [
+        {
+          "branches": [
+            "main"
+          ],
+          "event": "push",
+          "paths": [
+            ".github/workflows/pages.yml",
+            "site/**"
+          ]
+        },
+        {
+          "event": "workflow_dispatch"
+        }
+      ],
+      "uses": [
+        "actions/checkout",
+        "actions/deploy-pages",
+        "actions/setup-node",
+        "actions/upload-pages-artifact"
+      ],
+      "usesWorkflowToken": false
+    },
+    {
+      "checksCount": 5,
+      "commands": [
+        {
+          "job": "build",
+          "step": "Install dependencies",
+          "text": "npm ci"
+        },
+        {
+          "job": "build",
+          "step": "Lint",
+          "text": "npm run lint"
+        },
+        {
+          "job": "build",
+          "step": "Run tests",
+          "text": "npm test"
+        },
+        {
+          "job": "build",
+          "step": "Compile (production)",
+          "text": "npm run compile"
+        },
+        {
+          "job": "build",
+          "step": "Verify tag matches package.json version",
+          "text": "TAG_VERSION=\"${GITHUB_REF#refs/tags/v}\"\nPKG_VERSION=\"$(node -p \"require('./package.json').version\")\"\nif [ \"$TAG_VERSION\" != \"$PKG_VERSION\" ]; then\n  echo \"::error::Tag version (v${TAG_VERSION}) does not match package.json version (${PKG_VERSION})\"\n  exit 1\nfi\necho \"✓ Tag v${TAG_VERSION} matches package.json ${PKG_VERSION}\"\n"
+        },
+        {
+          "job": "build",
+          "step": "Verify CHANGELOG has entry for this version",
+          "text": "PKG_VERSION=\"$(node -p \"require('./package.json').version\")\"\nif ! grep -q \"## \\[${PKG_VERSION}\\]\" CHANGELOG.md; then\n  echo \"::error::CHANGELOG.md has no entry for version ${PKG_VERSION}\"\n  exit 1\nfi\necho \"✓ CHANGELOG.md has entry for [${PKG_VERSION}]\"\n"
+        },
+        {
+          "job": "build",
+          "step": "Package VSIX",
+          "text": "npx vsce package"
+        },
+        {
+          "job": "build",
+          "step": "Get version",
+          "text": "echo \"version=$(node -p \"require('./package.json').version\")\" >> $GITHUB_OUTPUT"
+        },
+        {
+          "job": "build",
+          "step": "Generate SHA256",
+          "text": "sha256sum codecomfy-vscode-${{ steps.version.outputs.version }}.vsix > SHA256SUMS.txt\n"
+        },
+        {
+          "job": "publish_marketplace",
+          "step": "Install dependencies",
+          "text": "npm ci"
+        },
+        {
+          "job": "publish_marketplace",
+          "step": "Package VSIX",
+          "text": "npx vsce package"
+        },
+        {
+          "job": "publish_marketplace",
+          "step": "Publish to VS Code Marketplace",
+          "text": "set -e\necho \"VSCE_PAT length: ${#VSCE_PAT}\"\nnpx --yes vsce verify-pat mcp-tool-shop -p \"$VSCE_PAT\"\nnpx --yes vsce publish -p \"$VSCE_PAT\" || {\n  echo \"\"\n  echo \"Marketplace publish failed (likely 401).\"\n  echo \"If verify-pat passes but publish fails, this is often due to Azure DevOps PAT org-scope quirks.\"\n  echo \"Local workaround: npx vsce publish\"\n  exit 1\n}\n"
+        }
+      ],
+      "elsewhere": [],
+      "file": ".github/workflows/publish.yml",
+      "gated": [
+        {
+          "jobs": [
+            "build"
+          ],
+          "pushes": false,
+          "sends": [
+            "releases"
+          ],
+          "stages": [],
+          "when": {
+            "event": "push",
+            "tags": true
+          }
+        },
+        {
+          "jobs": [
+            "publish_marketplace"
+          ],
+          "pushes": false,
+          "sends": [
+            "publishesTo:vscode-marketplace"
+          ],
+          "stages": [],
+          "when": {
+            "event": "workflow_dispatch"
+          }
+        }
+      ],
+      "landings": [],
+      "mentions": [
+        {
+          "job": "build",
+          "path": "CHANGELOG.md"
+        },
+        {
+          "job": "build",
+          "path": "package.json"
+        },
+        {
+          "job": "build",
+          "path": "tsconfig.test.json"
+        }
+      ],
+      "name": "Build and Release",
+      "permissions": [
+        "contents:write"
+      ],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "root",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "scripts",
+          "depth": 0,
+          "files": 1
+        },
+        {
+          "boundary": "site",
+          "depth": 0,
+          "files": 4
+        },
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 26
+        },
+        {
+          "boundary": "test",
+          "depth": 0,
+          "files": 27
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "job": "build",
+          "matched": true,
+          "path": "eslint.config.mjs",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "scripts/",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "site/",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "src/",
+          "runKind": "checks",
+          "via": "eslint eslint.config.mjs"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "test/",
+          "runKind": "checks",
+          "via": "tsc tsconfig.test.json"
+        },
+        {
+          "job": "build",
+          "path": "test/register-vscode-stub.js",
+          "runKind": "executes"
+        }
+      ],
+      "runsCount": 6,
+      "secrets": [
+        "GITHUB_TOKEN",
+        "VSCE_PAT"
+      ],
+      "sends": {
+        "deploysPages": false,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [
+        {
+          "event": "push",
+          "tags": [
+            "v*"
+          ]
+        },
+        {
+          "event": "workflow_dispatch"
+        }
+      ],
+      "uses": [
+        "actions/checkout",
+        "actions/setup-node",
+        "softprops/action-gh-release"
+      ],
+      "usesWorkflowToken": true
+    },
+    {
+      "checksCount": 0,
+      "commands": [],
+      "elsewhere": [],
+      "entry": "src/extension.ts",
+      "extension": true,
+      "file": "package.json",
+      "kind": "package",
+      "landings": [],
+      "mentions": [],
+      "name": "codecomfy-vscode",
+      "permissions": [],
+      "publishedTo": [
+        "vscode-marketplace"
+      ],
+      "pushes": false,
+      "reach": [
+        {
+          "boundary": "src",
+          "depth": 0,
+          "files": 26
+        }
+      ],
+      "readers": [],
+      "runs": [
+        {
+          "path": "src/extension.ts",
+          "runKind": "executes"
+        }
+      ],
+      "runsCount": 1,
+      "secrets": [],
+      "sends": {
+        "deploysPages": false,
+        "dispatchesTo": [],
+        "opensIssues": false,
+        "opensIssuesOnFailure": false,
+        "opensPullRequests": false,
+        "publishes": false,
+        "publishesTo": [],
+        "releases": false
+      },
+      "stages": [],
+      "triggers": [],
+      "uses": [],
+      "usesWorkflowToken": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "test",
+      "fromTests": true,
+      "kind": "file",
+      "to": "src"
+    }
+  ],
+  "generatedFrom": {
+    "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571",
+    "tracked": 113
+  },
+  "landings": [
+    {
+      "readers": [
+        {
+          "by": ".github/workflows/publish.yml"
+        }
+      ],
+      "target": "CHANGELOG.md",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": ".github/workflows/publish.yml"
+        }
+      ],
+      "target": "package.json",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "site/astro.config.mjs",
+          "call": "content-collection",
+          "confidence": "ast"
+        }
+      ],
+      "target": "site/src/content/docs",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "site/astro.config.mjs",
+          "call": "autogenerate",
+          "confidence": "ast"
+        }
+      ],
+      "target": "site/src/content/docs/handbook",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "scripts/sync-kb.mjs",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/kb",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "scripts/sync-kb.mjs",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/kb/nodes.json",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "scripts/sync-kb.mjs",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "src/kb/presets.json",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "eslint.config.mjs",
+          "call": "literal",
+          "confidence": "ast"
+        }
+      ],
+      "target": "test/register-vscode-stub.js",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": ".github/workflows/ci.yml"
+        },
+        {
+          "by": ".github/workflows/publish.yml"
+        }
+      ],
+      "target": "tsconfig.test.json",
+      "writers": []
+    }
+  ],
+  "overlaps": [],
+  "submodules": [],
+  "symlinks": [],
+  "testFiles": 30,
+  "unassigned": []
+}

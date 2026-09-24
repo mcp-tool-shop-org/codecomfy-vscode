@@ -11,6 +11,7 @@ on:
       - 'tsconfig*.json'
       - 'eslint.config.mjs'
       - '.github/workflows/**'
+      - 'atlas/**'
       - 'site/package.json'
       - 'site/package-lock.json'
       - 'site/astro.config.mjs'
@@ -24,6 +25,7 @@ on:
       - 'tsconfig*.json'
       - 'eslint.config.mjs'
       - '.github/workflows/**'
+      - 'atlas/**'
       - 'site/package.json'
       - 'site/package-lock.json'
       - 'site/astro.config.mjs'
@@ -38,6 +40,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Atlas requires Node 22 or later, and this job tests on Node 20, so the
+      # check gets its own Node 22 first; the setup-node step after it puts 20
+      # back in front for everything the job tests.
+      - name: Set up Node for the Atlas check
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+
+      - name: Atlas check
+        run: npx --yes @dogfood-lab/atlas@1.17.0 check
 
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
