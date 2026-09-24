@@ -27,3 +27,4 @@ RELEASE_NOTES_v*.md
 dist-release/**
 CONTRIBUTING.md
 site/**
+atlas/**
