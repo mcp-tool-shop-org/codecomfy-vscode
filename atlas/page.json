@@ -49,10 +49,102 @@
       "kind": "part",
       "name": "test",
       "partLabel": "test"
+    },
+    {
+      "kind": "place",
+      "readers": [
+        "scripts",
+        "src"
+      ],
+      "target": "src/kb/nodes.json",
+      "writers": [
+        "scripts"
+      ]
+    },
+    {
+      "kind": "place",
+      "readers": [
+        "scripts",
+        "src"
+      ],
+      "target": "src/kb/presets.json",
+      "writers": [
+        "scripts"
+      ]
     }
   ],
   "changes": {
-    "first": true
+    "fileCounts": {
+      "added": 0,
+      "changed": 109,
+      "moved": 0,
+      "parts": 9,
+      "removed": 0
+    },
+    "items": [
+      {
+        "kind": "door",
+        "sentence": "CI now also runs test/unit/.",
+        "subjects": [
+          ".github/workflows/ci.yml",
+          "test/unit/"
+        ]
+      },
+      {
+        "kind": "door",
+        "sentence": "Build and Release now also runs test/unit/.",
+        "subjects": [
+          ".github/workflows/publish.yml",
+          "test/unit/"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "src/kb/nodes.json is now written by scripts/sync-kb.mjs.",
+        "subjects": [
+          "src/kb/nodes.json",
+          "scripts/sync-kb.mjs"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "src/kb/presets.json is now written by scripts/sync-kb.mjs.",
+        "subjects": [
+          "src/kb/presets.json",
+          "scripts/sync-kb.mjs"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "src/kb/nodes.json is now also read by src/profiles/registry.ts.",
+        "subjects": [
+          "src/kb/nodes.json",
+          "src/profiles/registry.ts"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "And 1 more new writer or reader of a place.",
+        "subjects": []
+      },
+      {
+        "kind": "origin",
+        "sentence": "src was authored and is now mixed.",
+        "subjects": [
+          "src"
+        ]
+      },
+      {
+        "kind": "counts",
+        "sentence": "109 files changed content, across 9 parts.",
+        "subjects": []
+      }
+    ],
+    "since": {
+      "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571",
+      "generatedAt": "2026-09-24T09:03:59.912Z"
+    },
+    "unchanged": false
   },
   "changesTogether": [
     {
@@ -102,23 +194,26 @@
     }
   ],
   "changesTogetherNote": [
-    "Confidence is low: fewer than 20 source files reach 10 revisions in the window.",
-    "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
+    "Confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions.",
+    "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571",
+  "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507",
   "defaultBranch": "main",
-  "derived": "9 parts, mostly TypeScript (50 files). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. People install the codecomfy-vscode extension.",
+  "derived": "9 parts, mostly TypeScript (50 files), JavaScript (5), CSS (2) and Astro (1). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. It deploys a site to GitHub Pages. People install the codecomfy-vscode extension.",
   "doors": [
     {
-      "checks": [
-        "eslint.config.mjs",
-        "scripts/",
-        "site/",
+      "builds": [
         "src/",
         "test/"
       ],
-      "checksCount": 5,
+      "checks": [
+        "eslint.config.mjs",
+        "scripts/",
+        "site/"
+      ],
+      "checksCount": 3,
+      "checksMore": 0,
       "file": ".github/workflows/ci.yml",
       "id": ".github/workflows/ci.yml",
       "landings": [],
@@ -138,7 +233,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 4
+          "files": 6
         },
         {
           "boundary": "src",
@@ -152,26 +247,31 @@
         }
       ],
       "runs": [
-        "test/register-vscode-stub.js"
+        "test/register-vscode-stub.js",
+        "test/unit/"
       ],
-      "runsCount": 1,
+      "runsCount": 2,
+      "runsMore": 0,
       "sends": [],
       "stages": [],
       "triggers": [
-        "on a pull request touching 11 paths",
+        "on a pull request to main touching 11 paths",
         "on a push to main touching 11 paths",
         "or by hand"
       ]
     },
     {
-      "checks": [
-        "eslint.config.mjs",
-        "scripts/",
-        "site/",
+      "builds": [
         "src/",
         "test/"
       ],
-      "checksCount": 5,
+      "checks": [
+        "eslint.config.mjs",
+        "scripts/",
+        "site/"
+      ],
+      "checksCount": 3,
+      "checksMore": 0,
       "file": ".github/workflows/publish.yml",
       "id": ".github/workflows/publish.yml",
       "landings": [],
@@ -191,7 +291,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 4
+          "files": 6
         },
         {
           "boundary": "src",
@@ -205,11 +305,13 @@
         }
       ],
       "runs": [
-        "test/register-vscode-stub.js"
+        "test/register-vscode-stub.js",
+        "test/unit/"
       ],
-      "runsCount": 1,
+      "runsCount": 2,
+      "runsMore": 0,
       "sends": [
-        "creates a GitHub release on a tag push",
+        "creates a GitHub release and uploads SHA256SUMS.txt and files named at run time to the release on a tag push",
         "publishes to the VS Code Marketplace when run by hand"
       ],
       "stages": [],
@@ -221,6 +323,7 @@
     {
       "checks": [],
       "checksCount": 0,
+      "checksMore": 0,
       "file": ".github/workflows/pages.yml",
       "id": ".github/workflows/pages.yml",
       "landings": [],
@@ -230,7 +333,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 3
+          "files": 5
         }
       ],
       "runs": [
@@ -238,6 +341,7 @@
         "site/src/"
       ],
       "runsCount": 2,
+      "runsMore": 0,
       "sends": [
         "deploys the site"
       ],
@@ -250,6 +354,7 @@
     {
       "checks": [],
       "checksCount": 0,
+      "checksMore": 0,
       "extension": true,
       "file": "package.json",
       "id": "package.json#codecomfy-vscode",
@@ -269,6 +374,7 @@
         "src/extension.ts"
       ],
       "runsCount": 1,
+      "runsMore": 0,
       "sends": [],
       "stages": [],
       "triggers": []
@@ -284,15 +390,28 @@
       "to": "src"
     }
   ],
-  "generated": [],
-  "generatedAt": "2026-09-24T09:03:59.912Z",
+  "engine": "1.24.0",
+  "generated": [
+    {
+      "place": "src/kb/nodes.json",
+      "writers": [
+        "scripts/sync-kb.mjs"
+      ]
+    },
+    {
+      "place": "src/kb/presets.json",
+      "writers": [
+        "scripts/sync-kb.mjs"
+      ]
+    }
+  ],
+  "generatedAt": "2026-09-30T20:09:04.350Z",
   "limits": [
-    "1 import site could not be resolved.",
-    "1 file uses syntax the parser cannot read (test/unit/ffmpeg-utils.test.ts), so what it imports is not known.",
-    "4 writes and 8 reads use paths built at run time and are not named here.",
-    "16 writes and 39 reads go to the directory the command is run in, the home directory or a path its caller passes, not to this repository.",
-    "3 commands are built at run time and not followed.",
-    "Statistics confidence is low: fewer than 20 source files reach 10 revisions in the window."
+    "1 import could not be resolved: `test/helpers.ts` imports a path built at run time.",
+    "2 writes and 6 reads use paths built at run time and are not named here.",
+    "16 writes and 39 reads go to a path their caller passes, not to this repository.",
+    "4 commands are built at run time and not followed.",
+    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {
@@ -311,18 +430,22 @@
   "repo": "mcp-tool-shop-org/codecomfy-vscode",
   "sequences": [],
   "startDoor": ".github/workflows/ci.yml",
-  "startHere": [],
-  "startNote": "CI runs no code this map can follow; it only checks code, so there is no path of files to read in order.",
+  "startHere": [
+    ".github/workflows/ci.yml",
+    "src/extension.ts",
+    "src/logging/logger.ts",
+    "src/presets/registry.ts"
+  ],
   "summary": null,
   "summaryFrom": null,
   "testFiles": 30,
   "testedBy": {
     "scripts": 0,
-    "src": 21
+    "src": 22
   },
-  "unnamedWrites": 4,
+  "unnamedWrites": 2,
   "unread": [],
-  "unreadFiles": 1,
+  "unreadFiles": 0,
   "unreadNote": [],
   "untested": [
     {
@@ -332,5 +455,5 @@
     }
   ],
   "untestedNote": [],
-  "written": 0
+  "written": 2
 }

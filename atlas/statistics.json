@@ -131,7 +131,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "src",
-      "qualifyingSourceCommits": 9,
+      "qualifyingSourceCommits": 8,
       "rebaseline": null
     },
     {
@@ -147,7 +147,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "test",
-      "qualifyingSourceCommits": 9,
+      "qualifyingSourceCommits": 8,
       "rebaseline": null
     }
   ],
@@ -155,8 +155,8 @@
     "definition": "commits is how many commits in the window touch the file, including merges and commits dropped from coupling. lines is added plus deleted in those commits.",
     "files": [
       {
-        "commits": 4,
-        "lines": 28,
+        "commits": 6,
+        "lines": 54,
         "path": ".github/workflows/ci.yml"
       },
       {
@@ -175,13 +175,13 @@
         "path": ".gitignore"
       },
       {
-        "commits": 5,
-        "lines": 8,
+        "commits": 7,
+        "lines": 10,
         "path": ".vscodeignore"
       },
       {
-        "commits": 11,
-        "lines": 698,
+        "commits": 10,
+        "lines": 691,
         "path": "CHANGELOG.md"
       },
       {
@@ -220,8 +220,8 @@
         "path": "README.ja.md"
       },
       {
-        "commits": 15,
-        "lines": 228,
+        "commits": 14,
+        "lines": 226,
         "path": "README.md"
       },
       {
@@ -260,6 +260,31 @@
         "path": "assets/screenshot-treeview.png"
       },
       {
+        "commits": 2,
+        "lines": 174,
+        "path": "atlas/README.md"
+      },
+      {
+        "commits": 2,
+        "lines": 76,
+        "path": "atlas/boundaries.yaml"
+      },
+      {
+        "commits": 2,
+        "lines": 672,
+        "path": "atlas/page.json"
+      },
+      {
+        "commits": 2,
+        "lines": 1642,
+        "path": "atlas/statistics.json"
+      },
+      {
+        "commits": 2,
+        "lines": 4440,
+        "path": "atlas/structure.json"
+      },
+      {
         "commits": 4,
         "lines": 322,
         "path": "docs/comfy-agent-thread.md"
@@ -280,8 +305,8 @@
         "path": "package-lock.json"
       },
       {
-        "commits": 13,
-        "lines": 167,
+        "commits": 12,
+        "lines": 165,
         "path": "package.json"
       },
       {
@@ -315,23 +340,13 @@
         "path": "site/src/assets/screenshot-treeview.png"
       },
       {
-        "commits": 1,
-        "lines": 143,
-        "path": "site/src/content/docs/handbook/beginners.md"
-      },
-      {
-        "commits": 4,
-        "lines": 158,
+        "commits": 3,
+        "lines": 36,
         "path": "site/src/content/docs/handbook/configuration.md"
       },
       {
         "commits": 1,
-        "lines": 2,
-        "path": "site/src/content/docs/handbook/getting-started.md"
-      },
-      {
-        "commits": 2,
-        "lines": 49,
+        "lines": 47,
         "path": "site/src/content/docs/handbook/index.md"
       },
       {
@@ -345,8 +360,8 @@
         "path": "site/src/content/docs/handbook/profiles.md"
       },
       {
-        "commits": 2,
-        "lines": 4,
+        "commits": 1,
+        "lines": 2,
         "path": "site/src/content/docs/handbook/reference.md"
       },
       {
@@ -355,8 +370,8 @@
         "path": "site/src/content/docs/handbook/run-history.md"
       },
       {
-        "commits": 3,
-        "lines": 138,
+        "commits": 2,
+        "lines": 4,
         "path": "site/src/content/docs/handbook/usage.md"
       },
       {
@@ -365,8 +380,8 @@
         "path": "site/src/site-config.ts"
       },
       {
-        "commits": 2,
-        "lines": 23,
+        "commits": 1,
+        "lines": 8,
         "path": "src/config.ts"
       },
       {
@@ -458,11 +473,6 @@
         "commits": 8,
         "lines": 226,
         "path": "src/types/index.ts"
-      },
-      {
-        "commits": 1,
-        "lines": 60,
-        "path": "src/validation/url.ts"
       },
       {
         "commits": 1,
@@ -570,8 +580,8 @@
         "path": "test/unit/validation-paths.test.ts"
       },
       {
-        "commits": 2,
-        "lines": 168,
+        "commits": 1,
+        "lines": 87,
         "path": "test/unit/validation-url.test.ts"
       },
       {
@@ -583,19 +593,33 @@
   },
   "confidence": {
     "level": "low",
-    "reason": "fewer than 20 source files reach 10 revisions in the window"
+    "reason": "fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions"
   },
-  "generatedAt": "2026-09-24T09:03:59.912Z",
+  "generatedAt": "2026-09-30T20:09:04.350Z",
   "generatedFrom": {
-    "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571"
+    "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507"
   },
   "pairs": [
     {
       "a": "CHANGELOG.md",
       "b": "package.json",
-      "either": 11,
-      "shared": 7,
-      "strength": 0.636364
+      "either": 10,
+      "shared": 6,
+      "strength": 0.6
+    },
+    {
+      "a": "CHANGELOG.md",
+      "b": "src/engines/comfyServerEngine.ts",
+      "either": 10,
+      "shared": 5,
+      "strength": 0.5
+    },
+    {
+      "a": "CHANGELOG.md",
+      "b": "src/types/index.ts",
+      "either": 8,
+      "shared": 4,
+      "strength": 0.5
     },
     {
       "a": "README.es.md",
@@ -747,16 +771,23 @@
     {
       "a": "package.json",
       "b": "src/engines/comfyServerEngine.ts",
-      "either": 12,
+      "either": 11,
       "shared": 6,
+      "strength": 0.545455
+    },
+    {
+      "a": "package.json",
+      "b": "src/extension.ts",
+      "either": 10,
+      "shared": 5,
       "strength": 0.5
     },
     {
       "a": "package.json",
       "b": "src/types/index.ts",
-      "either": 10,
+      "either": 9,
       "shared": 5,
-      "strength": 0.5
+      "strength": 0.555556
     },
     {
       "a": "src/engines/comfyServerEngine.ts",
@@ -789,17 +820,17 @@
     "fallenShared": 3,
     "floor": "fallen",
     "floorHeld": false,
-    "floorTrigger": "revision-depth",
-    "headDate": "2026-09-17T18:38:12-07:00",
+    "floorTrigger": "both",
+    "headDate": "2026-09-24T02:42:35-07:00",
     "inScopeFiles": 118,
     "pinnedStart": null,
-    "priorFloor": null,
-    "qualifyingCommits": 30,
+    "priorFloor": "fallen",
+    "qualifyingCommits": 29,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-03-22T01:38:12.000Z",
+    "since": "2026-03-28T09:42:35.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",
@@ -809,7 +840,9 @@
       ".tsx",
       ".mts",
       ".cts",
-      ".py"
+      ".py",
+      ".rs",
+      ".gd"
     ],
     "sourceFileReach": 20,
     "sourceFileRise": 25,
