@@ -9,15 +9,15 @@
       "externals": 0,
       "files": [
         {
-          "hash": "59e675c6272ba696c89325529b14fc12f3b1de8437b4f6489bc6d78e0563d509",
+          "hash": "a7ab4c073faf719495f8d1483eaf3804ca02a900df4ab1fd44e91a06b07dc328",
           "path": ".github/workflows/ci.yml"
         },
         {
-          "hash": "4eb81eeb113bdba84a09846e4b80ab63d20507cb41935566c110e37f99afe899",
+          "hash": "93dc62c74dfddae3a1dc3291b236a3e266cc0f9963100f2967357b3f3833b310",
           "path": ".github/workflows/pages.yml"
         },
         {
-          "hash": "21c307b0bc285807e555bfe8442b7b1fb4babb8ceeb43ee66484a9a5db4c98ca",
+          "hash": "eb25977e5c3287ef908133706a837d319f55485a7ba97a8ebbf9828e4dadc1ea",
           "path": ".github/workflows/publish.yml"
         }
       ],
@@ -40,7 +40,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "b2b8920b275138c4a455052721646701cadf330866b2024594426d2bbbefe300",
+          "hash": "e20ca73384f98d55b1b16dfb9f3820ba6b2cc8327eec36a8e53590c8fb39957c",
           "path": "assets/SCREENSHOTS.md"
         },
         {
@@ -48,7 +48,7 @@
           "path": "assets/icon.png"
         },
         {
-          "hash": "2dac145caf3e3ce22db56a6f9c69c8977eb2acad04bc9988f81fea0c58451c09",
+          "hash": "874c3ce3df0a325fe84b3a5a5e3d13ed73b20fe919e7cf5c3aff1009bf34d550",
           "path": "assets/icon.svg"
         },
         {
@@ -56,15 +56,15 @@
           "path": "assets/logo.png"
         },
         {
-          "hash": "399d32e3274191652a1949712834f30b398a54654b4dcb963c8d29ec7f6abdb0",
+          "hash": "cb5ece1a9586d2e0e65b66653508d655abc9ada2cd644ff8b089fd9d22d86b12",
           "path": "assets/screenshot-command-palette.svg"
         },
         {
-          "hash": "28f3a747feb19863ec2ee16b23f7bd59fe75dd811c9c8d0d69d3e4e6c153372f",
+          "hash": "c46cc8656190d371bffbffa04a0d5e0e4a33add6d265eb7b4b0426d396dd067e",
           "path": "assets/screenshot-output.svg"
         },
         {
-          "hash": "de95f6e5cbc56ba46dfe30dac1082e564cbf3c4e1ccd7f249d37d49375619a34",
+          "hash": "b9789db21b99dbc9157c946d235f3c3558f2690c5a479541ea53fe3dda955ff5",
           "path": "assets/screenshot-statusbar.svg"
         },
         {
@@ -93,15 +93,15 @@
       "externals": 0,
       "files": [
         {
-          "hash": "32b8f276c2865c7992341393e315e20a2b5afd97b53af77afa80e400033bcf23",
+          "hash": "8a8ca6bf87e2c3c18c35acb4009e8957ca59b0389d03354b09b4fcf3f88f2b4c",
           "path": "docs/comfy-agent-thread.md"
         },
         {
-          "hash": "59b31eb891579227fa157f36a8792870033a8f31e24ba5b5c367a5d59b41e76a",
+          "hash": "5ce070d9c650a5fa22b8c64032019b8c56caebd6f52fe4a876272dbffb480dbe",
           "path": "docs/index.md"
         },
         {
-          "hash": "764a083d78c8a3f7ea1b9287e6f3de31dcfa1605bcada774e1b77397a2b1564d",
+          "hash": "f989f1b5328ef81cb2b42864564fdc27805ff556dcdfc2b34190bea97ee89a71",
           "path": "docs/integration-testing.md"
         }
       ],
@@ -124,91 +124,91 @@
       "externals": 0,
       "files": [
         {
-          "hash": "3a67fcde57892130e66e2b184fb90a47684c0c4a985ba9b7dd517b3abd79d450",
+          "hash": "f731d21bbde6589909e63a13f52a28ae9bb3fa253cffdf6564bdac16755bc2e5",
           "path": ".gitignore"
         },
         {
-          "hash": "41d8d91afeb47692a2c9dcc80172823716faffcdc75b23edd7035676d3346653",
+          "hash": "23a37468c0da9c47ea00dc96ac562888a245b59e8dc7b3a933cbb70a6e838b4f",
           "path": ".vscodeignore"
         },
         {
-          "hash": "3b6c81b06b38e8900e2d505d8a2d604e814be449cb6860a92250d0531e560182",
+          "hash": "9e96df39e920cb1c7184161f60042ce164f0ad9f8a5005bd4226711e7dd067fc",
           "path": "CHANGELOG.md"
         },
         {
-          "hash": "207dd9c6bd8170f9655ca1621350f28286d22f043f28f9335af495ad63b6b7e0",
+          "hash": "5bee4b674a9119db5c6254a7e40fbaf24455030fb2d2086c064141ff5730ed26",
           "path": "CLAUDE.md"
         },
         {
-          "hash": "014f8aa03d7441a6dcc0701f9dcbbdbc3b0c117a3578612cb80ce4f7a389447f",
+          "hash": "b60b2cedc689d002f3e62d9d0da9f7dcf068a2685a0973ac7953974662d415fc",
           "path": "CONTRIBUTING.md"
         },
         {
-          "hash": "b2c65730665c91bb28c45ca336452b81069f23f932393907e89240e183eb4e0f",
+          "hash": "7334db9435ad4f48835c4da800904b9e177a1eefdd6bb61d8ce5b0ab00932c0f",
           "path": "LICENSE"
         },
         {
-          "hash": "fdf0405bd07ca3359f082af541d12bd7eab66e8fb4f69ab3c695204af036aa08",
+          "hash": "950efb9d8972e5a4f69e3f78c772fd442f5b2b49fe8d58afdbd2341ef64b061d",
           "path": "README.es.md"
         },
         {
-          "hash": "fdef8d6a0ed07f16319cb4d1042ca04e0608389a7e94e28769ed5bc4ac463a82",
+          "hash": "7ffe1a13bc8884aba601041b8f52b79c7fd8421e2df405bb93d1f916f78a8fec",
           "path": "README.fr.md"
         },
         {
-          "hash": "422bcc2cf7fd86208c8adadcb0464ef41baba1c92069ccb6f09e13bb0508e3ac",
+          "hash": "62ed6b386d0e7e68204a1ef2e5383c7635a31262cda550e13d44a60ec0fff4fe",
           "path": "README.hi.md"
         },
         {
-          "hash": "2af0127eda5e4953a08199d0157046f745a8554da1ceb45600dc133035352a29",
+          "hash": "d4744b69d28ec4954b7bf0e10a73fc27d8764d486ac4d1d9ddf10663317a0d51",
           "path": "README.it.md"
         },
         {
-          "hash": "3d8fd01f5140c483a0a4ec6db5ceb3bc3672a1f5f731eab00cc763478366fbbc",
+          "hash": "bf3faa99eabc8fd308e631aa8043111bd8e7dedb0328854a19a72261601df756",
           "path": "README.ja.md"
         },
         {
-          "hash": "19b558c727b09291427bc51070d951b038d4f6af993210afcf76f8feefd80974",
+          "hash": "bb279e3ab4e16d36604138e053f0293663855b74e598f0efaa3fcaf19f59c0d2",
           "path": "README.md"
         },
         {
-          "hash": "554aafe1718cf80ccc8ebc376dd11f9ac98913b31a4f64e584e9242d4cf6d227",
+          "hash": "babbb40aa1a42beaa5c76ddcd453a15f8fe516dea23d81c6ec19a77dce685844",
           "path": "README.pt-BR.md"
         },
         {
-          "hash": "3794eaae131ad3e610b6ced08228e0b8c31d4e51af5e87164e4a2b789926e950",
+          "hash": "7f026e5465c556ee3a0d381d4478329981941196c6262ebf4fad58df7873c428",
           "path": "README.zh.md"
         },
         {
-          "hash": "644281eeb769e6eebd5c04da4dd97af538d26ba9443d897b44b686d30ccf6fd2",
+          "hash": "b14f7763d963a95921ee255306c4ab83fe1b4e205ea7bc023ff5d08358db5bc5",
           "path": "SCORECARD.md"
         },
         {
-          "hash": "ab934fbac1966b26c308afe9ca5d5857570b49d655aa130ce237e38503268abb",
+          "hash": "760566fec4adfbd649be67b5491059b09ed11a0d9e98cc8b21daabbf87fef567",
           "path": "SECURITY.md"
         },
         {
-          "hash": "faf62a854780e6eff6379f59d4fc12f37fb84345f95ff7e2a228ea9200364c99",
+          "hash": "0119427c89952442ee90d1a8974134366a741ef821b2af3de0941a742ccaab70",
           "path": "SHIP_GATE.md"
         },
         {
-          "hash": "0db78f5ab73eb42919be2a79e805ed12c5e44e38a0eb43667538e76e5fda5f90",
+          "hash": "9f91bbba79017a6500b410151b274281dc5875b2bd6aacd0653ddc56c8df60e9",
           "path": "eslint.config.mjs"
         },
         {
-          "hash": "7ce9b072cf4ffa721978b3dc947808f36ad2a7179fe9634a44097d2edee80bd1",
+          "hash": "b8b3e32d064e948c7eadf84b73724ca6ee2e8c4278bad8dbb7e858d223ad25ca",
           "path": "package-lock.json"
         },
         {
-          "hash": "9f908f609a076fe4c6f06371c5b71fee6e877842db02c63e132d0fc73e1592ac",
+          "hash": "cdb598215c5b7d47d99bebf396655ec45f562ee46f8ce6005298ea4a1976e530",
           "path": "package.json"
         },
         {
-          "hash": "ea018a34e3293ef871abc111d97d2e72ec2f220a998ce01886df125d95288892",
+          "hash": "78398d694eabd80d97c68c0a5884e5c62c01c7521813b3af7592acc76a09fda3",
           "path": "tsconfig.json"
         },
         {
-          "hash": "d1e31e4864a672d965b237889b9939d0c01a95e527d7a80bb3ee5c2649b2ffda",
+          "hash": "8e35461f96e5ffebda676ccac381e3a3f37772e5ddbd3f9b2a4dc591d1e14e01",
           "path": "tsconfig.test.json"
         }
       ],
@@ -231,7 +231,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "32381c83ca1306c97fa08904cd15b8fd59536911977bcbe4063846f1473fc5d8",
+          "hash": "ab31bef966637a4213bb6573112bbc96ea8cbab2a2c580194f708207c30bfd78",
           "path": "schemas/codecomfy-preset.schema.json"
         }
       ],
@@ -246,15 +246,22 @@
       "unresolvedSites": 0
     },
     {
-      "dynamicReads": 2,
+      "dynamicReads": 0,
       "dynamicSpawns": 0,
       "dynamicSpawnsInTests": 0,
-      "dynamicWrites": 2,
+      "dynamicWrites": 0,
       "entryPoints": [],
       "externals": 0,
       "files": [
         {
-          "hash": "7602713bba305712f4d079df205177e1a694c9273a5012cbb53570ae57c2a32f",
+          "failurePaths": [
+            {
+              "in": "resolveSource",
+              "kind": "throw",
+              "line": 77
+            }
+          ],
+          "hash": "045197d8d44350a92ae9bcde094f2079bfaaa99d98b32d8df0a9e9bbca0bc687",
           "path": "scripts/sync-kb.mjs"
         }
       ],
@@ -264,6 +271,15 @@
       "importConfidence": "full",
       "name": "scripts",
       "origin": "authored",
+      "outsidePlaces": [
+        {
+          "reads": 4,
+          "where": [
+            "caller"
+          ],
+          "writes": 0
+        }
+      ],
       "outsideReads": 4,
       "role": "code",
       "testedBy": 0,
@@ -278,15 +294,15 @@
       "externals": 0,
       "files": [
         {
-          "hash": "38dd6f4cec2ee36d9e053e1ba4b69ca6f8c24d365b5ec7f0ef79a79926552115",
+          "hash": "614cc03d6360af7f6af25aef51fefdd5c1b6c44d5758f9499c0d4992bd7d5eaf",
           "path": "site/astro.config.mjs"
         },
         {
-          "hash": "b5578baf42cab82e5e7b451b6992cb929aeb6ff8d02d8e11ab690e6f67fea144",
+          "hash": "af5d4f54dca60686724d306eb58759fb25b6f5ba4d66559ab84a968112a184e5",
           "path": "site/package-lock.json"
         },
         {
-          "hash": "cff923d88f356795747a843362ca300b43d09c5715e6356f904b4d5fa06a7fae",
+          "hash": "17ed487ab5049bb52f8c5e35f77f21be7da639f1fb6a3fa70e9b02ffabfe7be6",
           "path": "site/package.json"
         },
         {
@@ -294,67 +310,77 @@
           "path": "site/src/assets/screenshot-treeview.png"
         },
         {
-          "hash": "6e1b55a028cc33de13853eccf2ef2eb6b8e869085dbe2dc18510ae72396e8cde",
+          "constantOnly": true,
+          "hash": "203a4c1cfc342717e02b2c6652ac3d9ed91677e9ede6350271ab8af5b133165a",
           "path": "site/src/content.config.ts"
         },
         {
-          "hash": "79e7096d206ce915fe805db620bc511b607868cbdc41157de3f8485efa332144",
+          "hash": "87bd5e87afb4fba507a976590df27ecbe9f9b27cf944c451d8a8f89a484ba1b4",
           "path": "site/src/content/docs/handbook/beginners.md"
         },
         {
-          "hash": "e818cbe59358fa966f7654396df5f3bd18c6d90eb3e04ef087cc08d7967aa1cf",
+          "hash": "4ca3759928fcfc4a440d5c55ba5f22028396e6b5ea8ee0ad214ddec6acc82125",
           "path": "site/src/content/docs/handbook/configuration.md"
         },
         {
-          "hash": "63d1cea7716e9cae82b728b0bba50bd117fab73c2afc5e10e41c51e975b08678",
+          "hash": "5466423a6f0d256c3cdedc17f7dff7e4f0a97d483ff6df206473bcb790d0368b",
           "path": "site/src/content/docs/handbook/getting-started.md"
         },
         {
-          "hash": "9e3fbafb1cebb0903cc48c09daed03cebe28f216fc42e6ba6fab9d00ce280d7a",
+          "hash": "973c4b66185b9c47135e4a4dc9ea656624c1507a41126a8331fa0dd2567a2413",
           "path": "site/src/content/docs/handbook/index.md"
         },
         {
-          "hash": "4fe8b1da96f2b16c81eb152c793bdfd643d1ee580751d887e7b319c16322f862",
+          "hash": "50dbeab62f3105a9a7fe5b0b6f436dc7e33fcb1fd3bc187004f52efd1d53ded1",
           "path": "site/src/content/docs/handbook/presets.md"
         },
         {
-          "hash": "b7f39a674f442703b2071d157c98c2f730d39284dd81c5b964dd073421677f0b",
+          "hash": "b863f9d53a5c71f79b723c90d86c0cca4884237026af71b6a7d22fd8ad5b323d",
           "path": "site/src/content/docs/handbook/profiles.md"
         },
         {
-          "hash": "78d74c29fc1d0b57eb55462b6816f7a179ce8ca79f9b5023a50700d7bbe7a317",
+          "hash": "27a9d4f37a776912aaa13368cd5079b19f85892cbce092bdd288a5058a009e3b",
           "path": "site/src/content/docs/handbook/reference.md"
         },
         {
-          "hash": "57f774bc0ed71ac83a175654a80e5d9e450878b88a3c23b92967dad177a3ef43",
+          "hash": "109b9b93f1d3fc283bfba711954da38156ebe0f8e8f81b57df1a2f76ff46cb01",
           "path": "site/src/content/docs/handbook/run-history.md"
         },
         {
-          "hash": "d5098f7f57137962c68c90b380d607761cd1d3a8f454e14fab4b6b657793c4c3",
+          "hash": "10fe028a9390283cd214ed8c306ea6886314c474c808b7a09765af52643a0927",
           "path": "site/src/content/docs/handbook/usage.md"
         },
         {
-          "hash": "a699ad78a6d27d6864ccfe4c3a4a01993aca28ecb4a3d20893f37db9f9b1a522",
+          "hash": "391533713539035d3c92282579d43de0f137067867fdb502d7eaea3c74601d2a",
+          "importOrder": [
+            "site/src/styles/global.css",
+            "site/src/site-config.ts"
+          ],
+          "importsFiles": [
+            "site/src/site-config.ts",
+            "site/src/styles/global.css"
+          ],
           "path": "site/src/pages/index.astro"
         },
         {
-          "hash": "7d368c510282c594ba69f4278154989e1f920b9d7f1d905dcfc9b7c6718bd8cd",
+          "constantOnly": true,
+          "hash": "05efbf07534c96cfe692323be822d17b3b52e166af183d59211dfbae7dabf289",
           "path": "site/src/site-config.ts"
         },
         {
-          "hash": "5995279a40a9a63426a93feec129006b261cc7200426a398914d0317722ef19b",
+          "hash": "29ee8df91833e694bdba973126b34a6177de4cf01dab6d9ef7d3126e8e2b67fb",
           "path": "site/src/styles/global.css"
         },
         {
-          "hash": "04bf00704f1a83aa9de96fe004f5b4bc1c81efdd6241b746e359639c78fccf36",
+          "hash": "2a311a0a90b692f20eb2577cd9d486b807b87c41b6ee478dd3341f94f43028da",
           "path": "site/src/styles/starlight-custom.css"
         },
         {
-          "hash": "943169cf59874242f1eabf1cad3bf2ddd80c6629ef8318b7906d1987136bb2e5",
+          "hash": "517c29214feecd741fd4fbb73451ca7cbf09455ec4c6188b0968f86da0be9211",
           "path": "site/tailwind.config.js"
         },
         {
-          "hash": "61fc24492db9aef7ec38eb91cfeebaef96155014bb5f22648fd8ed2327c6cae2",
+          "hash": "b5b0a5b04a14cddd7713c5e1c82e86c79c17c2f86b170e26e9b170b3d5e01cd9",
           "path": "site/tsconfig.json"
         }
       ],
@@ -370,7 +396,7 @@
     },
     {
       "dynamicReads": 6,
-      "dynamicSpawns": 3,
+      "dynamicSpawns": 4,
       "dynamicSpawnsInTests": 0,
       "dynamicWrites": 2,
       "entryPoints": [
@@ -384,7 +410,7 @@
           "exports": [
             "getConfig"
           ],
-          "hash": "3435b90fc8337301d577d7a50bfabe2161586ee3a52d1687ec6eff67ef172fa1",
+          "hash": "ecbc3f66bac99374ed8010a37afd64e9ea64ff20d5f8c431e6c8e440a60f2d64",
           "importsFiles": [
             "src/types/index.ts",
             "src/validation/paths.ts",
@@ -430,7 +456,29 @@
             "isEventStreamSupported",
             "toWebSocketUrl"
           ],
-          "hash": "093c1e12e19a657defadf2d4f248f7a2639420e904131c623e61b0da85856606",
+          "failurePaths": [
+            {
+              "in": "connect",
+              "kind": "catch",
+              "line": 243
+            },
+            {
+              "in": "connect",
+              "kind": "catch",
+              "line": 258
+            },
+            {
+              "in": "close",
+              "kind": "catch",
+              "line": 332
+            },
+            {
+              "in": "handleMessage",
+              "kind": "catch",
+              "line": 354
+            }
+          ],
+          "hash": "39afa376e1cab86b3b90d482333985f49fdcb65412a149ed0680846fecb0c157",
           "importsFiles": [
             "src/logging/logger.ts"
           ],
@@ -441,7 +489,123 @@
             "categorizeError",
             "composeAvailabilityMessage"
           ],
-          "hash": "00ccca59af07c362abef413fbee269619b9584798b5d91ab3d751915af65b982",
+          "failurePaths": [
+            {
+              "in": "hasClass",
+              "kind": "catch",
+              "line": 289
+            },
+            {
+              "in": "listModels",
+              "kind": "catch",
+              "line": 313
+            },
+            {
+              "in": "uploadFile",
+              "kind": "catch",
+              "line": 371
+            },
+            {
+              "in": "getAvailability",
+              "kind": "catch",
+              "line": 395
+            },
+            {
+              "in": "finish",
+              "kind": "catch",
+              "line": 436
+            },
+            {
+              "in": "generate",
+              "kind": "catch",
+              "line": 592
+            },
+            {
+              "in": "cancel",
+              "kind": "catch",
+              "line": 635
+            },
+            {
+              "in": "clearQueue",
+              "kind": "catch",
+              "line": 661
+            },
+            {
+              "in": "getQueueDepth",
+              "kind": "catch",
+              "line": 686
+            },
+            {
+              "in": "submitPrompt",
+              "kind": "throw",
+              "line": 791
+            },
+            {
+              "in": "submitPrompt",
+              "kind": "catch",
+              "line": 796
+            },
+            {
+              "in": "submitPrompt",
+              "kind": "throw",
+              "line": 806
+            },
+            {
+              "in": "submitPrompt",
+              "kind": "throw",
+              "line": 808
+            },
+            {
+              "in": "fetchHistoryOnce",
+              "kind": "catch",
+              "line": 827
+            },
+            {
+              "in": "pollForCompletion",
+              "kind": "catch",
+              "line": 883
+            },
+            {
+              "in": "pollForCompletion",
+              "kind": "throw",
+              "line": 895
+            },
+            {
+              "in": "collectFiles",
+              "kind": "catch",
+              "line": 972
+            },
+            {
+              "in": "collectFiles",
+              "kind": "catch",
+              "line": 1023
+            },
+            {
+              "in": "collectFrames",
+              "kind": "catch",
+              "line": 1108
+            },
+            {
+              "in": "downloadToFile",
+              "kind": "catch",
+              "line": 1222
+            },
+            {
+              "in": "downloadToFile",
+              "kind": "catch",
+              "line": 1224
+            }
+          ],
+          "hash": "d01634872067decaadf25ff231a1db9ad3d1d0101e79f605164afe1629815133",
+          "importOrder": [
+            "src/types/index.ts",
+            "src/polling/backoff.ts",
+            "src/engines/comfyValidation.ts",
+            "src/logging/logger.ts",
+            "src/engines/workflowInjection.ts",
+            "src/engines/comfyEvents.ts",
+            "src/engines/retrieval.ts"
+          ],
           "importsFiles": [
             "src/engines/comfyEvents.ts",
             "src/engines/comfyValidation.ts",
@@ -460,7 +624,89 @@
             "validateHistoryResponse",
             "validatePromptResponse"
           ],
-          "hash": "1182254cf16de2d722ee5c4e867aad44623c3fe8684c1c4455133f7547987be6",
+          "failurePaths": [
+            {
+              "in": "validatePromptResponse",
+              "kind": "throw",
+              "line": 55
+            },
+            {
+              "in": "validatePromptResponse",
+              "kind": "throw",
+              "line": 61
+            },
+            {
+              "in": "validatePromptResponse",
+              "kind": "throw",
+              "line": 70
+            },
+            {
+              "in": "validatePromptResponse",
+              "kind": "throw",
+              "line": 88
+            },
+            {
+              "in": "validateHistoryEntry",
+              "kind": "throw",
+              "line": 168
+            },
+            {
+              "in": "validateHistoryEntry",
+              "kind": "throw",
+              "line": 175
+            },
+            {
+              "in": "validateHistoryEntry",
+              "kind": "throw",
+              "line": 185
+            },
+            {
+              "in": "validateHistoryEntry",
+              "kind": "throw",
+              "line": 200
+            },
+            {
+              "in": "validateHistoryResponse",
+              "kind": "throw",
+              "line": 264
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 311
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 322
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 331
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 340
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 349
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 359
+            },
+            {
+              "in": "sanitizeComfyFilename",
+              "kind": "throw",
+              "line": 369
+            }
+          ],
+          "hash": "27d551453a22ee6b7ab40c65a66b6de4dc6016914fc1e0c9ad85b7785dbdf584",
           "path": "src/engines/comfyValidation.ts"
         },
         {
@@ -470,7 +716,29 @@
             "findFfmpeg",
             "parseFfmpegVersionLine"
           ],
-          "hash": "038059e5c806150521be0c38e989f757f58aac342ee1737573246ccebf1c31cf",
+          "failurePaths": [
+            {
+              "in": "isFfmpegOnPath",
+              "kind": "catch",
+              "line": 66
+            },
+            {
+              "in": "probeFfmpegVersion",
+              "kind": "catch",
+              "line": 190
+            },
+            {
+              "in": "renameFramesSequentially",
+              "kind": "catch",
+              "line": 341
+            },
+            {
+              "in": "cleanupPartialVideo",
+              "kind": "catch",
+              "line": 397
+            }
+          ],
+          "hash": "70d7d5892ec46c71a242ae8f54cbf6af23601e461763cc1dfb00910b08a2bf87",
           "importsFiles": [
             "src/logging/logger.ts"
           ],
@@ -482,7 +750,7 @@
           "exports": [
             "preflightPreset"
           ],
-          "hash": "d070b64ce56dd12ad499bb81c1153be31654fb3939a35e4d1056c63b24d04478",
+          "hash": "81caf42ee3629cd4988cc0a1a57645d829faa24475b4343342fc16bfa9e0ab4f",
           "importsFiles": [
             "src/profiles/registry.ts"
           ],
@@ -523,7 +791,7 @@
             "explainEmptyOutputs",
             "isFrameSequence"
           ],
-          "hash": "e87f32ef327b57da5633e30553193ccf40b0c3a3d099a43299cb33d3d7bd01cd",
+          "hash": "d8d4129c53dc845f5a904d34ac5684b5eea026ff1f801626582c1af074cb377e",
           "importsFiles": [
             "src/engines/comfyValidation.ts"
           ],
@@ -540,7 +808,7 @@
             "substitutePlaceholders",
             "toInt"
           ],
-          "hash": "db1c9dbf20c398e1d6f8fbc5f425753c4508acf20960e78073a6b43dfb5f4ddb",
+          "hash": "1920d61d07a072f8f8ff0d4ff15a091e8d9f2ad160ad3bc2cb48c5f17725ead8",
           "importsFiles": [
             "src/types/index.ts"
           ],
@@ -553,7 +821,44 @@
             "activate",
             "deactivate"
           ],
-          "hash": "7176091b343f2f3b800872c99142e4766bc273d3c190e844423889e4244f782d",
+          "failurePaths": [
+            {
+              "in": "ensureComfyReachable",
+              "kind": "catch",
+              "line": 127
+            },
+            {
+              "in": "activate",
+              "kind": "catch",
+              "line": 206
+            },
+            {
+              "in": "openGalleryCommand",
+              "kind": "catch",
+              "line": 278
+            },
+            {
+              "in": "rerunJobCommand",
+              "kind": "catch",
+              "line": 734
+            },
+            {
+              "in": "newPresetFromHQCommand",
+              "kind": "catch",
+              "line": 854
+            },
+            {
+              "in": "newPresetFromHQCommand",
+              "kind": "catch",
+              "line": 865
+            },
+            {
+              "in": "runGeneration",
+              "kind": "catch",
+              "line": 1246
+            }
+          ],
+          "hash": "85289552392140c06e07dde82f1b1315fe6da2cf362ab4e6e174d5e7a0104e4c",
           "importsFiles": [
             "src/config.ts",
             "src/engines/comfyServerEngine.ts",
@@ -1034,11 +1339,11 @@
           ]
         },
         {
-          "hash": "bacab4c026215bea8f82644a316adf4126826e6b6eb1833442ccc66d3c0185da",
+          "hash": "c9c08c126faa05dd0bf9c16dcb210958151c8b5a4cbe470d158faba6500c9456",
           "path": "src/kb/nodes.json"
         },
         {
-          "hash": "71e33d1b6c43d4678bb4b345339e89ea40e94dc2428d07095d9da4b0acfc0704",
+          "hash": "b021656cc9b666d993a3d5c67e8800070678298519f6e9c037e71cf7bf20b0ce",
           "path": "src/kb/presets.json"
         },
         {
@@ -1046,29 +1351,42 @@
             "createChannelLogger",
             "createNullLogger"
           ],
-          "hash": "f9d9d026367d5b190837380804bff493fa486968071d9582c03323c8756c97cb",
+          "hash": "397a9d992d6725184df87e9b1eec672c98cec9afb16987c2064c3da33a76afaa",
           "path": "src/logging/logger.ts"
         },
         {
           "exports": [
             "nextDelay"
           ],
-          "hash": "12f46a4e485bcd363c00d66b60d77a03af02b74463a92637706649f0288c6046",
+          "hash": "9e136ea4729bb0977ecb55d8d077b94c8a6c8f9ad8bc5747634e4f9edbe063f7",
           "path": "src/polling/backoff.ts"
         },
         {
-          "hash": "58e3904de94261280eb6accaaefb35c68770c75e92cdb3ad67bd4e5114f06d95",
+          "hash": "41365b25030724ddb012e667127d11c4610290ebf5fd26c9cb3d9e76a09659c4",
           "path": "src/presets/hq-image.json"
         },
         {
-          "hash": "384759a2bb69e1c9f3d04615b5d3d03e0623787ea289c05de5d2ffd51384bbc4",
+          "hash": "379efa72ad8919799c61efa571e77f4eb9eeeb854c8b6e56a0cc504e6691c15d",
           "path": "src/presets/hq-video.json"
         },
         {
           "exports": [
             "getPresetRegistry"
           ],
-          "hash": "0219cdf3cc18686dcdabc0951e136eea79ff6da5a56ea2be25e9ef65d2dcc8bc",
+          "failurePaths": [
+            {
+              "in": "loadFromDirectory",
+              "kind": "catch",
+              "line": 135
+            }
+          ],
+          "hash": "397e91525a86e6f1d3dcf864269a3644a9187194e466137585ac6506551f9c52",
+          "importOrder": [
+            "src/types/index.ts",
+            "src/logging/logger.ts",
+            "src/presets/hq-image.json",
+            "src/presets/hq-video.json"
+          ],
           "importsFiles": [
             "src/logging/logger.ts",
             "src/presets/hq-image.json",
@@ -1085,7 +1403,29 @@
             "readPngTextChunks",
             "readPngWorkflow"
           ],
-          "hash": "ff38d1619402c541c81b9a72a125db0741aca531ac6e6508c2fd0c8168df6c00",
+          "failurePaths": [
+            {
+              "in": "readPngTextChunks",
+              "kind": "catch",
+              "line": 48
+            },
+            {
+              "in": "parseTextChunk",
+              "kind": "catch",
+              "line": 118
+            },
+            {
+              "in": "readPngWorkflow",
+              "kind": "catch",
+              "line": 154
+            },
+            {
+              "in": "extractApiGraph",
+              "kind": "catch",
+              "line": 194
+            }
+          ],
+          "hash": "dcf5f9933e808e143fc09c767ed60a94b718d681c4629d4c55a53f0436849797",
           "path": "src/profiles/metadata.ts",
           "sequences": [
             {
@@ -1233,7 +1573,12 @@
             "requiredInputs",
             "toEnginePreset"
           ],
-          "hash": "02f3dd9bae6936bf770602c36b2b37fd11aca7389403c989ac1c399b22e013bd",
+          "hash": "398a6cb3ddf482e107868da079a597510c9ba6f5331ac07cdace7abed051e9f4",
+          "importOrder": [
+            "src/types/index.ts",
+            "src/kb/presets.json",
+            "src/kb/nodes.json"
+          ],
           "importsFiles": [
             "src/kb/nodes.json",
             "src/kb/presets.json",
@@ -1246,7 +1591,58 @@
             "createEmptyIndex",
             "pruneRuns"
           ],
-          "hash": "d78c7bd2787636b21db4bb2147772cbfa8055464a423394cf8fc8af0ac5a46bb",
+          "failurePaths": [
+            {
+              "in": "listRuns",
+              "kind": "catch",
+              "line": 129
+            },
+            {
+              "in": "listRuns",
+              "kind": "catch",
+              "line": 133
+            },
+            {
+              "in": "getRunTimestamp",
+              "kind": "catch",
+              "line": 158
+            },
+            {
+              "in": "getRunTimestamp",
+              "kind": "catch",
+              "line": 165
+            },
+            {
+              "in": "pruneSelected",
+              "kind": "catch",
+              "line": 189
+            },
+            {
+              "in": "pruneSelected",
+              "kind": "catch",
+              "line": 209
+            },
+            {
+              "in": "walk",
+              "kind": "catch",
+              "line": 255
+            },
+            {
+              "in": "walk",
+              "kind": "catch",
+              "line": 270
+            },
+            {
+              "in": "pruneIndexEntries",
+              "kind": "catch",
+              "line": 315
+            }
+          ],
+          "hash": "ed23b854cf20afa4c969de29e695e3281a88772fd138ad5da952dee0a65c17c2",
+          "importOrder": [
+            "src/types/index.ts",
+            "src/logging/logger.ts"
+          ],
           "importsFiles": [
             "src/logging/logger.ts",
             "src/types/index.ts"
@@ -1254,7 +1650,56 @@
           "path": "src/pruning/pruner.ts"
         },
         {
-          "hash": "5c8883133054cbeaa3ed3c365a357882929f4f6cef57354be250b87f43394240",
+          "failurePaths": [
+            {
+              "in": "run",
+              "kind": "catch",
+              "line": 209
+            },
+            {
+              "in": "run",
+              "kind": "catch",
+              "line": 221
+            },
+            {
+              "in": "run",
+              "kind": "catch",
+              "line": 226
+            },
+            {
+              "in": "cancel",
+              "kind": "catch",
+              "line": 264
+            },
+            {
+              "in": "handleFailure",
+              "kind": "catch",
+              "line": 411
+            },
+            {
+              "in": "updateIndex",
+              "kind": "catch",
+              "line": 468
+            },
+            {
+              "in": "atomicRenameWithRetry",
+              "kind": "catch",
+              "line": 553
+            },
+            {
+              "in": "atomicRenameWithRetry",
+              "kind": "catch",
+              "line": 576
+            }
+          ],
+          "hash": "343a6e34cf19933d252175dc04cc512e0724a06470cd67a9a6719cd26df1a38b",
+          "importOrder": [
+            "src/types/index.ts",
+            "src/engines/ffmpeg.ts",
+            "src/engines/workflowInjection.ts",
+            "src/logging/logger.ts",
+            "src/pruning/pruner.ts"
+          ],
           "importsFiles": [
             "src/engines/ffmpeg.ts",
             "src/engines/workflowInjection.ts",
@@ -1265,14 +1710,31 @@
           "path": "src/router/jobRouter.ts"
         },
         {
-          "hash": "4f3b1dedf2234f3417df6a3e92960ebe826c2d06c00a9b082f96a1f55c489e25",
+          "failurePaths": [
+            {
+              "in": "attachWatcher",
+              "kind": "catch",
+              "line": 84
+            },
+            {
+              "in": "attachWatcher",
+              "kind": "catch",
+              "line": 94
+            },
+            {
+              "in": "readRuns",
+              "kind": "catch",
+              "line": 179
+            }
+          ],
+          "hash": "9cd122f53b42a782ce5d6a83efa3ad53449f1fa6dce4bada229f8e120f47287c",
           "importsFiles": [
             "src/types/index.ts"
           ],
           "path": "src/runHistoryProvider.ts"
         },
         {
-          "hash": "4e87ed8aa70bc827e3bc3e7839a1816038bcd6cffd3479dafe672e98667e2894",
+          "hash": "c4eaf2a9b0719bb00441b098faab8f3c1fe7fd94afe2bb192fa750bddd3b5032",
           "path": "src/types/index.ts"
         },
         {
@@ -1280,7 +1742,7 @@
             "parseSeed",
             "validatePrompt"
           ],
-          "hash": "7d2fac2d1e6ed993afce92a096554f3df9f4b268e78dd65d0c47a42d399b4019",
+          "hash": "10d4deda39fb746ad333890d05d93257fefd45b2f8f57230a7712e86e7fded62",
           "path": "src/validation/inputs.ts"
         },
         {
@@ -1290,34 +1752,63 @@
             "looksExecutable",
             "validateExecutablePath"
           ],
-          "hash": "958d1b12ebb36e7bf1451e43697d6e3b65d6b2e188f2a7989645ad198c8e74ff",
+          "failurePaths": [
+            {
+              "in": "existsFile",
+              "kind": "catch",
+              "line": 25
+            }
+          ],
+          "hash": "ffde54675cd4df504b59f141efa7388dc4c07d92c0c1cb5ce659a19d671f99b8",
           "path": "src/validation/paths.ts"
         },
         {
           "exports": [
             "validateComfyUrl"
           ],
-          "hash": "19b07f2214f16781da23000c159b9ba06e82c390ae6ac794001b2b53c09b81e4",
+          "failurePaths": [
+            {
+              "in": "validateComfyUrl",
+              "kind": "catch",
+              "line": 35
+            }
+          ],
+          "hash": "75263d9cafb28428d1f8a7864f842be16533e3878a11dbdccf8f513e592c5c52",
           "path": "src/validation/url.ts"
         },
         {
           "exports": [
             "validateVideoLimits"
           ],
-          "hash": "2d04a07bcbf49bde0495b325719a4e447fbb803b4258254d812ea9dc1d2842a0",
+          "hash": "91b2604fe0eef32f05310375ffb565762cdb83986693724db4fd70ab1f8c97df",
           "path": "src/validation/video.ts"
         }
+      ],
+      "frameworks": [
+        "vscode"
       ],
       "globs": [
         "src/**"
       ],
       "importConfidence": "full",
       "name": "src",
-      "origin": "authored",
+      "origin": "mixed",
+      "outsidePlaces": [
+        {
+          "reads": 35,
+          "where": [
+            "caller"
+          ],
+          "writes": 16
+        }
+      ],
       "outsideReads": 35,
       "outsideWrites": 16,
       "role": "code",
-      "testedBy": 21,
+      "testRunners": [
+        "mocha"
+      ],
+      "testedBy": 22,
       "unresolvedSites": 0
     },
     {
@@ -1329,11 +1820,11 @@
       "externals": 0,
       "files": [
         {
-          "hash": "5b0345fb2bbae32d8c698689f5afa518494620cd86938a9edfba5da3ff801eec",
+          "hash": "e5063acedc4ce90824ce782392ef21b33f6369c4aa74e4c596fef6c51c61b7ed",
           "path": "test/fixtures/comfy/README.md"
         },
         {
-          "hash": "2dab59e29ef13ad631720cd662f7243ab63fdd2b014fcece9645659dfa801288",
+          "hash": "0cea314544ad8130bb898b2984a18105120ed23792398d2af1fd57b7591748d5",
           "path": "test/fixtures/comfy/hq-image/index.json"
         },
         {
@@ -1348,29 +1839,29 @@
             "registerCleanup",
             "stubFetch"
           ],
-          "hash": "c9479316dfabc6ed8988015b8e9de61216389be3c712dc20fc92e31236e297cc",
+          "hash": "c6a7a1150003ad94b7326859e834ade25df9b20592e9a572c42b3d7f3dcca235",
           "path": "test/helpers.ts"
         },
         {
-          "hash": "36bd5cfd8f73509e2961a8f590075afb433dcbb0a910f5036b79ace84ce8f1ae",
+          "hash": "06b7e571f44a4da4905c75fc99435b0c62c12430a791828cfa3f4672a4defa87",
           "path": "test/register-vscode-stub.js"
         },
         {
           "exports": [
             "_makeExtensionContext"
           ],
-          "hash": "4e960a7801004899bbf3b6dfe4c9a91726cc48170578e728c73f1f46035e3498",
+          "hash": "4d70da83c92de1cb2f43789c92f2237ef284c613b68f289e7806cf0e70202b33",
           "path": "test/stubs/vscode.ts"
         },
         {
-          "hash": "f386ed57d4f93f9cca96b205c9e037074e197891ae57e34f53f2b84503dff160",
+          "hash": "f49dc808f638aa3c7e777bc00c3154c1b4683f9a6a16b164d8a510ee6ca00061",
           "importsFiles": [
             "src/polling/backoff.ts"
           ],
           "path": "test/unit/backoff.test.ts"
         },
         {
-          "hash": "18b513a45de65c19cf829ce4e60764cca68dd450e0cb50369b9f0ee3bbe7d1e0",
+          "hash": "c0558b5d3baabb4f1f05b96c9e10d44fe0fc0c20dc4bb6574bf1f51a95ad0631",
           "importsFiles": [
             "src/engines/comfyEvents.ts",
             "src/engines/comfyServerEngine.ts"
@@ -1378,7 +1869,15 @@
           "path": "test/unit/comfy-events.test.ts"
         },
         {
-          "hash": "bc4ccbe4dd426949cee6470c82f5aa88d2cd463cb4032014a1771f768ba20152",
+          "hash": "47f7e2ce2f17e665f782a2c74a2d8c08c708cf73784642f1a977496984e8329e",
+          "importOrder": [
+            "src/engines/comfyServerEngine.ts",
+            "src/types/index.ts",
+            "src/engines/comfyValidation.ts",
+            "src/router/jobRouter.ts",
+            "src/logging/logger.ts",
+            "test/helpers.ts"
+          ],
           "importsFiles": [
             "src/engines/comfyServerEngine.ts",
             "src/engines/comfyValidation.ts",
@@ -1390,14 +1889,14 @@
           "path": "test/unit/comfy-server-engine.test.ts"
         },
         {
-          "hash": "68c2cc48343a68659e447b076be3fdd0d9af52416b4234e517534d2b1bd5646e",
+          "hash": "a2974f9b4c33089b7d516c98d2acfdf4dcf641beded3cd887670ee23e1759f53",
           "importsFiles": [
             "src/engines/comfyValidation.ts"
           ],
           "path": "test/unit/comfy-validation.test.ts"
         },
         {
-          "hash": "24d231170459e27f094e72e63fc6acf7338a7499324b28355c251f1afa04ef10",
+          "hash": "0be768d6bd45121e7c7e6f408ad9aec411ba1455aaade03f5be51f019842e987",
           "importsFiles": [
             "src/config.ts",
             "test/helpers.ts"
@@ -1405,14 +1904,18 @@
           "path": "test/unit/config.test.ts"
         },
         {
-          "hash": "a2287f7caf7394a8577e9908aaf889d2d7bb9d83c7e245cec8a8f7398d997c7e",
+          "hash": "9e7c456103cdf98eb6b2b37ebbdf2c946fb91aa6180f7dc959bc03ce021adf43",
           "importsFiles": [
             "src/engines/comfyServerEngine.ts"
           ],
           "path": "test/unit/error-categorization.test.ts"
         },
         {
-          "hash": "57b64ef8919a8f7ed46f4d1f77ecc0d46bc0285523c661dedf6307564093a805",
+          "hash": "442c0f7cd6d4237dd408fa41d31315b7d0ddfd92fcc2dd904cd2b2c7c494b6b1",
+          "importOrder": [
+            "test/helpers.ts",
+            "src/extension.ts"
+          ],
           "importsFiles": [
             "src/extension.ts",
             "test/helpers.ts"
@@ -1420,19 +1923,29 @@
           "path": "test/unit/extension.test.ts"
         },
         {
-          "hash": "f025eac28e5a80583e2fc5f41d0ae6d4715951d42c45e03cea28ef79cc4f66eb",
-          "parseError": true,
+          "hash": "5c37a0b04a3244dda2aa90fe0d7eedab847681003df8e10cebd8d86791b0caa2",
+          "importsFiles": [
+            "src/engines/ffmpeg.ts",
+            "test/helpers.ts"
+          ],
           "path": "test/unit/ffmpeg-utils.test.ts"
         },
         {
-          "hash": "391881bc2004daf0f2c364665e5f2f75c1ab0e09c09596b07b2942ae394ec2b1",
+          "hash": "069802cf315fe729dbd1e1a2f4c7e48ff4bab6ffa71a847d9f2e249c1ba9b3bc",
           "importsFiles": [
             "test/helpers.ts"
           ],
           "path": "test/unit/helpers.test.ts"
         },
         {
-          "hash": "d2a0b7005df5792bdc8514e45d25454f7360a2632a88dc74ca2bdc28bf2087ff",
+          "hash": "bc82cc3bd534857195d719f69a4e760972f6f94c8ebfa3164c65225cf4f299ae",
+          "importOrder": [
+            "src/router/jobRouter.ts",
+            "src/logging/logger.ts",
+            "src/types/index.ts",
+            "test/helpers.ts",
+            "src/engines/comfyServerEngine.ts"
+          ],
           "importsFiles": [
             "src/engines/comfyServerEngine.ts",
             "src/logging/logger.ts",
@@ -1443,14 +1956,18 @@
           "path": "test/unit/job-router.test.ts"
         },
         {
-          "hash": "e1e565a8c708cdca3780a315815451d144bbe2aa2e05fc6bc0aec2d3f41fcff8",
+          "hash": "8d0c512aece73659cf69bd3ff22b36174ca8b741a2dd58c6ec3328dee847f560",
           "importsFiles": [
             "src/logging/logger.ts"
           ],
           "path": "test/unit/logger.test.ts"
         },
         {
-          "hash": "7221e938f1817c0f5094062b0e4b11298e27c5a30b0499b9bedf69e9bd426bd6",
+          "hash": "f29d71864efa0338cdaf1a0f804555e1e4dce74284230425465967c9fee633bd",
+          "importOrder": [
+            "test/helpers.ts",
+            "src/extension.ts"
+          ],
           "importsFiles": [
             "src/extension.ts",
             "test/helpers.ts"
@@ -1458,7 +1975,12 @@
           "path": "test/unit/new-preset-command.test.ts"
         },
         {
-          "hash": "aefd4a3413047fa17791b154adf3ba5d31c6f310d30cc1780960b24de2b26ff0",
+          "hash": "15f565fe2f5f937c16213abaa907320e7c2b801cb826765a909d27ff22003640",
+          "importOrder": [
+            "src/presets/registry.ts",
+            "src/logging/logger.ts",
+            "test/helpers.ts"
+          ],
           "importsFiles": [
             "src/logging/logger.ts",
             "src/presets/registry.ts",
@@ -1467,7 +1989,14 @@
           "path": "test/unit/presets-registry.test.ts"
         },
         {
-          "hash": "52a0f95ce57ff2f49ad548285df2bc5999470363b41a5aa5a5d4aef675dab71d",
+          "hash": "79b0a6e7748fd8422c28beee6c66d355954cae76fe32c91aa63ed69a18f75545",
+          "importOrder": [
+            "src/engines/retrieval.ts",
+            "src/engines/comfyValidation.ts",
+            "src/profiles/registry.ts",
+            "src/engines/preflight.ts",
+            "src/profiles/metadata.ts"
+          ],
           "importsFiles": [
             "src/engines/comfyValidation.ts",
             "src/engines/preflight.ts",
@@ -1478,7 +2007,7 @@
           "path": "test/unit/profiles.test.ts"
         },
         {
-          "hash": "d470075b9e6396cef232c15f91183ac4548f51e55d8e31aadbd5c44ebfb65c9e",
+          "hash": "e5efb1bbbfa4de02b049141e171d5cf1a3052bdc5fd9132799739c87f3cd8728",
           "importsFiles": [
             "src/pruning/pruner.ts",
             "src/types/index.ts",
@@ -1487,18 +2016,18 @@
           "path": "test/unit/pruner.test.ts"
         },
         {
-          "hash": "98b4d27647631e27c6bc347d51cfa77f2f852d00891ffdac6706a7663527a2a2",
+          "hash": "d3bcb7b647467168aa806103d0b93583c64dc2bb215a61dca7d48a64cf6fc567",
           "importsFiles": [
             "src/engines/comfyValidation.ts"
           ],
           "path": "test/unit/sanitize-comfy-filename.test.ts"
         },
         {
-          "hash": "bb70ea31b1eb0e47df359c2773f7744ad9f7dc51a4cd9611d34b4e7f9dd0df48",
+          "hash": "afead7d8fb50541c64d2b48c07c68cc8d49d60fb4b36a2bedc63a17b9a3a1cc6",
           "path": "test/unit/smoke.test.ts"
         },
         {
-          "hash": "0732db4b1e8d2181edb0b30b3688651a44d617cd398f69cc80122343973d08ce",
+          "hash": "cac6239596c4b6405deba891a77e2225de0604f48c13b2d9aed84da489c1297b",
           "importsFiles": [
             "src/runHistoryProvider.ts",
             "src/types/index.ts",
@@ -1507,21 +2036,21 @@
           "path": "test/unit/tree.test.ts"
         },
         {
-          "hash": "1b98b221455cf6c805fc01b106c749ec1c5833b5ed66cc0b218b52d5064c35d5",
+          "hash": "5615849a7ededf74418b23a167a1ce2a59bfb61623221e0812e8fa23114a2af7",
           "importsFiles": [
             "src/types/index.ts"
           ],
           "path": "test/unit/types.test.ts"
         },
         {
-          "hash": "a49ef208be460f7ef6bf94a01d816bc1d7e93d3ba623f56b1bee4eecaa6dfe8a",
+          "hash": "2f9b9aa3b5d90b6752ce92f1215dec81ac0b0571711209b87e52fd5027bd3157",
           "importsFiles": [
             "src/validation/inputs.ts"
           ],
           "path": "test/unit/validation-inputs.test.ts"
         },
         {
-          "hash": "57c0e333f0c89b26955a3156c661a45965e2db817568a6c18b1f9ca1d34c0c9a",
+          "hash": "5a99fbf66349434d58f369c7a81fdebd7e50985eeb9de0e03d8a6a0f428dbcb0",
           "importsFiles": [
             "src/validation/paths.ts",
             "test/helpers.ts"
@@ -1529,21 +2058,22 @@
           "path": "test/unit/validation-paths.test.ts"
         },
         {
-          "hash": "6d6bda01a7820e0417e89abb62f8b1d3766c97aead7ee10f8c5f9304fc385fee",
+          "hash": "c7c211be8477717e234eb0af7d17fd4be2f08e9be0d744f07910177e98e53749",
           "importsFiles": [
             "src/validation/url.ts"
           ],
-          "path": "test/unit/validation-url.test.ts"
+          "path": "test/unit/validation-url.test.ts",
+          "testFramework": "mocha"
         },
         {
-          "hash": "0b47c0e255df51cd8ac4d61ae3eb540079c70183db1fde5b6085e00c58354856",
+          "hash": "be00dbcffa75ea157c9671e675cd18db195a6ce189a6779a5b2c2a3397ee6062",
           "importsFiles": [
             "src/validation/video.ts"
           ],
           "path": "test/unit/validation-video.test.ts"
         },
         {
-          "hash": "4dbed747fc0ed0134e5b07f110721196b6be809b621264294cad34d522a425a8",
+          "hash": "14c45da65f9d329b5ad1da07453b01f68e078638eeb995a7598902b38a7c75a5",
           "importsFiles": [
             "src/engines/workflowInjection.ts",
             "src/types/index.ts"
@@ -1558,47 +2088,146 @@
       "name": "test",
       "origin": "authored",
       "role": "test",
+      "testRunners": [
+        "mocha"
+      ],
       "testedBy": 0,
+      "unresolvedNamed": [
+        {
+          "path": "test/helpers.ts",
+          "specifier": null,
+          "why": "dynamic"
+        }
+      ],
       "unresolvedSites": 1
     }
   ],
   "doors": [
     {
-      "checksCount": 5,
+      "checksCount": 3,
       "commands": [
         {
+          "dir": "",
           "job": "quality-gates",
-          "step": "Atlas check",
-          "text": "npx --yes @dogfood-lab/atlas@1.17.0 check"
+          "programs": [
+            "npx"
+          ],
+          "step": "Atlas check"
         },
         {
+          "dir": "",
           "job": "quality-gates",
-          "step": "Install dependencies",
-          "text": "npm ci --audit=false"
+          "programs": [
+            "npm"
+          ],
+          "step": "Install dependencies"
         },
         {
+          "dir": "",
           "job": "quality-gates",
-          "step": "Lint",
-          "text": "npm run lint"
+          "programs": [
+            "npm"
+          ],
+          "step": "Lint"
         },
         {
+          "dir": "",
           "job": "quality-gates",
-          "step": "Run tests",
-          "text": "npm test"
+          "programs": [
+            "npm"
+          ],
+          "step": "Run tests"
         },
         {
+          "dir": "",
           "job": "quality-gates",
-          "step": "Compile (production)",
-          "text": "npm run compile"
+          "programs": [
+            "npm"
+          ],
+          "step": "Compile (production)"
         },
         {
+          "dir": "",
           "job": "dep-audit",
-          "step": "Audit production dependencies (fail on HIGH+)",
-          "text": "npm audit --omit=dev --audit-level=high"
+          "programs": [
+            "npm"
+          ],
+          "step": "Audit production dependencies (fail on HIGH+)"
         }
       ],
       "elsewhere": [],
       "file": ".github/workflows/ci.yml",
+      "jobs": [
+        {
+          "basis": "declared",
+          "name": "quality-gates",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "22",
+                  "range": ">=22.0.0 <23.0.0-0"
+                }
+              ],
+              "step": "Set up Node for the Atlas check",
+              "uses": "actions/setup-node",
+              "version": "22"
+            },
+            {
+              "ranges": [
+                {
+                  "from": "20",
+                  "range": ">=20.0.0 <21.0.0-0"
+                }
+              ],
+              "step": "Setup Node.js",
+              "uses": "actions/setup-node",
+              "version": "20"
+            }
+          ]
+        },
+        {
+          "basis": "declared",
+          "name": "dep-audit",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "20",
+                  "range": ">=20.0.0 <21.0.0-0"
+                }
+              ],
+              "step": "1",
+              "uses": "actions/setup-node",
+              "version": "20"
+            }
+          ]
+        }
+      ],
       "landings": [],
       "mentions": [
         {
@@ -1623,7 +2252,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 4
+          "files": 6
         },
         {
           "boundary": "src",
@@ -1662,28 +2291,38 @@
           "via": "eslint eslint.config.mjs"
         },
         {
+          "built": true,
           "directory": true,
           "job": "quality-gates",
           "matched": true,
           "path": "src/",
-          "runKind": "checks",
+          "runKind": "executes",
           "via": "eslint eslint.config.mjs"
         },
         {
+          "built": true,
           "directory": true,
           "job": "quality-gates",
           "matched": true,
           "path": "test/",
-          "runKind": "checks",
+          "runKind": "executes",
           "via": "tsc tsconfig.test.json"
         },
         {
           "job": "quality-gates",
           "path": "test/register-vscode-stub.js",
           "runKind": "executes"
+        },
+        {
+          "directory": true,
+          "job": "quality-gates",
+          "matched": true,
+          "path": "test/unit/",
+          "runKind": "executes",
+          "via": "eslint eslint.config.mjs"
         }
       ],
-      "runsCount": 6,
+      "runsCount": 7,
       "secrets": [],
       "sends": {
         "deploysPages": false,
@@ -1696,6 +2335,17 @@
         "releases": false
       },
       "stages": [],
+      "tests": [
+        {
+          "files": 24,
+          "job": "quality-gates",
+          "runner": "mocha",
+          "step": "Run tests",
+          "through": [
+            "npm test"
+          ]
+        }
+      ],
       "triggers": [
         {
           "branches": [
@@ -1749,18 +2399,74 @@
       "checksCount": 0,
       "commands": [
         {
+          "dir": "site",
           "job": "build",
-          "step": "Install site dependencies",
-          "text": "npm ci"
+          "programs": [
+            "npm"
+          ],
+          "step": "Install site dependencies"
         },
         {
+          "dir": "site",
           "job": "build",
-          "step": "Build site",
-          "text": "npm run build"
+          "programs": [
+            "npm"
+          ],
+          "step": "Build site"
         }
       ],
       "elsewhere": [],
       "file": ".github/workflows/pages.yml",
+      "jobs": [
+        {
+          "basis": "declared",
+          "name": "build",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "22",
+                  "range": ">=22.0.0 <23.0.0-0"
+                }
+              ],
+              "step": "1",
+              "uses": "actions/setup-node",
+              "version": "22"
+            }
+          ]
+        },
+        {
+          "basis": "declared",
+          "environment": {
+            "name": "github-pages"
+          },
+          "name": "deploy",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ]
+        }
+      ],
       "landings": [],
       "mentions": [],
       "name": "Deploy site to GitHub Pages",
@@ -1774,7 +2480,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 3
+          "files": 5
         }
       ],
       "readers": [],
@@ -1832,67 +2538,108 @@
       "usesWorkflowToken": false
     },
     {
-      "checksCount": 5,
+      "checksCount": 3,
       "commands": [
         {
+          "dir": "",
           "job": "build",
-          "step": "Install dependencies",
-          "text": "npm ci"
+          "programs": [
+            "npm"
+          ],
+          "step": "Install dependencies"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Lint",
-          "text": "npm run lint"
+          "programs": [
+            "npm"
+          ],
+          "step": "Lint"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Run tests",
-          "text": "npm test"
+          "programs": [
+            "npm"
+          ],
+          "step": "Run tests"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Compile (production)",
-          "text": "npm run compile"
+          "programs": [
+            "npm"
+          ],
+          "step": "Compile (production)"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Verify tag matches package.json version",
-          "text": "TAG_VERSION=\"${GITHUB_REF#refs/tags/v}\"\nPKG_VERSION=\"$(node -p \"require('./package.json').version\")\"\nif [ \"$TAG_VERSION\" != \"$PKG_VERSION\" ]; then\n  echo \"::error::Tag version (v${TAG_VERSION}) does not match package.json version (${PKG_VERSION})\"\n  exit 1\nfi\necho \"✓ Tag v${TAG_VERSION} matches package.json ${PKG_VERSION}\"\n"
+          "programs": [
+            "echo",
+            "node"
+          ],
+          "step": "Verify tag matches package.json version"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Verify CHANGELOG has entry for this version",
-          "text": "PKG_VERSION=\"$(node -p \"require('./package.json').version\")\"\nif ! grep -q \"## \\[${PKG_VERSION}\\]\" CHANGELOG.md; then\n  echo \"::error::CHANGELOG.md has no entry for version ${PKG_VERSION}\"\n  exit 1\nfi\necho \"✓ CHANGELOG.md has entry for [${PKG_VERSION}]\"\n"
+          "programs": [
+            "echo",
+            "grep",
+            "node"
+          ],
+          "step": "Verify CHANGELOG has entry for this version"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Package VSIX",
-          "text": "npx vsce package"
+          "programs": [
+            "npx"
+          ],
+          "step": "Package VSIX"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Get version",
-          "text": "echo \"version=$(node -p \"require('./package.json').version\")\" >> $GITHUB_OUTPUT"
+          "programs": [
+            "echo",
+            "node"
+          ],
+          "step": "Get version"
         },
         {
+          "dir": "",
           "job": "build",
-          "step": "Generate SHA256",
-          "text": "sha256sum codecomfy-vscode-${{ steps.version.outputs.version }}.vsix > SHA256SUMS.txt\n"
+          "programs": [
+            "sha256sum"
+          ],
+          "step": "Generate SHA256"
         },
         {
+          "dir": "",
           "job": "publish_marketplace",
-          "step": "Install dependencies",
-          "text": "npm ci"
+          "programs": [
+            "npm"
+          ],
+          "step": "Install dependencies"
         },
         {
+          "dir": "",
           "job": "publish_marketplace",
-          "step": "Package VSIX",
-          "text": "npx vsce package"
+          "programs": [
+            "npx"
+          ],
+          "step": "Package VSIX"
         },
         {
+          "dir": "",
           "job": "publish_marketplace",
-          "step": "Publish to VS Code Marketplace",
-          "text": "set -e\necho \"VSCE_PAT length: ${#VSCE_PAT}\"\nnpx --yes vsce verify-pat mcp-tool-shop -p \"$VSCE_PAT\"\nnpx --yes vsce publish -p \"$VSCE_PAT\" || {\n  echo \"\"\n  echo \"Marketplace publish failed (likely 401).\"\n  echo \"If verify-pat passes but publish fails, this is often due to Azure DevOps PAT org-scope quirks.\"\n  echo \"Local workaround: npx vsce publish\"\n  exit 1\n}\n"
+          "programs": [
+            "echo",
+            "npx"
+          ],
+          "step": "Publish to VS Code Marketplace"
         }
       ],
       "elsewhere": [],
@@ -1904,6 +2651,8 @@
           ],
           "pushes": false,
           "sends": [
+            "assets:file:SHA256SUMS.txt",
+            "assets:files",
             "releases"
           ],
           "stages": [],
@@ -1924,6 +2673,66 @@
           "when": {
             "event": "workflow_dispatch"
           }
+        }
+      ],
+      "jobs": [
+        {
+          "basis": "declared",
+          "name": "build",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "20",
+                  "range": ">=20.0.0 <21.0.0-0"
+                }
+              ],
+              "step": "Setup Node.js",
+              "uses": "actions/setup-node",
+              "version": "20"
+            }
+          ]
+        },
+        {
+          "basis": "declared",
+          "name": "publish_marketplace",
+          "runsOn": [
+            {
+              "labels": [
+                "ubuntu-latest"
+              ],
+              "platform": {
+                "cpu": "x64",
+                "libc": "glibc",
+                "os": "linux"
+              }
+            }
+          ],
+          "setup": [
+            {
+              "ranges": [
+                {
+                  "from": "20",
+                  "range": ">=20.0.0 <21.0.0-0"
+                }
+              ],
+              "step": "Setup Node.js",
+              "uses": "actions/setup-node",
+              "version": "20"
+            }
+          ]
         }
       ],
       "landings": [],
@@ -1960,7 +2769,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 4
+          "files": 6
         },
         {
           "boundary": "src",
@@ -1999,28 +2808,38 @@
           "via": "eslint eslint.config.mjs"
         },
         {
+          "built": true,
           "directory": true,
           "job": "build",
           "matched": true,
           "path": "src/",
-          "runKind": "checks",
+          "runKind": "executes",
           "via": "eslint eslint.config.mjs"
         },
         {
+          "built": true,
           "directory": true,
           "job": "build",
           "matched": true,
           "path": "test/",
-          "runKind": "checks",
+          "runKind": "executes",
           "via": "tsc tsconfig.test.json"
         },
         {
           "job": "build",
           "path": "test/register-vscode-stub.js",
           "runKind": "executes"
+        },
+        {
+          "directory": true,
+          "job": "build",
+          "matched": true,
+          "path": "test/unit/",
+          "runKind": "executes",
+          "via": "eslint eslint.config.mjs"
         }
       ],
-      "runsCount": 6,
+      "runsCount": 7,
       "secrets": [
         "GITHUB_TOKEN",
         "VSCE_PAT"
@@ -2036,6 +2855,17 @@
         "releases": false
       },
       "stages": [],
+      "tests": [
+        {
+          "files": 24,
+          "job": "build",
+          "runner": "mocha",
+          "step": "Run tests",
+          "through": [
+            "npm test"
+          ]
+        }
+      ],
       "triggers": [
         {
           "event": "push",
@@ -2110,15 +2940,17 @@
       "to": "src"
     }
   ],
+  "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571",
+    "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507",
     "tracked": 113
   },
   "landings": [
     {
       "readers": [
         {
-          "by": ".github/workflows/publish.yml"
+          "by": ".github/workflows/publish.yml",
+          "confidence": "config"
         }
       ],
       "target": "CHANGELOG.md",
@@ -2127,7 +2959,8 @@
     {
       "readers": [
         {
-          "by": ".github/workflows/publish.yml"
+          "by": ".github/workflows/publish.yml",
+          "confidence": "config"
         }
       ],
       "target": "package.json",
@@ -2159,34 +2992,53 @@
       "readers": [
         {
           "by": "scripts/sync-kb.mjs",
-          "call": "literal",
+          "call": "existsSync",
           "confidence": "ast"
-        }
-      ],
-      "target": "src/kb",
-      "writers": []
-    },
-    {
-      "readers": [
+        },
         {
           "by": "scripts/sync-kb.mjs",
-          "call": "literal",
+          "call": "readFileSync",
+          "confidence": "ast"
+        },
+        {
+          "by": "src/profiles/registry.ts",
+          "call": "import",
           "confidence": "ast"
         }
       ],
       "target": "src/kb/nodes.json",
-      "writers": []
+      "writers": [
+        {
+          "by": "scripts/sync-kb.mjs",
+          "confidence": "ast"
+        }
+      ]
     },
     {
       "readers": [
         {
           "by": "scripts/sync-kb.mjs",
-          "call": "literal",
+          "call": "existsSync",
+          "confidence": "ast"
+        },
+        {
+          "by": "scripts/sync-kb.mjs",
+          "call": "readFileSync",
+          "confidence": "ast"
+        },
+        {
+          "by": "src/profiles/registry.ts",
+          "call": "import",
           "confidence": "ast"
         }
       ],
       "target": "src/kb/presets.json",
-      "writers": []
+      "writers": [
+        {
+          "by": "scripts/sync-kb.mjs",
+          "confidence": "ast"
+        }
+      ]
     },
     {
       "readers": [
@@ -2202,10 +3054,12 @@
     {
       "readers": [
         {
-          "by": ".github/workflows/ci.yml"
+          "by": ".github/workflows/ci.yml",
+          "confidence": "config"
         },
         {
-          "by": ".github/workflows/publish.yml"
+          "by": ".github/workflows/publish.yml",
+          "confidence": "config"
         }
       ],
       "target": "tsconfig.test.json",
