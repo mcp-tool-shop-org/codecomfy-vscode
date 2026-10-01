@@ -1,25 +1,19 @@
 # codecomfy-vscode: how it works
 
-Mapped at 2026-09-30 from commit 93df7e1 by Atlas 1.24.0.
+Mapped at 2026-10-01 from commit cf6d5a3 by Atlas 1.24.0.
 
 ## What this is
 
 9 parts, mostly TypeScript (50 files), JavaScript (5), CSS (2) and Astro (1). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. It deploys a site to GitHub Pages. People install the codecomfy-vscode extension.
 
-## What changed since 2026-09-24 (e196fbe)
+## What changed since 2026-09-30 (93df7e1)
 
-- CI now also runs test/unit/.
-- Build and Release now also runs test/unit/.
-- src/kb/nodes.json is now written by scripts/sync-kb.mjs.
-- src/kb/presets.json is now written by scripts/sync-kb.mjs.
-- src/kb/nodes.json is now also read by src/profiles/registry.ts.
-- And 1 more new writer or reader of a place.
-- src was authored and is now mixed.
-- 109 files changed content, across 9 parts.
+- CI's pull request trigger no longer names `.github/workflows/**`, `atlas/**`, `eslint.config.mjs`, `package-lock.json`, `package.json`, `site/astro.config.mjs`, `site/package-lock.json`, `site/package.json`, `src/**`, `test/**` and `tsconfig*.json`.
+- 2 files changed content, across 2 parts.
 
 ## What comes in
 
-1. **CI.** On a pull request to main touching 11 paths; on a push to main touching 11 paths; or by hand. Runs test/register-vscode-stub.js and test/unit/; builds src/ and test/; checks eslint.config.mjs, scripts/ and site/.
+1. **CI.** On a pull request to main; on a push to main touching 11 paths; or by hand. Runs test/register-vscode-stub.js and test/unit/; builds src/ and test/; checks eslint.config.mjs, scripts/ and site/.
 2. **Build and Release.** When a tag matching `v*` is pushed; or by hand. Runs test/register-vscode-stub.js and test/unit/; builds src/ and test/; checks eslint.config.mjs, scripts/ and site/.
 3. **Deploy site to GitHub Pages.** On a push to main touching 2 paths; or by hand. Runs site/astro.config.mjs and site/src/.
 4. **codecomfy-vscode** (the extension people install from the VS Code Marketplace). Loads src/extension.ts.
@@ -56,9 +50,9 @@ CI writes nothing this map can see.
 - **src/engines/comfyServerEngine.ts** and **src/types/index.ts** changed together in 5 of 8 commits, inside the src part.
 - **src/extension.ts** and **src/types/index.ts** changed together in 4 of 7 commits, inside the src part.
 
-Confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions.
+Confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
-Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits.
+Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do.
 
 ## What no test touches
 
@@ -93,6 +87,6 @@ Read those in order to follow one pull request end to end.
 - 2 writes and 6 reads use paths built at run time and are not named here.
 - 16 writes and 39 reads go to a path their caller passes, not to this repository.
 - 4 commands are built at run time and not followed.
-- Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions.
+- Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
 Regenerate with `npx --yes @dogfood-lab/atlas map`.

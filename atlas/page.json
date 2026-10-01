@@ -76,73 +76,28 @@
   "changes": {
     "fileCounts": {
       "added": 0,
-      "changed": 109,
+      "changed": 2,
       "moved": 0,
-      "parts": 9,
+      "parts": 2,
       "removed": 0
     },
     "items": [
       {
         "kind": "door",
-        "sentence": "CI now also runs test/unit/.",
+        "sentence": "CI's pull request trigger no longer names `.github/workflows/**`, `atlas/**`, `eslint.config.mjs`, `package-lock.json`, `package.json`, `site/astro.config.mjs`, `site/package-lock.json`, `site/package.json`, `src/**`, `test/**` and `tsconfig*.json`.",
         "subjects": [
-          ".github/workflows/ci.yml",
-          "test/unit/"
-        ]
-      },
-      {
-        "kind": "door",
-        "sentence": "Build and Release now also runs test/unit/.",
-        "subjects": [
-          ".github/workflows/publish.yml",
-          "test/unit/"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "src/kb/nodes.json is now written by scripts/sync-kb.mjs.",
-        "subjects": [
-          "src/kb/nodes.json",
-          "scripts/sync-kb.mjs"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "src/kb/presets.json is now written by scripts/sync-kb.mjs.",
-        "subjects": [
-          "src/kb/presets.json",
-          "scripts/sync-kb.mjs"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "src/kb/nodes.json is now also read by src/profiles/registry.ts.",
-        "subjects": [
-          "src/kb/nodes.json",
-          "src/profiles/registry.ts"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "And 1 more new writer or reader of a place.",
-        "subjects": []
-      },
-      {
-        "kind": "origin",
-        "sentence": "src was authored and is now mixed.",
-        "subjects": [
-          "src"
+          ".github/workflows/ci.yml"
         ]
       },
       {
         "kind": "counts",
-        "sentence": "109 files changed content, across 9 parts.",
+        "sentence": "2 files changed content, across 2 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "e196fbe4488b606c3ec0aa30d9cad995315fe571",
-      "generatedAt": "2026-09-24T09:03:59.912Z"
+      "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507",
+      "generatedAt": "2026-09-30T20:09:04.350Z"
     },
     "unchanged": false
   },
@@ -194,11 +149,11 @@
     }
   ],
   "changesTogetherNote": [
-    "Confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions.",
-    "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
+    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
+    "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507",
+  "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998",
   "defaultBranch": "main",
   "derived": "9 parts, mostly TypeScript (50 files), JavaScript (5), CSS (2) and Astro (1). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. It deploys a site to GitHub Pages. People install the codecomfy-vscode extension.",
   "doors": [
@@ -255,7 +210,7 @@
       "sends": [],
       "stages": [],
       "triggers": [
-        "on a pull request to main touching 11 paths",
+        "on a pull request to main",
         "on a push to main touching 11 paths",
         "or by hand"
       ]
@@ -405,13 +360,13 @@
       ]
     }
   ],
-  "generatedAt": "2026-09-30T20:09:04.350Z",
+  "generatedAt": "2026-10-01T02:14:48.722Z",
   "limits": [
     "1 import could not be resolved: `test/helpers.ts` imports a path built at run time.",
     "2 writes and 6 reads use paths built at run time and are not named here.",
     "16 writes and 39 reads go to a path their caller passes, not to this repository.",
     "4 commands are built at run time and not followed.",
-    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
+    "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {
