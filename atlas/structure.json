@@ -9,7 +9,7 @@
       "externals": 0,
       "files": [
         {
-          "hash": "a7ab4c073faf719495f8d1483eaf3804ca02a900df4ab1fd44e91a06b07dc328",
+          "hash": "4156680d73ccd3e6934d2003233f245dfb9195953299437c731183429ebe5e97",
           "path": ".github/workflows/ci.yml"
         },
         {
@@ -196,7 +196,7 @@
           "path": "eslint.config.mjs"
         },
         {
-          "hash": "b8b3e32d064e948c7eadf84b73724ca6ee2e8c4278bad8dbb7e858d223ad25ca",
+          "hash": "9dc2e133c732a9f826a54b43375c1ae9aa823739ea13fc974745c279bba542ab",
           "path": "package-lock.json"
         },
         {
@@ -2351,20 +2351,7 @@
           "branches": [
             "main"
           ],
-          "event": "pull_request",
-          "paths": [
-            ".github/workflows/**",
-            "atlas/**",
-            "eslint.config.mjs",
-            "package-lock.json",
-            "package.json",
-            "site/astro.config.mjs",
-            "site/package-lock.json",
-            "site/package.json",
-            "src/**",
-            "test/**",
-            "tsconfig*.json"
-          ]
+          "event": "pull_request"
         },
         {
           "branches": [
@@ -2942,7 +2929,7 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507",
+    "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998",
     "tracked": 113
   },
   "landings": [

@@ -15,20 +15,12 @@ on:
       - 'site/package.json'
       - 'site/package-lock.json'
       - 'site/astro.config.mjs'
+  # No paths filter on pull requests, deliberately: this workflow emits the
+  # required status check, and a PR that matched no path (a docs-only change)
+  # would never report it and could never merge. Pushes to main stay
+  # paths-gated.
   pull_request:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'test/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig*.json'
-      - 'eslint.config.mjs'
-      - '.github/workflows/**'
-      - 'atlas/**'
-      - 'site/package.json'
-      - 'site/package-lock.json'
-      - 'site/astro.config.mjs'
   workflow_dispatch:
 
 concurrency:
