@@ -76,84 +76,30 @@
   "changes": {
     "fileCounts": {
       "added": 0,
-      "changed": 2,
+      "changed": 3,
       "moved": 0,
       "parts": 2,
       "removed": 0
     },
     "items": [
       {
-        "kind": "door",
-        "sentence": "CI's pull request trigger no longer names `.github/workflows/**`, `atlas/**`, `eslint.config.mjs`, `package-lock.json`, `package.json`, `site/astro.config.mjs`, `site/package-lock.json`, `site/package.json`, `src/**`, `test/**` and `tsconfig*.json`.",
-        "subjects": [
-          ".github/workflows/ci.yml"
-        ]
-      },
-      {
         "kind": "counts",
-        "sentence": "2 files changed content, across 2 parts.",
+        "sentence": "Nothing structural changed since 2026-10-01; 3 files changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "93df7e1bb9d6c2cf9580b625ecd8454f19be8507",
-      "generatedAt": "2026-09-30T20:09:04.350Z"
+      "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998",
+      "generatedAt": "2026-10-01T02:14:48.722Z"
     },
-    "unchanged": false
+    "unchanged": true
   },
-  "changesTogether": [
-    {
-      "a": "src/engines/comfyServerEngine.ts",
-      "b": "src/extension.ts",
-      "either": 8,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 6
-    },
-    {
-      "a": "src/engines/comfyServerEngine.ts",
-      "b": "src/types/index.ts",
-      "either": 8,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 5
-    },
-    {
-      "a": "src/extension.ts",
-      "b": "src/types/index.ts",
-      "either": 7,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 4
-    }
-  ],
+  "changesTogether": [],
   "changesTogetherNote": [
-    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
-    "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
+    "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998",
+  "commit": "5c0bd68f5edd0c2b824efedf19b90a961f8c750e",
   "defaultBranch": "main",
   "derived": "9 parts, mostly TypeScript (50 files), JavaScript (5), CSS (2) and Astro (1). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. It deploys a site to GitHub Pages. People install the codecomfy-vscode extension.",
   "doors": [
@@ -360,13 +306,13 @@
       ]
     }
   ],
-  "generatedAt": "2026-10-01T02:14:48.722Z",
+  "generatedAt": "2026-10-15T03:11:18.368Z",
   "limits": [
     "1 import could not be resolved: `test/helpers.ts` imports a path built at run time.",
     "2 writes and 6 reads use paths built at run time and are not named here.",
     "16 writes and 39 reads go to a path their caller passes, not to this repository.",
     "4 commands are built at run time and not followed.",
-    "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
+    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {

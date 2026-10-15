@@ -184,7 +184,7 @@
           "path": "SCORECARD.md"
         },
         {
-          "hash": "760566fec4adfbd649be67b5491059b09ed11a0d9e98cc8b21daabbf87fef567",
+          "hash": "1e8f20be7b5a19eb8959ce6488906e8d0c755c35ab7ce1aa08f27ce3fea4a044",
           "path": "SECURITY.md"
         },
         {
@@ -196,7 +196,7 @@
           "path": "eslint.config.mjs"
         },
         {
-          "hash": "9dc2e133c732a9f826a54b43375c1ae9aa823739ea13fc974745c279bba542ab",
+          "hash": "09654d212cb62cbc9a70425d268054c11edf0afb05d22321c8b06b0c49c32bb4",
           "path": "package-lock.json"
         },
         {
@@ -298,7 +298,7 @@
           "path": "site/astro.config.mjs"
         },
         {
-          "hash": "af5d4f54dca60686724d306eb58759fb25b6f5ba4d66559ab84a968112a184e5",
+          "hash": "0607a19c4f60b635244a906c7ad2424359b50e20c4a83bc140f202abce4a941e",
           "path": "site/package-lock.json"
         },
         {
@@ -2929,7 +2929,7 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998",
+    "commit": "5c0bd68f5edd0c2b824efedf19b90a961f8c750e",
     "tracked": 113
   },
   "landings": [

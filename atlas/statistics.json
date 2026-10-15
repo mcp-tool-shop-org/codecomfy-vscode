@@ -65,7 +65,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "root",
-      "qualifyingSourceCommits": 1,
+      "qualifyingSourceCommits": 0,
       "rebaseline": null
     },
     {
@@ -126,12 +126,12 @@
           "test"
         ]
       },
-      "cohesion": 1,
+      "cohesion": null,
       "cohesionDropped": false,
       "confidence": "low",
       "highWater": null,
       "name": "src",
-      "qualifyingSourceCommits": 8,
+      "qualifyingSourceCommits": 4,
       "rebaseline": null
     },
     {
@@ -147,7 +147,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "test",
-      "qualifyingSourceCommits": 8,
+      "qualifyingSourceCommits": 4,
       "rebaseline": null
     }
   ],
@@ -155,94 +155,109 @@
     "definition": "commits is how many commits in the window touch the file, including merges and commits dropped from coupling. lines is added plus deleted in those commits.",
     "files": [
       {
-        "commits": 8,
-        "lines": 58,
+        "commits": 10,
+        "lines": 148,
         "path": ".github/workflows/ci.yml"
       },
       {
-        "commits": 1,
-        "lines": 8,
+        "commits": 2,
+        "lines": 58,
         "path": ".github/workflows/pages.yml"
       },
       {
-        "commits": 2,
-        "lines": 10,
+        "commits": 3,
+        "lines": 130,
         "path": ".github/workflows/publish.yml"
       },
       {
         "commits": 4,
-        "lines": 4,
+        "lines": 10,
         "path": ".gitignore"
       },
       {
-        "commits": 7,
-        "lines": 10,
+        "commits": 6,
+        "lines": 31,
         "path": ".vscodeignore"
       },
       {
-        "commits": 10,
-        "lines": 691,
+        "commits": 8,
+        "lines": 827,
         "path": "CHANGELOG.md"
       },
       {
         "commits": 4,
-        "lines": 167,
+        "lines": 157,
         "path": "CLAUDE.md"
       },
       {
-        "commits": 1,
-        "lines": 5,
+        "commits": 2,
+        "lines": 113,
         "path": "CONTRIBUTING.md"
       },
       {
-        "commits": 6,
-        "lines": 424,
+        "commits": 1,
+        "lines": 21,
+        "path": "LICENSE"
+      },
+      {
+        "commits": 4,
+        "lines": 601,
         "path": "README.es.md"
       },
       {
-        "commits": 6,
-        "lines": 266,
+        "commits": 4,
+        "lines": 446,
         "path": "README.fr.md"
       },
       {
-        "commits": 6,
-        "lines": 435,
+        "commits": 4,
+        "lines": 608,
         "path": "README.hi.md"
       },
       {
-        "commits": 6,
-        "lines": 263,
+        "commits": 4,
+        "lines": 440,
         "path": "README.it.md"
       },
       {
-        "commits": 6,
-        "lines": 401,
+        "commits": 4,
+        "lines": 574,
         "path": "README.ja.md"
       },
       {
-        "commits": 14,
-        "lines": 226,
+        "commits": 11,
+        "lines": 407,
         "path": "README.md"
       },
       {
-        "commits": 6,
-        "lines": 255,
+        "commits": 4,
+        "lines": 434,
         "path": "README.pt-BR.md"
       },
       {
-        "commits": 6,
-        "lines": 277,
+        "commits": 4,
+        "lines": 454,
         "path": "README.zh.md"
       },
       {
         "commits": 1,
-        "lines": 44,
+        "lines": 37,
+        "path": "SCORECARD.md"
+      },
+      {
+        "commits": 2,
+        "lines": 83,
         "path": "SECURITY.md"
       },
       {
         "commits": 1,
-        "lines": 49,
+        "lines": 93,
         "path": "SHIP_GATE.md"
+      },
+      {
+        "commits": 1,
+        "lines": 26,
+        "path": "assets/SCREENSHOTS.md"
       },
       {
         "commits": 1,
@@ -251,8 +266,28 @@
       },
       {
         "commits": 1,
+        "lines": 44,
+        "path": "assets/icon.svg"
+      },
+      {
+        "commits": 1,
         "lines": 0,
         "path": "assets/logo.png"
+      },
+      {
+        "commits": 1,
+        "lines": 9,
+        "path": "assets/screenshot-command-palette.svg"
+      },
+      {
+        "commits": 1,
+        "lines": 8,
+        "path": "assets/screenshot-output.svg"
+      },
+      {
+        "commits": 1,
+        "lines": 6,
+        "path": "assets/screenshot-statusbar.svg"
       },
       {
         "commits": 1,
@@ -260,8 +295,8 @@
         "path": "assets/screenshot-treeview.png"
       },
       {
-        "commits": 4,
-        "lines": 284,
+        "commits": 6,
+        "lines": 328,
         "path": "atlas/README.md"
       },
       {
@@ -270,18 +305,18 @@
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 4,
-        "lines": 1062,
+        "commits": 6,
+        "lines": 1204,
         "path": "atlas/page.json"
       },
       {
-        "commits": 4,
-        "lines": 1920,
+        "commits": 6,
+        "lines": 1996,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 4,
-        "lines": 6884,
+        "commits": 6,
+        "lines": 6926,
         "path": "atlas/structure.json"
       },
       {
@@ -291,22 +326,27 @@
       },
       {
         "commits": 1,
+        "lines": 21,
+        "path": "docs/index.md"
+      },
+      {
+        "commits": 1,
         "lines": 77,
         "path": "docs/integration-testing.md"
       },
       {
         "commits": 1,
-        "lines": 2,
+        "lines": 39,
         "path": "eslint.config.mjs"
       },
       {
-        "commits": 6,
-        "lines": 324,
+        "commits": 5,
+        "lines": 6134,
         "path": "package-lock.json"
       },
       {
-        "commits": 12,
-        "lines": 165,
+        "commits": 10,
+        "lines": 265,
         "path": "package.json"
       },
       {
@@ -320,18 +360,18 @@
         "path": "scripts/sync-kb.mjs"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 29,
         "path": "site/astro.config.mjs"
       },
       {
-        "commits": 1,
-        "lines": 6051,
+        "commits": 4,
+        "lines": 13602,
         "path": "site/package-lock.json"
       },
       {
-        "commits": 1,
-        "lines": 6,
+        "commits": 2,
+        "lines": 24,
         "path": "site/package.json"
       },
       {
@@ -340,13 +380,28 @@
         "path": "site/src/assets/screenshot-treeview.png"
       },
       {
+        "commits": 1,
+        "lines": 7,
+        "path": "site/src/content.config.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 143,
+        "path": "site/src/content/docs/handbook/beginners.md"
+      },
+      {
         "commits": 3,
-        "lines": 36,
+        "lines": 158,
         "path": "site/src/content/docs/handbook/configuration.md"
       },
       {
         "commits": 1,
-        "lines": 47,
+        "lines": 102,
+        "path": "site/src/content/docs/handbook/getting-started.md"
+      },
+      {
+        "commits": 2,
+        "lines": 74,
         "path": "site/src/content/docs/handbook/index.md"
       },
       {
@@ -360,8 +415,8 @@
         "path": "site/src/content/docs/handbook/profiles.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 129,
         "path": "site/src/content/docs/handbook/reference.md"
       },
       {
@@ -370,18 +425,43 @@
         "path": "site/src/content/docs/handbook/run-history.md"
       },
       {
-        "commits": 2,
-        "lines": 4,
+        "commits": 3,
+        "lines": 138,
         "path": "site/src/content/docs/handbook/usage.md"
       },
       {
-        "commits": 3,
-        "lines": 49,
+        "commits": 1,
+        "lines": 33,
+        "path": "site/src/pages/index.astro"
+      },
+      {
+        "commits": 4,
+        "lines": 102,
         "path": "site/src/site-config.ts"
       },
       {
         "commits": 1,
-        "lines": 8,
+        "lines": 3,
+        "path": "site/src/styles/global.css"
+      },
+      {
+        "commits": 1,
+        "lines": 5,
+        "path": "site/src/styles/starlight-custom.css"
+      },
+      {
+        "commits": 1,
+        "lines": 11,
+        "path": "site/tailwind.config.js"
+      },
+      {
+        "commits": 1,
+        "lines": 5,
+        "path": "site/tsconfig.json"
+      },
+      {
+        "commits": 1,
+        "lines": 68,
         "path": "src/config.ts"
       },
       {
@@ -390,18 +470,18 @@
         "path": "src/engines/comfyEvents.ts"
       },
       {
-        "commits": 11,
-        "lines": 2730,
+        "commits": 8,
+        "lines": 3133,
         "path": "src/engines/comfyServerEngine.ts"
       },
       {
-        "commits": 4,
-        "lines": 294,
+        "commits": 3,
+        "lines": 492,
         "path": "src/engines/comfyValidation.ts"
       },
       {
         "commits": 1,
-        "lines": 119,
+        "lines": 400,
         "path": "src/engines/ffmpeg.ts"
       },
       {
@@ -420,8 +500,8 @@
         "path": "src/engines/workflowInjection.ts"
       },
       {
-        "commits": 8,
-        "lines": 1179,
+        "commits": 6,
+        "lines": 1599,
         "path": "src/extension.ts"
       },
       {
@@ -435,13 +515,28 @@
         "path": "src/kb/presets.json"
       },
       {
-        "commits": 2,
-        "lines": 276,
+        "commits": 1,
+        "lines": 96,
+        "path": "src/logging/logger.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 94,
+        "path": "src/polling/backoff.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 76,
+        "path": "src/presets/hq-image.json"
+      },
+      {
+        "commits": 3,
+        "lines": 357,
         "path": "src/presets/hq-video.json"
       },
       {
         "commits": 2,
-        "lines": 96,
+        "lines": 167,
         "path": "src/presets/registry.ts"
       },
       {
@@ -456,12 +551,12 @@
       },
       {
         "commits": 1,
-        "lines": 124,
+        "lines": 332,
         "path": "src/pruning/pruner.ts"
       },
       {
         "commits": 6,
-        "lines": 296,
+        "lines": 684,
         "path": "src/router/jobRouter.ts"
       },
       {
@@ -471,8 +566,28 @@
       },
       {
         "commits": 8,
-        "lines": 226,
+        "lines": 404,
         "path": "src/types/index.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 103,
+        "path": "src/validation/inputs.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 126,
+        "path": "src/validation/paths.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 60,
+        "path": "src/validation/url.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 88,
+        "path": "src/validation/video.ts"
       },
       {
         "commits": 1,
@@ -485,18 +600,23 @@
         "path": "test/fixtures/comfy/hq-image/index.json"
       },
       {
-        "commits": 3,
+        "commits": 2,
         "lines": 577,
         "path": "test/helpers.ts"
       },
       {
         "commits": 1,
-        "lines": 350,
+        "lines": 21,
+        "path": "test/register-vscode-stub.js"
+      },
+      {
+        "commits": 2,
+        "lines": 427,
         "path": "test/stubs/vscode.ts"
       },
       {
         "commits": 1,
-        "lines": 56,
+        "lines": 196,
         "path": "test/unit/backoff.test.ts"
       },
       {
@@ -505,18 +625,23 @@
         "path": "test/unit/comfy-events.test.ts"
       },
       {
-        "commits": 4,
-        "lines": 1073,
+        "commits": 1,
+        "lines": 1348,
         "path": "test/unit/comfy-server-engine.test.ts"
       },
       {
         "commits": 1,
-        "lines": 58,
+        "lines": 248,
+        "path": "test/unit/comfy-validation.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 136,
         "path": "test/unit/config.test.ts"
       },
       {
         "commits": 1,
-        "lines": 13,
+        "lines": 85,
         "path": "test/unit/error-categorization.test.ts"
       },
       {
@@ -526,7 +651,7 @@
       },
       {
         "commits": 1,
-        "lines": 645,
+        "lines": 716,
         "path": "test/unit/ffmpeg-utils.test.ts"
       },
       {
@@ -535,9 +660,14 @@
         "path": "test/unit/helpers.test.ts"
       },
       {
-        "commits": 5,
-        "lines": 506,
+        "commits": 4,
+        "lines": 662,
         "path": "test/unit/job-router.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 104,
+        "path": "test/unit/logger.test.ts"
       },
       {
         "commits": 1,
@@ -546,7 +676,7 @@
       },
       {
         "commits": 2,
-        "lines": 168,
+        "lines": 349,
         "path": "test/unit/presets-registry.test.ts"
       },
       {
@@ -555,8 +685,8 @@
         "path": "test/unit/profiles.test.ts"
       },
       {
-        "commits": 2,
-        "lines": 135,
+        "commits": 1,
+        "lines": 341,
         "path": "test/unit/pruner.test.ts"
       },
       {
@@ -566,249 +696,71 @@
       },
       {
         "commits": 1,
+        "lines": 16,
+        "path": "test/unit/smoke.test.ts"
+      },
+      {
+        "commits": 1,
         "lines": 286,
         "path": "test/unit/tree.test.ts"
       },
       {
         "commits": 1,
-        "lines": 5,
+        "lines": 187,
         "path": "test/unit/types.test.ts"
       },
       {
         "commits": 1,
-        "lines": 31,
+        "lines": 169,
+        "path": "test/unit/validation-inputs.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 241,
         "path": "test/unit/validation-paths.test.ts"
       },
       {
         "commits": 1,
-        "lines": 87,
+        "lines": 168,
         "path": "test/unit/validation-url.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 158,
+        "path": "test/unit/validation-video.test.ts"
       },
       {
         "commits": 2,
         "lines": 718,
         "path": "test/unit/workflow-injection.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 19,
+        "path": "tsconfig.json"
+      },
+      {
+        "commits": 1,
+        "lines": 22,
+        "path": "tsconfig.test.json"
       }
     ]
   },
   "confidence": {
     "level": "low",
-    "reason": "fewer than 25 source files reach 10 revisions in the window"
+    "reason": "fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions"
   },
-  "generatedAt": "2026-10-01T02:14:48.722Z",
+  "generatedAt": "2026-10-15T03:11:18.368Z",
   "generatedFrom": {
-    "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998"
+    "commit": "5c0bd68f5edd0c2b824efedf19b90a961f8c750e"
   },
   "pairs": [
     {
-      "a": "CHANGELOG.md",
+      "a": "README.md",
       "b": "package.json",
-      "either": 10,
-      "shared": 6,
-      "strength": 0.6
-    },
-    {
-      "a": "CHANGELOG.md",
-      "b": "src/engines/comfyServerEngine.ts",
-      "either": 10,
-      "shared": 5,
-      "strength": 0.5
-    },
-    {
-      "a": "CHANGELOG.md",
-      "b": "src/types/index.ts",
-      "either": 8,
-      "shared": 4,
-      "strength": 0.5
-    },
-    {
-      "a": "README.es.md",
-      "b": "README.fr.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.es.md",
-      "b": "README.hi.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.es.md",
-      "b": "README.it.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.es.md",
-      "b": "README.ja.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.es.md",
-      "b": "README.pt-BR.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.es.md",
-      "b": "README.zh.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.fr.md",
-      "b": "README.hi.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.fr.md",
-      "b": "README.it.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.fr.md",
-      "b": "README.ja.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.fr.md",
-      "b": "README.pt-BR.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.fr.md",
-      "b": "README.zh.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.hi.md",
-      "b": "README.it.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.hi.md",
-      "b": "README.ja.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.hi.md",
-      "b": "README.pt-BR.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.hi.md",
-      "b": "README.zh.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.it.md",
-      "b": "README.ja.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.it.md",
-      "b": "README.pt-BR.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.it.md",
-      "b": "README.zh.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.ja.md",
-      "b": "README.pt-BR.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.ja.md",
-      "b": "README.zh.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "README.pt-BR.md",
-      "b": "README.zh.md",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "package.json",
-      "b": "src/engines/comfyServerEngine.ts",
-      "either": 11,
-      "shared": 6,
-      "strength": 0.545455
-    },
-    {
-      "a": "package.json",
-      "b": "src/extension.ts",
-      "either": 10,
-      "shared": 5,
-      "strength": 0.5
-    },
-    {
-      "a": "package.json",
-      "b": "src/types/index.ts",
-      "either": 9,
-      "shared": 5,
-      "strength": 0.555556
-    },
-    {
-      "a": "src/engines/comfyServerEngine.ts",
-      "b": "src/extension.ts",
-      "either": 8,
-      "shared": 6,
-      "strength": 0.75
-    },
-    {
-      "a": "src/engines/comfyServerEngine.ts",
-      "b": "src/types/index.ts",
       "either": 8,
       "shared": 5,
       "strength": 0.625
-    },
-    {
-      "a": "src/extension.ts",
-      "b": "src/types/index.ts",
-      "either": 7,
-      "shared": 4,
-      "strength": 0.571429
     }
   ],
   "parameters": {
@@ -820,17 +772,17 @@
     "fallenShared": 3,
     "floor": "fallen",
     "floorHeld": false,
-    "floorTrigger": "revision-depth",
-    "headDate": "2026-09-30T14:27:19-07:00",
+    "floorTrigger": "both",
+    "headDate": "2026-10-14T23:11:15-04:00",
     "inScopeFiles": 118,
     "pinnedStart": null,
     "priorFloor": "fallen",
-    "qualifyingCommits": 31,
+    "qualifyingCommits": 22,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-04-03T21:27:19.000Z",
+    "since": "2026-04-18T03:11:15.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",
