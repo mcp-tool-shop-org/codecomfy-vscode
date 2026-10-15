@@ -49,7 +49,7 @@ CodeComfy talks to a ComfyUI server over HTTP. The user picks that server. This 
 A compromised ComfyUI server — or a malicious HTTP proxy sitting between the extension and a legitimate ComfyUI — can return arbitrary bytes in the history JSON response. The filename fields are the sensitive ones: CodeComfy downloads each filename from `/view` and writes it into the workspace run folder. A crafted response could include:
 
 - Path-traversal patterns: `../../etc/passwd`, `..\\..\\Windows\\System32\\drivers\\etc\\hosts`
-- Absolute paths: `/etc/shadow`, `C:\\Users\\victim\\.ssh\\id_rsa`
+- Absolute paths: `/etc/shadow`, `C:\\Users\\<user>\\.ssh\\id_rsa`
 - Null bytes: `evil\0.png` (to truncate C-string-based downstream handlers)
 - Non-leaf paths with separators: `subdir/evil.png`
 - Platform-quirky names that round-trip differently through `path.basename()`
