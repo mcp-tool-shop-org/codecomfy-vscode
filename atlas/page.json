@@ -76,30 +76,77 @@
   "changes": {
     "fileCounts": {
       "added": 0,
-      "changed": 3,
+      "changed": 1,
       "moved": 0,
-      "parts": 2,
+      "parts": 1,
       "removed": 0
     },
     "items": [
       {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-10-01; 3 files changed content.",
+        "sentence": "Nothing structural changed since 2026-10-15; 1 file changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "cf6d5a33533a3ec4ebf7f1f621fe64766f035998",
-      "generatedAt": "2026-10-01T02:14:48.722Z"
+      "commit": "5c0bd68f5edd0c2b824efedf19b90a961f8c750e",
+      "generatedAt": "2026-10-15T03:11:18.368Z"
     },
     "unchanged": true
   },
-  "changesTogether": [],
+  "changesTogether": [
+    {
+      "a": "src/engines/comfyServerEngine.ts",
+      "b": "src/extension.ts",
+      "either": 8,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 6
+    },
+    {
+      "a": "src/engines/comfyServerEngine.ts",
+      "b": "src/types/index.ts",
+      "either": 8,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 5
+    },
+    {
+      "a": "src/extension.ts",
+      "b": "src/types/index.ts",
+      "either": 7,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 4
+    }
+  ],
   "changesTogetherNote": [
-    "Window: 180 days; a pair counts from 3 shared commits, since the window holds fewer than 30 qualifying commits."
+    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
+    "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "5c0bd68f5edd0c2b824efedf19b90a961f8c750e",
+  "commit": "ae5d8dcfdd273a28d85302f5703d9640a57811e5",
   "defaultBranch": "main",
   "derived": "9 parts, mostly TypeScript (50 files), JavaScript (5), CSS (2) and Astro (1). Work enters through 4 doors; CI and Build and Release each reach 5 parts, and CI is followed because a pull request goes through it. It publishes to the VS Code Marketplace. It deploys a site to GitHub Pages. People install the codecomfy-vscode extension.",
   "doors": [
@@ -291,7 +338,7 @@
       "to": "src"
     }
   ],
-  "engine": "1.24.0",
+  "engine": "1.26.0",
   "generated": [
     {
       "place": "src/kb/nodes.json",
@@ -306,13 +353,13 @@
       ]
     }
   ],
-  "generatedAt": "2026-10-15T03:11:18.368Z",
+  "generatedAt": "2026-11-11T22:12:56.998Z",
   "limits": [
     "1 import could not be resolved: `test/helpers.ts` imports a path built at run time.",
     "2 writes and 6 reads use paths built at run time and are not named here.",
     "16 writes and 39 reads go to a path their caller passes, not to this repository.",
     "4 commands are built at run time and not followed.",
-    "Statistics confidence is low: fewer than 30 qualifying commits in the window, and fewer than 25 source files reach 10 revisions."
+    "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/ci.yml",
   "partLabels": {
@@ -330,12 +377,20 @@
   "readers": [],
   "repo": "mcp-tool-shop-org/codecomfy-vscode",
   "sequences": [],
+  "startBeside": [
+    {
+      "files": [
+        "src/logging/logger.ts"
+      ],
+      "from": "src/extension.ts"
+    }
+  ],
   "startDoor": ".github/workflows/ci.yml",
   "startHere": [
     ".github/workflows/ci.yml",
     "src/extension.ts",
-    "src/logging/logger.ts",
-    "src/presets/registry.ts"
+    "src/presets/registry.ts",
+    "src/types/index.ts"
   ],
   "summary": null,
   "summaryFrom": null,
@@ -344,6 +399,7 @@
     "scripts": 0,
     "src": 22
   },
+  "testedCodeParts": 2,
   "unnamedWrites": 2,
   "unread": [],
   "unreadFiles": 0,
